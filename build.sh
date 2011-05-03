@@ -164,12 +164,18 @@ extend() { # Rebuild and install rTorrent with patches applied
     #echo "fix_ncurses_5.8.patch"
     #patch -uNp1 -i "${srcdir}/fix_ncurses_5.8.patch"
 
+    bold "pyroscope.patch"
+    patch -uNp1 -i "$SRC_DIR/patches/pyroscope.patch"
+    for i in "$SRC_DIR"/patches/*.cc; do
+        ln -nfs $i src
+    done
+    
     sed -i 's/rTorrent \" VERSION/rTorrent-eX " VERSION/' src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    
+
     # Build it
-    ( cd rtorrent-$RT_VERSION && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
+    ( cd rtorrent-$RT_VERSION && ./autogen.sh && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && make && make prefix=$INST_DIR install )
     symlink_binary -extended
 }

@@ -1,0 +1,24 @@
+--- rtorrent-0.8.6/src/Makefile.am	2011-05-02 23:58:08.000000000 +0200
++++ rtorrent-0.8.6/src/Makefile.am	2011-05-02 23:58:31.000000000 +0200
+@@ -17,6 +17,7 @@
+ 	utils/libsub_utils.a
+ 
+ rtorrent_SOURCES = \
++	command_pyroscope.cc \
+ 	command_download.cc \
+ 	command_dynamic.cc \
+ 	command_events.cc \
+--- rtorrent-0.8.6/src/command_helpers.cc	2009-11-12 09:03:48.000000000 +0100
++++ rtorrent-0.8.6/src/command_helpers.cc,pyro	2011-05-03 00:27:13.000000000 +0200
+@@ -75,9 +75,11 @@
+ void initialize_command_tracker();
+ void initialize_command_scheduler();
+ void initialize_command_ui();
++void initialize_command_pyroscope();
+ 
+ void
+ initialize_commands() {
++  initialize_command_pyroscope();
+   initialize_command_object();
+   initialize_command_dynamic();
+   initialize_command_events();
