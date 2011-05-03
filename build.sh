@@ -124,6 +124,7 @@ symlink_binary() {
 #
 prep() { # Create directories
     mkdir -p $INST_DIR/{bin,include,lib,man,share}
+    mkdir -p tarballs
 }
 
 download() { # Download & unpack sources
@@ -131,8 +132,8 @@ download() { # Download & unpack sources
         svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
     for url in $TARBALLS; do
         url_base=${url##*/}
-        test -f ${url_base} || ( echo "Getting $url_base" && wget -q $url )
-        test -d ${url_base%.tar.gz} || ( echo "Unpacking ${url_base}" && tar xfz ${url_base} )
+        test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget -q $url )
+        test -d ${url_base%.tar.gz} || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
     done
 }
 
@@ -209,6 +210,7 @@ check() { # Print some diagnostic success indicators
 #
 # MAIN
 #
+cd "$SRC_DIR"
 case "$1" in
     all)        download; prep; build; check ;;
     clean)      clean ;;
