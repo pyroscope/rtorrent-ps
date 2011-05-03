@@ -175,7 +175,8 @@ extend() { # Rebuild and install rTorrent with patches applied
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Build it
-    ( cd rtorrent-$RT_VERSION && ./autogen.sh && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
+    ( cd rtorrent-$RT_VERSION && ./autogen.sh && \
+        ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && make && make prefix=$INST_DIR install )
     symlink_binary -extended
 }
