@@ -144,7 +144,7 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
     if (element == "download_list") {
         displayType = ui::DownloadList::DISPLAY_DOWNLOAD_LIST;
     } else {
-        throw torrent::input_error(std::string("Unknown element ") + element);
+        throw torrent::input_error(std::string("Unknown display ") + element);
     }
     ui::ElementBase* display = control->ui()->download_list()->display(displayType);
     if (!display)
