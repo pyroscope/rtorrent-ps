@@ -41,18 +41,18 @@
 /*  @DOC
     compare=order,command1=[,...]
     
-        Compares two items like less= or greater=, but allows to compare
+        Compares two items like `less=` or `greater=`, but allows to compare
         by several different sort criteria, and ascending or descending
         order per given field. The first parameter is a string of order
         indicators, either `aA+` for ascending or `dD-` for descending. 
         The default, i.e. when there's more fields than indicators, is
         ascending. Field types other than value or string are treated
         as equal (or in other words, they're ignored).
-        
+
         If all fields are equal, then items are ordered in a random, but
         stable fashion.
 
-        Config example::
+        Configuration example:
             # VIEW: Show active and incomplete torrents (in view #9) and update every 20 seconds
             #       Items are grouped into complete, incomplete, and queued, in that order.
             #       Within each group, they're sorted by upload and then download speed.
@@ -116,10 +116,14 @@ static std::map<char, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_
 /*  @DOC
     ui.bind_key=display,key,"command1=[,...]"
 
-    Binds the given key on a specified display to execute the commands when pressed.
-    
-    "display" must be one of "download_list", ...
-    "key" can be either a single character for normal keys, or ^ plus a character for control keys.
+        Binds the given key on a specified display to execute the commands when pressed.
+        
+        "display" must be one of "download_list", ...
+        "key" can be either a single character for normal keys, or ^ plus a character for control keys.
+        
+        Configuration example:
+            # VIEW: Bind view #7 to the "rtcontrol" result
+            schedule = bind_7,1,0,"ui.bind_key=download_list,7,ui.current_view.set=rtcontrol"
 */
 torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
     const torrent::Object::list_type& args = rawArgs.as_list();
@@ -146,7 +150,10 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
     } else {
         throw torrent::input_error(std::string("Unknown display ") + element);
     }
-    ui::ElementBase* display = control->ui()->download_list()->display(displayType);
+    ui::DownloadList* dl_list = control->ui()->download_list();
+    if (!dl_list)
+        throw torrent::input_error("No download list.");
+    ui::ElementBase* display = dl_list->display(displayType);
     if (!display)
         throw torrent::input_error("Display not found.");
 
