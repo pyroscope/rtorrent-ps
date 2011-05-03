@@ -22,3 +22,13 @@
    initialize_command_object();
    initialize_command_dynamic();
    initialize_command_events();
+--- rtorrent-0.8.6/src/ui/download_list.h	2011-05-03 04:05:34.000000000 +0200
++++ rtorrent-0.8.6/src/ui/download_list.h,pyro	2011-05-03 04:11:23.000000000 +0200
+@@ -99,6 +99,7 @@
+   void                disable();
+ 
+   void                activate_display(Display d);
++  ElementBase*        display(Display d) { return d < DISPLAY_MAX_SIZE ? m_uiArray[d] : 0; }
+ 
+   core::View*         current_view();
+   void                set_current_view(const std::string& name);
