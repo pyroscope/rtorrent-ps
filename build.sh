@@ -3,7 +3,7 @@
 # Build rTorrent including patches
 #
 export LT_VERSION=0.12.6; export RT_VERSION=0.8.6
-#export LT_VERSION=0.12.7; export RT_VERSION=0.8.7
+export LT_VERSION=0.12.7; export RT_VERSION=0.8.7
 export CARES_VERSION=1.7.3
 export CURL_VERSION=7.21.1
 export XMLRPC_REV=2122
@@ -155,7 +155,10 @@ extend() { # Rebuild and install rTorrent with patches applied
     # Based on https://aur.archlinux.org/packages/rtorrent-extended/
     
     # Unpack original source
-    tar xfz rtorrent-$RT_VERSION.tar.gz
+    tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
+
+    # Version guards
+    [[ RT_VERSION == 0.8.6 ]] || _interface=0 && bold "Interface patches disabled"
 
     # Patch it
     pushd rtorrent-$RT_VERSION
@@ -176,9 +179,13 @@ extend() { # Rebuild and install rTorrent with patches applied
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Build it
-    ( cd rtorrent-$RT_VERSION && ./autogen.sh && \
+    ( cd rtorrent-$RT_VERSION && rm -f ltmain.sh scripts/{libtool,lt*}.m4 && \
+        libtoolize --automake --force --copy && aclocal && autoconf && automake && ./autogen.sh && \
         ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
-        make clean && make && make prefix=$INST_DIR install )
+        make clean && \
+        make && \
+        make prefix=$INST_DIR install \
+    )
     symlink_binary -extended
 }
 
@@ -201,7 +208,7 @@ check() { # Print some diagnostic success indicators
     done
     echo
     echo -n "Check that static linking worked: "
-    libs=$(ldd ~/bin/rtorrent | egrep "lib(cares|curl|xmlrpc|torrent)")
+    libs=$(ldd ~/bin/rtorrent-$RT_VERSION | egrep "lib(cares|curl|xmlrpc|torrent)")
     test -n $(echo "$libs" | grep -v "$INST_DIR") && echo OK || echo FAIL
     echo "$libs" | sed -e "s:$HOME:~:g"
 }

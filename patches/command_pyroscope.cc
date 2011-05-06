@@ -29,8 +29,8 @@
 #include "ui/download_list.h"
 #include "ui/element_base.h"
 #include "ui/element_download_list.h"
-#include "rpc/command_slot.h"
-#include "rpc/command_variable.h"
+//#include "rpc/command_slot.h"
+//#include "rpc/command_variable.h"
 #include "rpc/parse.h"
 
 #include "globals.h"
@@ -59,8 +59,12 @@
             view_sort_current = active,"compare=----,d.is_open=,d.get_complete=,d.get_up_rate=,d.get_down_rate="
             schedule = filter_active,12,20,"view_filter = active,\"or={d.get_up_rate=,d.get_down_rate=,not=$d.get_complete=}\" ;view_sort=active"
 */
+#if defined(CMD2_ANY)
+torrent::Object apply_compare(rpc::target_type target, const torrent::Object::list_type& args) {
+#else
 torrent::Object apply_compare(rpc::target_type target, const torrent::Object& rawArgs) {
     const torrent::Object::list_type& args = rawArgs.as_list();
+#endif
 
     if (!rpc::is_target_pair(target))
         throw torrent::input_error("Can only compare a target pair.");
@@ -125,7 +129,11 @@ static std::map<char, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_
             # VIEW: Bind view #7 to the "rtcontrol" result
             schedule = bind_7,1,0,"ui.bind_key=download_list,7,ui.current_view.set=rtcontrol"
 */
+#if defined(CMD2_ANY)
+torrent::Object apply_ui_bind_key(rpc::target_type target, const torrent::Object& rawArgs) {
+#else
 torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
+#endif
     const torrent::Object::list_type& args = rawArgs.as_list();
 
     if (args.size() != 3)
@@ -172,7 +180,12 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
 
 
 void initialize_command_pyroscope() {
+#if defined(CMD2_ANY)
+    CMD2_ANY_LIST("compare", &apply_compare);
+    CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
+#else
     ADD_ANY_LIST("compare", rak::ptr_fn(&apply_compare));
     ADD_COMMAND_LIST("ui.bind_key", rak::ptr_fn(&apply_ui_bind_key));
+#endif
 }
 
