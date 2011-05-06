@@ -2,8 +2,8 @@
 #
 # Build rTorrent including patches
 #
-export LT_VERSION=0.12.6
-export RT_VERSION=0.8.6
+export LT_VERSION=0.12.6; export RT_VERSION=0.8.6
+#export LT_VERSION=0.12.7; export RT_VERSION=0.8.7
 export CARES_VERSION=1.7.3
 export CURL_VERSION=7.21.1
 export XMLRPC_REV=2122
@@ -115,7 +115,7 @@ symlink_binary() {
 
     mkdir -p ~/bin
     ln -nfs "$binary$flavour" ~/bin/rtorrent-$RT_VERSION
-    ln -nfs rtorrent-$RT_VERSION ~/bin/rtorrent
+    test -e ~/bin/rtorrent || ln -s rtorrent-$RT_VERSION ~/bin/rtorrent
 }
 
 
@@ -212,10 +212,10 @@ check() { # Print some diagnostic success indicators
 #
 cd "$SRC_DIR"
 case "$1" in
-    all)        download; prep; build; check ;;
+    all)        prep; download; build; check ;;
     clean)      clean ;;
     clean_all)  clean_all ;; 
-    download)   download ;;
+    download)   prep; download ;;
     build)      prep; build; check ;;
     extend)     extend; check ;;
     check)      check ;;
