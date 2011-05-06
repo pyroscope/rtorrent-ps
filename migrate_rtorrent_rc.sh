@@ -66,14 +66,14 @@ sed -i $rc_file \
     -e 's%^port_range\([ =]\)%network.port_range\1%' \
     -e 's%^proxy_address\([ =]\)%network.proxy_address\1%' \
     -e 's%^scgi_dont_route\([ =]\)%network.scgi.dont_route\1%' \
-    -e 's%^session\([ =]\)%session.path\1%' \
-    -e 's%^system\.file_allocate.set\([ =]\)%system.file.allocate\1%' \
-    -e 's%^system\.method\.set\([ =]\)%method\1%' \
-    -e 's%^tracker_numwant\([ =]\)%trackers.numwant\1%' \
-    -e 's%^use_udp_trackers\([ =]\)%trackers.use_udp\1%' \
+    -e 's%^session\([ =]\)%session.path.set\1%' \
+    -e 's%^system\.file_allocate.set\([ =]\)%system.file.allocate.set\1%' \
+    -e 's%^system\.method\.set\([ =]\)%method.set\1%' \
+    -e 's%^tracker_numwant\([ =]\)%trackers.numwant.set\1%' \
+    -e 's%^use_udp_trackers\([ =]\)%trackers.use_udp.set\1%' \
     -e 's%^view_set\([ =]\)%view\1%' \
-    -e 's%^xmlrpc_dialect\([ =]\)%network.xmlrpc.dialect\1%' \
-    -e 's%^xmlrpc_size_limit\([ =]\)%network.xmlrpc.size_limit\1%' \
+    -e 's%^xmlrpc_dialect\([ =]\)%network.xmlrpc.dialect.set\1%' \
+    -e 's%^xmlrpc_size_limit\([ =]\)%network.xmlrpc.size_limit.set\1%' \
     -e 's%^system.method.has_key\([ =]\)%method.has_key\1%' \
     -e 's%^system.method.set_key\([ =]\)%method.set_key\1%' \
     -e 's%^system.method.list_keys\([ =]\)%method.list_keys\1%' \
@@ -395,8 +395,8 @@ sed -i $rc_file \
 
 diff -U1 $rc_file,0.8.6 $rc_file || :
 
-echo
 echo "WARNINGS:"
 echo "  event.download.inserted_new is now also called at startup, you have:"
 grep "event.download.inserted_new" $rc_file | sed -e "s/^/    /"
+
 
