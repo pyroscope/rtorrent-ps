@@ -166,12 +166,22 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
         throw torrent::input_error("Display not found.");
 
     // Bind the key to the given commands
+    bool new_binding = display->bindings().find(key) == display->bindings().end();
     bound_commands[displayType][key] = commands; // keep hold of the string, so the c_str() below remains valid
     switch (displayType) {
         case ui::DownloadList::DISPLAY_DOWNLOAD_LIST:
             display->bindings()[key] = sigc::bind(sigc::mem_fun(
                 *(ui::ElementDownloadList*)display, &ui::ElementDownloadList::receive_command), bound_commands[displayType][key].c_str());
             break;
+        default:
+            return torrent::Object();
+    }
+    
+    if (!new_binding) {
+        std::string msg = "Replaced key binding";
+        msg += " for " + keydef + " in " + element + " with " + commands.substr(0, 30);
+        if (commands.size() > 30) msg += "...";
+        control->core()->push_log(msg.c_str());
     }
 
     return torrent::Object();
