@@ -25,13 +25,13 @@ sed -i $rc_file \
     -e 's%^throttle_ip\([ =]\)%throttle.ip\1%' \
     -e 's%^throttle_up\([ =]\)%throttle.up\1%' \
     -e 's%^upload_rate\([ =]\)%throttle.global_up.max_rate.set_kb\1%' \
-    -e 's%^view_add\([ =]\)%view.add\1%' \
-    -e 's%^view_filter_on\([ =]\)%view.filter_on\1%' \
-    -e 's%^view_filter\([ =]\)%view.filter\1%' \
-    -e 's%^view_list\([ =]\)%view.list\1%' \
-    -e 's%^view_sort_current\([ =]\)%view.sort_current\1%' \
-    -e 's%^view_sort_new\([ =]\)%view.sort_new\1%' \
-    -e 's%^view_sort\([ =]\)%view.sort\1%' \
+    -e 's%view_add\([ =]\)%view.add\1%' \
+    -e 's%view_filter_on\([ =]\)%view.filter_on\1%' \
+    -e 's%view_filter\([ =]\)%view.filter\1%' \
+    -e 's%view_list\([ =]\)%view.list\1%' \
+    -e 's%view_sort_current\([ =]\)%view.sort_current\1%' \
+    -e 's%view_sort_new\([ =]\)%view.sort_new\1%' \
+    -e 's%view_sort\([ =]\)%view.sort\1%' \
     -r
 
 # Setters
