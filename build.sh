@@ -173,7 +173,12 @@ extend() { # Rebuild and install rTorrent with patches applied
     for i in "$SRC_DIR"/patches/*.cc; do
         ln -nfs $i src
     done
-    
+
+    # http://libtorrent.rakshasa.no/ticket/2411
+    # svn diff -r1184:1186 svn://rakshasa.no/libtorrent/trunk/  >patches/fix_2411_threading.patch
+    # svn diff -r1187:1188 svn://rakshasa.no/libtorrent/trunk/ >>patches/fix_2411_threading.patch
+    [[ RT_VERSION != 0.8.7 ]] || patch -uNp1 -i "$SRC_DIR/patches/fix_2411_threading.patch"
+
     sed -i 's/rTorrent \" VERSION/rTorrent-eX " VERSION/' src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
