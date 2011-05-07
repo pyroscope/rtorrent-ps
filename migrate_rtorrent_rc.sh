@@ -395,8 +395,3 @@ sed -i $rc_file \
 
 diff -U1 $rc_file,0.8.6 $rc_file || :
 
-echo "WARNINGS:"
-echo "  event.download.inserted_new is now also called at startup, you have:"
-grep "event.download.inserted_new" $rc_file | sed -e "s/^/    /"
-
-
