@@ -33,11 +33,12 @@ class Parser(ParserBase):
 
         self.addRule("Comment","^ *#.*$")
 
-        #self.addRulePair("String", r"(?<!\\)\"", r"(?<!\\)\"")
-        self.addRule("Char", r'\\?[$(){}"]')
-        self.addRule("Number", r"[0-9]+[kKmMgG")
-        self.addRule("ID", "[a-z_][0-9a-z_.]*")
-        self.addRule("SPChar", r'[,=\\]')
+        path_chars = r"[-~a-zA-Z0-9_./]+"
+        self.addRule("String", '/'.join([path_chars]*2)) # a file system path
+        self.addRule("Char", r'[$]')
+        self.addRule("Number", r"[0-9]+[kKmMgG]?")
+        self.addRule("ID", "[a-z_][0-9a-z_.]*=?")
+        self.addRule("SPChar", r'(?:\\?[(){}"\\]|[,=\\])')
 
         self.addConstant([
             "event.download.closed",
@@ -60,6 +61,11 @@ class Parser(ParserBase):
         ])
 
         reserved = [
+            "d.save_session",
+            "max_open_sockets",
+            "max_open_files",
+            "umask",
+
             "system.listMethods",
             "system.methodExist",
             "system.methodHelp",
