@@ -41,6 +41,10 @@ class Parser(ParserBase):
         self.addRule("SPChar", r'(?:\\?[(){}"\\]|[,=\\])')
 
         self.addConstant([
+            "argument.0",
+            "argument.1",
+            "argument.2",
+            "argument.3",
             "event.download.closed",
             "event.download.erased",
             "event.download.finished",
@@ -65,6 +69,27 @@ class Parser(ParserBase):
             "max_open_sockets",
             "max_open_files",
             "umask",
+
+            "system.get_cwd",
+            "system.set_cwd",
+            "system.set_umask",
+            "set_max_open_sockets",
+            "set_key_layout",
+            "on_close",
+            "on_erase",
+            "on_finished",
+            "on_hash_queued",
+            "on_hash_removed",
+            "on_insert",
+            "on_open",
+            "on_start",
+            "on_stop",
+            "get_safe_free_diskspace",
+            "get_key_layout",
+            "enable_trackers",
+            "d.set_peer_exchange",
+            "d.add_peer",
+            "call_download",
 
             "system.listMethods",
             "system.methodExist",
