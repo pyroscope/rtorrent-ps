@@ -1,4 +1,8 @@
 #! /bin/bash
+#
+# This script migrates a .rtorrent.rc file from the old (0.8.6) to the new (0.8.7) syntax.
+# Call it with the path of the configuration file, a backup will be made automatically.
+#
 test -n "$1" || { echo "Usage: $0 «rcfile»" ; exit 1; }
 
 set -e
