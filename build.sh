@@ -4,6 +4,7 @@
 #
 export LT_VERSION=0.12.6; export RT_VERSION=0.8.6
 export LT_VERSION=0.12.7; export RT_VERSION=0.8.7
+export LT_VERSION=0.12.8; export RT_VERSION=0.8.8
 export CARES_VERSION=1.7.3
 export CURL_VERSION=7.21.1
 export XMLRPC_REV=2122
@@ -184,7 +185,7 @@ extend() { # Rebuild and install rTorrent with patches applied
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Build it
-    ( cd rtorrent-$RT_VERSION && rm -f ltmain.sh scripts/{libtool,lt*}.m4 && \
+    ( set +x ; cd rtorrent-$RT_VERSION && rm -f ltmain.sh scripts/{libtool,lt*}.m4 && \
         libtoolize --automake --force --copy && aclocal && autoconf && automake && ./autogen.sh && \
         ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && \
