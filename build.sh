@@ -2,9 +2,10 @@
 #
 # Build rTorrent including patches
 #
-export LT_VERSION=0.12.6; export RT_VERSION=0.8.6
-export LT_VERSION=0.12.7; export RT_VERSION=0.8.7
-export LT_VERSION=0.12.8; export RT_VERSION=0.8.8
+
+export RT_MINOR=6
+export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
+
 export CARES_VERSION=1.7.3
 export CURL_VERSION=7.21.1
 export XMLRPC_REV=2122
@@ -26,6 +27,12 @@ _keybindings=0
 #
 # HERE BE DRAGONS!
 #
+
+# Keep rTorrent version, once it was built in this directory
+test ! -d rtorrent-0.8.6 || { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
+test ! -d rtorrent-0.8.7 || { export LT_VERSION=0.12.7; export RT_VERSION=0.8.7; }
+test ! -d rtorrent-0.8.8 || { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
+
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
 export CFLAGS="-I $INST_DIR/include"
 export CXXFLAGS="$CFLAGS"
@@ -234,6 +241,8 @@ case "$1" in
     check)      check ;;
     *)
         echo >&2 "Usage: $0 (all | clean | clean_all | download | build | check | extend )"
+        echo >&2 "Build rTorrent $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INST_DIR)"
+        echo >&2 
         grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | tr @ \\t
         exit 1
         ;;
