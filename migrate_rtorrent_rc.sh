@@ -46,7 +46,6 @@ sed -i $rc_file \
     -e 's%^connection_leech\([ =]\)%protocol.connection.leech\1%' \
     -e 's%^connection_seed\([ =]\)%protocol.connection.seed\1%' \
     -e 's%^dht_port\([ =]\)%dht.port\1%' \
-    -e 's%^directory\([ =]\)%directory.default\1%' \
     -e 's%^hash_interval\([ =]\)%system.hash.interval\1%' \
     -e 's%^hash_max_tries\([ =]\)%system.hash.max_tries\1%' \
     -e 's%^hash_read_ahead\([ =]\)%system.hash.read_ahead\1%' \
@@ -71,7 +70,6 @@ sed -i $rc_file \
     -e 's%^port_range\([ =]\)%network.port_range\1%' \
     -e 's%^proxy_address\([ =]\)%network.proxy_address\1%' \
     -e 's%^scgi_dont_route\([ =]\)%network.scgi.dont_route\1%' \
-    -e 's%^session\([ =]\)%session.path.set\1%' \
     -e 's%^system\.file_allocate.set\([ =]\)%system.file.allocate.set\1%' \
     -e 's%^system\.method\.set\([ =]\)%method.set\1%' \
     -e 's%^tracker_numwant\([ =]\)%trackers.numwant.set\1%' \
@@ -90,6 +88,8 @@ sed -i $rc_file \
 
 # Setters that need ".set"
 sed -i $rc_file \
+    -e 's%^directory\([ =]\)%directory.default.set\1%' \
+    -e 's%^session\([ =]\)%session.path.set\1%' \
     -e 's%^dht\([ =]\)%dht.mode.set\1%' \
     -e 's%^encryption\([ =]\)%protocol.encryption.set\1%' \
     -r
