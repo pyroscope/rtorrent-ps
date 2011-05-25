@@ -13,7 +13,8 @@ test -e $rc_file,0.8.6 || cp $rc_file $rc_file,0.8.6
 #    -e 's%^ratio.min\([ =]\)%group2.seeding.ratio.min\1%' \
 #    -e 's%^ratio.upload\([ =]\)%group2.seeding.ratio.upload\1%' \
 
-# Always start fresh
+# Always start fresh, but make a backup copy in case someone made manual changes after the initial migration
+cp $rc_file $rc_file-$(date +'%Y-%m-%d-%H-%M-%S')
 cp $rc_file,0.8.6 $rc_file
 
 # Generic
