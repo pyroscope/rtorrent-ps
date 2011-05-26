@@ -16,8 +16,8 @@ _ipv6=0
 _ip_filter=0
 _friend=0
 _bad_peer_handling=0
-# 1 = canvas color patch / 2 = karabja mod patch
-_interface=2
+# 1 = canvas color patch / 2 = karabja mod patch / 3 = PyroScope UI
+_interface=3
 _show_idle_times=0
 _trackerinfo=1
 # 1 = tjwoosta vi keybindings / 2 = akston vi keybindings
@@ -178,9 +178,14 @@ extend() { # Rebuild and install rTorrent with patches applied
 
     bold "pyroscope.patch"
     patch -uNp1 -i "$SRC_DIR/patches/pyroscope.patch"
-    for i in "$SRC_DIR"/patches/*.cc; do
+    for i in "$SRC_DIR"/patches/*.{cc,h}; do
         ln -nfs $i src
     done
+
+    if [[ "${_interface}" = "3" ]]; then
+        bold "ui_pyroscope.patch"
+        patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
+    fi
 
     # http://libtorrent.rakshasa.no/ticket/2411
     # svn diff -r1184:1186 svn://rakshasa.no/libtorrent/trunk/  >patches/fix_2411_threading.patch

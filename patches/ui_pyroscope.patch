@@ -1,0 +1,16 @@
+--- orig/src/Makefile.am	2009-11-14 08:34:04.000000000 +0100
++++ rtorrent-0.8.6/src/Makefile.am	2011-05-27 00:38:37.000000000 +0200
+@@ -37,2 +38,3 @@
+ 	main.cc \
++	ui_pyroscope.cc \
+ 	option_parser.cc \
+--- orig/src/command_helpers.cc	2009-11-12 09:03:48.000000000 +0100
++++ rtorrent-0.8.6/src/command_helpers.cc	2011-05-27 00:42:07.000000000 +0200
+@@ -77,2 +78,3 @@
+ void initialize_command_ui();
++void initialize_command_ui_pyroscope();
+ 
+@@ -91,2 +94,3 @@
+   initialize_command_scheduler();
++  initialize_command_ui_pyroscope();
+ 
