@@ -99,6 +99,15 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 		}
 	}
 
+	// show "X of Y"
+	if (pos == 1) {
+		int item_idx = view->focus() - view->begin_visible();
+		if (item_idx == view->size())
+			canvas->print(canvas->width() - 16, 0, "[ NONE of %-5d]", view->size());
+		else
+			canvas->print(canvas->width() - 16, 0, "[%5d of %-5d]", item_idx + 1, view->size());
+	}
+
 	// download title color
 	torrent::Download* item = (*range.first)->download();
 	int title_col;
