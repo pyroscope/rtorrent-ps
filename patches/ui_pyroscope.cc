@@ -191,6 +191,11 @@ const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand
 }
 
 
+static int get_colors() {
+	return COLORS;
+}
+
+
 void initialize_command_ui_pyroscope() {
 #if defined(CMD2_ANY)
 #else
@@ -207,5 +212,10 @@ void initialize_command_ui_pyroscope() {
 	NEW_VARIABLE_STRING("ui.color.label", 		"blue");
 	NEW_VARIABLE_STRING("ui.color.info", 		"bold cyan");
 	NEW_VARIABLE_STRING("ui.color.focus", 		"standout");
+
+	ADD_COMMAND_VOID("system.colors.max", rak::ptr_fun(&get_colors));
+	ADD_COMMAND_VOID("system.colors.enabled", rak::ptr_fun(&has_colors));
+	ADD_COMMAND_VOID("system.colors.rgb", rak::ptr_fun(&can_change_color));
 #endif
 }
+
