@@ -141,10 +141,15 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 		if (url.substr(0, 8) == "http://") url = url.substr(8);
 		if (url.find('/') > 0) url = url.substr(0, url.find('/'));
 		if (url.find(':') > 0) url = url.substr(0, url.find(':'));
-		if (url.length() > TRACKER_LABEL_WIDTH) url = url.substr(url.length() - TRACKER_LABEL_WIDTH);
 
-		canvas->print(canvas->width() - url.length() - 2, pos, "{%s}", url.c_str());
-		canvas->set_attr(canvas->width() - url.length() - 1, pos, url.length(), attr_map[ps::COL_INFO], ps::COL_INFO);
+		int len = url.length();
+		if (len > TRACKER_LABEL_WIDTH) {
+			url = "…" + url.substr(len - TRACKER_LABEL_WIDTH);
+			len = TRACKER_LABEL_WIDTH + 1;
+		}
+
+		canvas->print(canvas->width() - len - 2, pos, "{%s}", url.c_str());
+		canvas->set_attr(canvas->width() - len - 1, pos, len, attr_map[ps::COL_INFO], ps::COL_INFO);
 	}
 
 	// message alert
