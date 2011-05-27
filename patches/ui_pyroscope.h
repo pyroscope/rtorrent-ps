@@ -11,6 +11,7 @@ enum ColorKind {
     COL_LEECHING,
     COL_ALARM,
     COL_TITLE,
+    COL_INFO,
     COL_FOCUS,
     COL_MAX
 };

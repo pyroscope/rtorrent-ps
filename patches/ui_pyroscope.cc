@@ -12,12 +12,16 @@
 #include "rpc/command_variable.h"
 #include "core/view.h"
 #include "core/download.h"
+#include "torrent/tracker.h"
+#include "torrent/tracker_list.h"
 #include "torrent/rate.h"
 #include "display/window.h"
 #include "display/canvas.h"
 
 #include "command_helpers.h"
 
+
+#define TRACKER_LABEL_WIDTH 20U
 
 typedef std::pair<core::View::iterator, core::View::iterator> Range;
 
@@ -35,6 +39,7 @@ static const char* color_vars[ps::COL_MAX] = {
 	"ui.color.leeching",
 	"ui.color.alarm",
 	"ui.color.title",
+	"ui.color.info",
 	"ui.color.focus",
 };
 
@@ -91,6 +96,7 @@ void ui_pyroscope_canvas_init() {
 
 void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view, display::Canvas* canvas, int pos, Range& range) {
 	pos -= 3;
+	torrent::Download* item = (*range.first)->download();
 	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
 
 	if (range.first == view->focus()) {
@@ -109,13 +115,37 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	}
 
 	// download title color
-	torrent::Download* item = (*range.first)->download();
 	int title_col;
 	if ((*range.first)->is_done())
 		title_col = item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE;
 	else
 		title_col = item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE;
 	canvas->set_attr(3, pos, -1, attr_map[title_col], title_col);
+
+	// show label for tracker in focus
+	torrent::TrackerList* tl = item->tracker_list();
+	torrent::Tracker* tracker = tl->at(0);
+	for (int trkidx = 0; trkidx < tl->size(); trkidx++) {
+		torrent::Tracker* tracker = tl->at(trkidx);
+	    if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP &&
+	    		tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
+			break;
+	    }
+	}
+	if (!tracker && tl->size()) tracker = tl->at(0);
+	if (tracker && !tracker->url().empty()) {
+		std::string url = tracker->url();
+		int off = 0;
+
+		if (url.substr(0, 7) == "http://") url = url.substr(7);
+		if (url.substr(0, 8) == "http://") url = url.substr(8);
+		if (url.find('/') > 0) url = url.substr(0, url.find('/'));
+		if (url.find(':') > 0) url = url.substr(0, url.find(':'));
+		if (url.length() > TRACKER_LABEL_WIDTH) url = url.substr(url.length() - TRACKER_LABEL_WIDTH);
+
+		canvas->print(canvas->width() - url.length() - 2, pos, "{%s}", url.c_str());
+		canvas->set_attr(canvas->width() - url.length() - 1, pos, url.length(), attr_map[ps::COL_INFO], ps::COL_INFO);
+	}
 
 	// message alert
 	if (!(*range.first)->message().empty()) {
@@ -147,6 +177,7 @@ void initialize_command_ui_pyroscope() {
 	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold cyan");
 	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold yellow on red");
 	NEW_VARIABLE_STRING("ui.color.title", 		"bold");
+	NEW_VARIABLE_STRING("ui.color.info", 		"magenta");
 	NEW_VARIABLE_STRING("ui.color.focus", 		"standout");
 #endif
 }
