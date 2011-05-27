@@ -39,6 +39,7 @@ static const char* color_vars[ps::COL_MAX] = {
 	"ui.color.leeching",
 	"ui.color.alarm",
 	"ui.color.title",
+	"ui.color.label",
 	"ui.color.info",
 	"ui.color.focus",
 };
@@ -109,9 +110,9 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	if (pos == 1) {
 		int item_idx = view->focus() - view->begin_visible();
 		if (item_idx == view->size())
-			canvas->print(canvas->width() - 16, 0, "[ NONE of %-5d]", view->size());
+			canvas->print(canvas->width() - 17, 0, "[ NONE of %-5d]", view->size());
 		else
-			canvas->print(canvas->width() - 16, 0, "[%5d of %-5d]", item_idx + 1, view->size());
+			canvas->print(canvas->width() - 17, 0, "[%5d of %-5d]", item_idx + 1, view->size());
 	}
 
 	// download title color
@@ -120,7 +121,7 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 		title_col = item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE;
 	else
 		title_col = item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE;
-	canvas->set_attr(3, pos, -1, attr_map[title_col], title_col);
+	canvas->set_attr(2, pos, -1, attr_map[title_col] | (range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0), title_col);
 
 	// show label for tracker in focus
 	torrent::TrackerList* tl = item->tracker_list();
@@ -138,7 +139,7 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 		int off = 0;
 
 		if (url.substr(0, 7) == "http://") url = url.substr(7);
-		if (url.substr(0, 8) == "http://") url = url.substr(8);
+		if (url.substr(0, 8) == "https://") url = url.substr(8);
 		if (url.find('/') > 0) url = url.substr(0, url.find('/'));
 		if (url.find(':') > 0) url = url.substr(0, url.find(':'));
 
@@ -148,12 +149,33 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 			len = TRACKER_LABEL_WIDTH + 1;
 		}
 
-		canvas->print(canvas->width() - len - 2, pos, "{%s}", url.c_str());
-		canvas->set_attr(canvas->width() - len - 1, pos, len, attr_map[ps::COL_INFO], ps::COL_INFO);
+		int xpos = canvas->width() - len - 3;
+		canvas->print(xpos, pos, "{%s}", url.c_str());
+		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO], ps::COL_INFO);
+		canvas->set_attr(xpos, pos, 1, attr_map[ps::COL_INFO] ^ A_BOLD, ps::COL_INFO);
+		canvas->set_attr(canvas->width() - 2, pos, 1, attr_map[ps::COL_INFO] ^ A_BOLD, ps::COL_INFO);
 	}
 
+	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
+	//12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- [TI R: ???0,00]
+	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 78, 2, 83, 1, 87, 1, 95, 2};
+	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
+
+	canvas->set_attr(3, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO], ps::COL_INFO);
+	for (int label_idx = 0; label_idx < sizeof(label_pos) / sizeof(int); label_idx += 2) {
+		if (labels[label_idx/2]) canvas->print(label_pos[label_idx], pos+1, labels[label_idx/2]);
+		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL], ps::COL_LABEL);
+	}
+
+	// up / down
+	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING] | (item->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+		item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL);
+	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING] | (item->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+		item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL);
+
 	// message alert
-	if (!(*range.first)->message().empty()) {
+	if (!(*range.first)->message().empty() && (*range.first)->message().find("Tried all trackers") == std::string::npos) {
 		canvas->set_attr(1, pos, 1, attr_map[ps::COL_ALARM], ps::COL_ALARM);
 		canvas->set_attr(1, pos+1, 1, attr_map[ps::COL_ALARM], ps::COL_ALARM);
 		canvas->set_attr(1, pos+2, -1, attr_map[ps::COL_ALARM], ps::COL_ALARM);
@@ -178,11 +200,12 @@ void initialize_command_ui_pyroscope() {
 
 	NEW_VARIABLE_STRING("ui.color.complete", 	"green");
 	NEW_VARIABLE_STRING("ui.color.seeding", 	"bold green");
-	NEW_VARIABLE_STRING("ui.color.incomplete", 	"cyan");
-	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold cyan");
-	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold yellow on red");
+	NEW_VARIABLE_STRING("ui.color.incomplete", 	"magenta");
+	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold magenta");
+	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold white on red");
 	NEW_VARIABLE_STRING("ui.color.title", 		"bold");
-	NEW_VARIABLE_STRING("ui.color.info", 		"magenta");
+	NEW_VARIABLE_STRING("ui.color.label", 		"blue");
+	NEW_VARIABLE_STRING("ui.color.info", 		"bold cyan");
 	NEW_VARIABLE_STRING("ui.color.focus", 		"standout");
 #endif
 }
