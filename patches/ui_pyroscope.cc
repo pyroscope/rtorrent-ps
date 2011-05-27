@@ -162,7 +162,7 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 78, 2, 83, 1, 87, 1, 95, 2};
 	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
 
-	canvas->set_attr(3, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO], ps::COL_INFO);
+	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO], ps::COL_INFO);
 	for (int label_idx = 0; label_idx < sizeof(label_pos) / sizeof(int); label_idx += 2) {
 		if (labels[label_idx/2]) canvas->print(label_pos[label_idx], pos+1, labels[label_idx/2]);
 		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL], ps::COL_LABEL);
