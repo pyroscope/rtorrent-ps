@@ -3,7 +3,8 @@
 #include "config.h"
 #include "globals.h"
 
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
 //#include <rak/functional.h>
 //#include <rak/functional_fun.h>
@@ -46,6 +47,10 @@ static const char* color_vars[ps::COL_MAX] = {
 
 namespace display {
 
+static int get_colors() {
+	return COLORS;
+}
+
 void split(std::vector<std::string>& words, const char* str, char delim = ' ') {
 	do {
 		const char* begin = str;
@@ -55,7 +60,14 @@ void split(std::vector<std::string>& words, const char* str, char delim = ' ') {
 }
 
 
+void ui_pyroscope_canvas_init();
+
 void ui_pyroscope_colormap_init() {
+	if (!get_colors()) {
+		initscr();
+		ui_pyroscope_canvas_init();
+	}
+
 	for (int k = 1; k < ps::COL_MAX; k++) {
 		init_pair(k, -1, -1);
 		std::string col_def = rpc::call_command_string(color_vars[k]);
@@ -66,6 +78,7 @@ void ui_pyroscope_colormap_init() {
 
 		short col[2] = {-1, -1};
 		short col_idx = 0;
+		short bright = 0;
 		unsigned long attr = A_NORMAL;
 		for (int i = 0; i < words.size(); i++) {
 			if (words[i] == "bold") attr |= A_BOLD;
@@ -74,14 +87,23 @@ void ui_pyroscope_colormap_init() {
 			else if (words[i] == "reverse") attr |= A_REVERSE;
 			else if (words[i] == "blink") attr |= A_BLINK;
 			else if (words[i] == "dim") attr |= A_DIM;
-			else if (words[i] == "on") col_idx = 1;
+			else if (words[i] == "on") { col_idx = 1; bright = 0; }
+			else if (words[i] == "gray") col[col_idx] = bright ? 7 : 8; // bright gray is white
+			else if (words[i] == "bright") bright = 8;
 			else for (short c = 0; c < 8; c++) {
 				if (words[i] == color_names[c]) {
-					col[col_idx] = c;
+					col[col_idx] = bright + c;
 					break;
 				}
 			}
 		}
+
+		if (col[0] != -1 && col[0] >= get_colors() || col[1] != -1 && col[1] >= get_colors()) {
+			char buf[33];
+			sprintf(buf, "%d", get_colors());
+			throw torrent::input_error(col_def + ": your terminal only supports " + buf + " colors.");
+		}
+
 		attr_map[k] = attr;
 		init_pair(k, col[0], col[1]);
 	}
@@ -191,11 +213,6 @@ const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand
 }
 
 
-static int get_colors() {
-	return COLORS;
-}
-
-
 void initialize_command_ui_pyroscope() {
 #if defined(CMD2_ANY)
 #else
@@ -204,16 +221,16 @@ void initialize_command_ui_pyroscope() {
 			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
 
 	NEW_VARIABLE_STRING("ui.color.complete", 	"green");
-	NEW_VARIABLE_STRING("ui.color.seeding", 	"bold green");
-	NEW_VARIABLE_STRING("ui.color.incomplete", 	"magenta");
-	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold magenta");
+	NEW_VARIABLE_STRING("ui.color.seeding", 	"bold bright green");
+	NEW_VARIABLE_STRING("ui.color.incomplete", 	"yellow");
+	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold bright yellow");
 	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold white on red");
-	NEW_VARIABLE_STRING("ui.color.title", 		"bold");
-	NEW_VARIABLE_STRING("ui.color.label", 		"blue");
-	NEW_VARIABLE_STRING("ui.color.info", 		"bold cyan");
-	NEW_VARIABLE_STRING("ui.color.focus", 		"standout");
+	NEW_VARIABLE_STRING("ui.color.title", 		"bold bright white on gray");
+	NEW_VARIABLE_STRING("ui.color.label", 		"gray");
+	NEW_VARIABLE_STRING("ui.color.info", 		"white");
+	NEW_VARIABLE_STRING("ui.color.focus", 		"reverse");
 
-	ADD_COMMAND_VOID("system.colors.max", rak::ptr_fun(&get_colors));
+	ADD_COMMAND_VOID("system.colors.max", rak::ptr_fun(&display::get_colors));
 	ADD_COMMAND_VOID("system.colors.enabled", rak::ptr_fun(&has_colors));
 	ADD_COMMAND_VOID("system.colors.rgb", rak::ptr_fun(&can_change_color));
 #endif
