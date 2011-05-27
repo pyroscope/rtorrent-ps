@@ -14,3 +14,24 @@
    initialize_command_scheduler();
 +  initialize_command_ui_pyroscope();
  
+--- orig/src/display/canvas.cc	2009-11-12 09:03:47.000000000 +0100
++++ rtorrent-0.8.6/src/display/canvas.cc	2011-05-27 02:31:24.000000000 +0200
+@@ -94,2 +94,4 @@
+   initscr();
++  extern void ui_pyroscope_canvas_init();
++  ui_pyroscope_canvas_init();
+   raw();
+--- orig/src/display/window_download_list.cc	2009-11-12 09:03:47.000000000 +0100
++++ rtorrent-0.8.6/src/display/window_download_list.cc	2011-05-27 03:56:14.000000000 +0200
+@@ -107,2 +107,4 @@
+ 
++    void ui_pyroscope_download_list_redraw(Window* window, core::View* view, display::Canvas* canvas, int pos, Range& range);
++    ui_pyroscope_download_list_redraw(this, m_view, m_canvas, pos, range);
+     ++range.first;
+--- orig/src/rpc/command_variable.h	2009-11-12 09:03:42.000000000 +0100
++++ rtorrent-0.8.6/src/rpc/command_variable.h	2011-05-27 04:06:44.000000000 +0200
+@@ -66,2 +66,4 @@
+ 
++  static const torrent::Object set_color_string(Command* rawCommand, cleaned_type target, const torrent::Object& args);
++
+ private:
