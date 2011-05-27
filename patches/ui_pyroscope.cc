@@ -41,11 +41,11 @@ static const char* color_vars[ps::COL_MAX] = {
 namespace display {
 
 void split(std::vector<std::string>& words, const char* str, char delim = ' ') {
-    do {
-    	const char* begin = str;
-    	while (*str && *str != delim) str++;
-    	words.push_back(std::string(begin, str));
-    } while (*str++);
+	do {
+		const char* begin = str;
+		while (*str && *str != delim) str++;
+		words.push_back(std::string(begin, str));
+	} while (*str++);
 }
 
 
@@ -91,7 +91,7 @@ void ui_pyroscope_canvas_init() {
 
 void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view, display::Canvas* canvas, int pos, Range& range) {
 	pos -= 3;
-    canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
+	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
 
 	if (range.first == view->focus()) {
 		for (int i = 0; i < 3; i++ ) {
