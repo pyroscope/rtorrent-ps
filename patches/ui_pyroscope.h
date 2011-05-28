@@ -11,6 +11,7 @@ enum ColorKind {
     COL_LEECHING,
     COL_ALARM,
     COL_TITLE,
+    COL_FOOTER,
     COL_LABEL,
     COL_ODD,
     COL_EVEN,

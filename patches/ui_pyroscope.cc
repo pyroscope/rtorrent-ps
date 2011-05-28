@@ -40,6 +40,7 @@ static const char* color_vars[ps::COL_MAX] = {
 	"ui.color.leeching",
 	"ui.color.alarm",
 	"ui.color.title",
+	"ui.color.footer",
 	"ui.color.label",
 	"ui.color.odd",
 	"ui.color.even",
@@ -49,9 +50,11 @@ static const char* color_vars[ps::COL_MAX] = {
 
 namespace display {
 
+
 static int get_colors() {
 	return COLORS;
 }
+
 
 void split(std::vector<std::string>& words, const char* str, char delim = ' ') {
 	do {
@@ -266,7 +269,7 @@ void ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 
 void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
-	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
+	canvas->set_attr(0, 0, -1, attr_map[ps::COL_FOOTER], ps::COL_FOOTER);
 }
 
 
@@ -292,15 +295,16 @@ void initialize_command_ui_pyroscope() {
 	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold bright yellow");
 	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold white on red");
 	NEW_VARIABLE_STRING("ui.color.title", 		"bold bright white on gray");
+	NEW_VARIABLE_STRING("ui.color.footer", 		"bold bright cyan on gray");
 	NEW_VARIABLE_STRING("ui.color.label", 		"gray");
 	NEW_VARIABLE_STRING("ui.color.odd", 		"");
 	NEW_VARIABLE_STRING("ui.color.even", 		"");
 	NEW_VARIABLE_STRING("ui.color.info", 		"white");
 	NEW_VARIABLE_STRING("ui.color.focus", 		"reverse");
 
-	ADD_COMMAND_VOID("system.colors.max", rak::ptr_fun(&display::get_colors));
-	ADD_COMMAND_VOID("system.colors.enabled", rak::ptr_fun(&has_colors));
-	ADD_COMMAND_VOID("system.colors.rgb", rak::ptr_fun(&can_change_color));
+	ADD_COMMAND_VOID("system.colors.max",       rak::ptr_fun(&display::get_colors));
+	ADD_COMMAND_VOID("system.colors.enabled",   rak::ptr_fun(&has_colors));
+	ADD_COMMAND_VOID("system.colors.rgb",       rak::ptr_fun(&can_change_color));
 #endif
 }
 
