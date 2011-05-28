@@ -295,7 +295,7 @@ void initialize_command_ui_pyroscope() {
 	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold bright yellow");
 	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold white on red");
 	NEW_VARIABLE_STRING("ui.color.title", 		"bold bright white on gray");
-	NEW_VARIABLE_STRING("ui.color.footer", 		"bold bright cyan on gray");
+	NEW_VARIABLE_STRING("ui.color.footer", 		"bold bright cyan on blue");
 	NEW_VARIABLE_STRING("ui.color.label", 		"gray");
 	NEW_VARIABLE_STRING("ui.color.odd", 		"");
 	NEW_VARIABLE_STRING("ui.color.even", 		"");
