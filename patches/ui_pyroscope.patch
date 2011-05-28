@@ -35,3 +35,12 @@
 +  static const torrent::Object set_color_string(Command* rawCommand, cleaned_type target, const torrent::Object& args);
 +
  private:
+--- orig/src/display/canvas.h	2009-11-12 09:03:47.000000000 +0100
++++ rtorrent-0.8.6/src/display/canvas.h	2011-05-28 13:42:58.000000000 +0200
+@@ -134,4 +134,6 @@
+   va_start(arglist, str);
++  if (y < height()) {
+   wmove(m_window, y, x);
+   vw_printw(m_window, const_cast<char*>(str), arglist);
++  }
+   va_end(arglist);
