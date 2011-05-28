@@ -3,7 +3,7 @@
 #include "config.h"
 #include "globals.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 
 //#include <rak/functional.h>
@@ -152,12 +152,12 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	}
 
 	// show "X of Y"
-	if (pos == 1) {
+	if (pos == 1 && canvas->width() > 16) {
 		int item_idx = view->focus() - view->begin_visible();
 		if (item_idx == view->size())
-			canvas->print(canvas->width() - 17, 0, "[ none of %-5d]", view->size());
+			canvas->print(canvas->width() - 16, 0, "[ none of %-5d]", view->size());
 		else
-			canvas->print(canvas->width() - 17, 0, "[%5d of %-5d]", item_idx + 1, view->size());
+			canvas->print(canvas->width() - 16, 0, "[%5d of %-5d]", item_idx + 1, view->size());
 	}
 
 	// download title color
@@ -195,17 +195,48 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 			len = TRACKER_LABEL_WIDTH + 1;
 		}
 
-		int xpos = canvas->width() - len - 3;
+		int xpos = canvas->width() - len - 2;
 		canvas->print(xpos, pos, "{%s}", url.c_str());
 		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO + offset] | focus_attr, ps::COL_INFO + offset);
 		canvas->set_attr(xpos, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
-		canvas->set_attr(canvas->width() - 2, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
+		canvas->set_attr(canvas->width() - 1, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
+	}
+
+	// better handling for trail of line 2 (ratio etc.)
+	int status_pos = 91;
+
+	if (status_pos < canvas->width()) {
+		canvas->print(status_pos, pos+1, "R:%5d%% [%c%c] %-4.4s  ",
+			int(rpc::call_command_value("d.get_ratio", rpc::make_target(*range.first)) + 500) / 1000,
+			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(*range.first)).empty() ? ' ' : 'T',
+			(rpc::call_command_value("d.get_ignore_commands", rpc::make_target(*range.first)) == 0) ? ' ' : 'I',
+			(*range.first)->priority() == 2 ? "" :
+				rpc::call_command_string("d.get_priority_str", rpc::make_target(*range.first)).c_str()
+		);
+		status_pos += 9 + 5 + 5;
+	}
+
+	if (status_pos < canvas->width()) {
+		std::string item_status;
+
+		if (!(*range.first)->bencode()->get_key("rtorrent").get_key_string("throttle_name").empty()) {
+			//item_status += "T=";
+			item_status += rpc::call_command_string("d.get_throttle_name", rpc::make_target(*range.first)) + ' ';
+		}
+
+		int chars_left = canvas->width() - status_pos - item_status.length();
+		if (chars_left < 0) {
+			item_status = item_status.substr(0, 1-chars_left) + "…";
+		} else if (chars_left > 0) {
+			item_status = std::string(chars_left, ' ') + item_status;
+		}
+		canvas->print(status_pos, pos+1, "%s", item_status.c_str());
 	}
 
 	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
 	//12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- [TI R: ???0,00]
-	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 78, 2, 83, 1, 87, 1, 95, 2};
+	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- R:nnnnn% [TI]
+	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 78, 2, 91, 2, 100, 1, 103, 1};
 	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
 
 	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
@@ -220,7 +251,7 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (item->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
 		(item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL) + offset);
 
-	// message alert
+	// mark alert messages
 	if (!(*range.first)->message().empty() && (*range.first)->message().find("Tried all trackers") == std::string::npos) {
 		canvas->set_attr(1, pos, 1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 		canvas->set_attr(1, pos+1, 1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
