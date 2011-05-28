@@ -138,12 +138,11 @@ void ui_pyroscope_canvas_init() {
 }
 
 
-void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view, display::Canvas* canvas, int pos, Range& range) {
+void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
     int offset = (((range.first - view->begin_visible()) & 1) + 1) * ps::COL_MAX;
 
 	pos -= 3;
 	torrent::Download* item = (*range.first)->download();
-	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
 
 	if (range.first == view->focus()) {
 		for (int i = 0; i < 3; i++ ) {
@@ -158,6 +157,7 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 			canvas->print(canvas->width() - 16, 0, "[ none of %-5d]", view->size());
 		else
 			canvas->print(canvas->width() - 16, 0, "[%5d of %-5d]", item_idx + 1, view->size());
+		canvas->set_attr(canvas->width() - 16, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
 	}
 
 	// download title color
@@ -236,7 +236,7 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
 	//12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- R:nnnnn% [TI]
-	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 78, 2, 91, 2, 100, 1, 103, 1};
+	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 79, 1, 91, 2, 100, 1, 103, 1};
 	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
 
 	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
@@ -258,6 +258,17 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 		canvas->set_attr(1, pos+2, -1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 	}
 }
+
+
+void ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view) {
+	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
+}
+
+
+void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
+	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
+}
+
 
 } // namespace
 
