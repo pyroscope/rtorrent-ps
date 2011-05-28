@@ -2,7 +2,7 @@
 # Copyright (C) 2006 by Johannes Zellner, <johannes@zellner.org>
 # modified by mac@calmar.ws to fit my output needs
 # modified by crncosta@carloscosta.org to fit my output needs
-# pyroscope.project@gmail.com added a final "tput init", and the output format
+# pyroscope.project@gmail.com added a final "tput init", and changed the output format
 
 import os
 import sys
