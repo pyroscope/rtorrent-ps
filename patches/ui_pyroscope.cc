@@ -289,7 +289,7 @@ void initialize_command_ui_pyroscope() {
 		add_variable(key, key ".set", 0, \
 			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
 
-	NEW_VARIABLE_STRING("ui.color.complete", 	"green");
+	NEW_VARIABLE_STRING("ui.color.complete", 	"bright green");
 	NEW_VARIABLE_STRING("ui.color.seeding", 	"bold bright green");
 	NEW_VARIABLE_STRING("ui.color.incomplete", 	"yellow");
 	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold bright yellow");
