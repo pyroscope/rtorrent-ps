@@ -162,11 +162,12 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 
 	// download title color
 	int title_col;
+	unsigned long focus_attr = range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0;
 	if ((*range.first)->is_done())
 		title_col = (item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE) + offset;
 	else
 		title_col = (item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE) + offset;
-	canvas->set_attr(2, pos, -1, attr_map[title_col] | (range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0), title_col);
+	canvas->set_attr(2, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
 	// show label for tracker in focus
 	torrent::TrackerList* tl = item->tracker_list();
@@ -196,9 +197,9 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 
 		int xpos = canvas->width() - len - 3;
 		canvas->print(xpos, pos, "{%s}", url.c_str());
-		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
-		canvas->set_attr(xpos, pos, 1, attr_map[ps::COL_INFO + offset] ^ A_BOLD, ps::COL_INFO + offset);
-		canvas->set_attr(canvas->width() - 2, pos, 1, attr_map[ps::COL_INFO + offset] ^ A_BOLD, ps::COL_INFO + offset);
+		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO + offset] | focus_attr, ps::COL_INFO + offset);
+		canvas->set_attr(xpos, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
+		canvas->set_attr(canvas->width() - 2, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
 	}
 
 	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
