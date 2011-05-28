@@ -39,6 +39,7 @@ export CXXFLAGS="$CFLAGS"
 export LDFLAGS="-L$INST_DIR/lib"
 export PKG_CONFIG_PATH="$INST_DIR/lib/pkgconfig"
 
+SELF_URL=http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/rtorrent-extended
 XMLRPC_URL="https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced@$XMLRPC_REV"
 TARBALLS=$(cat <<.
 http://c-ares.haxx.se/c-ares-$CARES_VERSION.tar.gz
@@ -136,6 +137,8 @@ prep() { # Create directories
 }
 
 download() { # Download & unpack sources
+    test -d .svn || { svn co $SELF_URL tarballs/self ; rm tarballs/self/build.sh; mv tarballs/self/* tarballs/self/.svn . ; }
+
     test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
         svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
     for url in $TARBALLS; do
