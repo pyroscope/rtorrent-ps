@@ -207,7 +207,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
 	if (status_pos < canvas->width()) {
 		canvas->print(status_pos, pos+1, "R:%5d%% [%c%c] %-4.4s  ",
-			int(rpc::call_command_value("d.get_ratio", rpc::make_target(*range.first)) + 500) / 1000,
+			int(rpc::call_command_value("d.get_ratio", rpc::make_target(*range.first)) + 5) / 10,
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(*range.first)).empty() ? ' ' : 'T',
 			(rpc::call_command_value("d.get_ignore_commands", rpc::make_target(*range.first)) == 0) ? ' ' : 'I',
 			(*range.first)->priority() == 2 ? "" :
