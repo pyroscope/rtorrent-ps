@@ -26,7 +26,7 @@
 
 typedef std::pair<core::View::iterator, core::View::iterator> Range;
 
-static unsigned long attr_map[ps::COL_MAX] = {0};
+static unsigned long attr_map[3 * ps::COL_MAX] = {0};
 
 static const char* color_names[] = {
     "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
@@ -41,6 +41,8 @@ static const char* color_vars[ps::COL_MAX] = {
 	"ui.color.alarm",
 	"ui.color.title",
 	"ui.color.label",
+	"ui.color.odd",
+	"ui.color.even",
 	"ui.color.info",
 	"ui.color.focus",
 };
@@ -68,6 +70,9 @@ void ui_pyroscope_colormap_init() {
 		ui_pyroscope_canvas_init();
 	}
 
+    int bg_odd = -1;
+    int bg_even = -1;
+
 	for (int k = 1; k < ps::COL_MAX; k++) {
 		init_pair(k, -1, -1);
 		std::string col_def = rpc::call_command_string(color_vars[k]);
@@ -90,7 +95,11 @@ void ui_pyroscope_colormap_init() {
 			else if (words[i] == "on") { col_idx = 1; bright = 0; }
 			else if (words[i] == "gray") col[col_idx] = bright ? 7 : 8; // bright gray is white
 			else if (words[i] == "bright") bright = 8;
-			else for (short c = 0; c < 8; c++) {
+			else if (words[i].find_first_not_of("0123456789") == std::string::npos) {
+			    short c; 
+			    sscanf(words[i].c_str(), "%hd", &c);
+				col[col_idx] = c;
+			} else for (short c = 0; c < 8; c++) {
 				if (words[i] == color_names[c]) {
 					col[col_idx] = bright + c;
 					break;
@@ -106,6 +115,18 @@ void ui_pyroscope_colormap_init() {
 
 		attr_map[k] = attr;
 		init_pair(k, col[0], col[1]);
+		if (k == ps::COL_EVEN) bg_even = col[1];
+		if (k == ps::COL_ODD)  bg_odd  = col[1];
+	}
+
+	for (int k = 1; k < ps::COL_MAX; k++) {
+		short fg, bg; 
+		pair_content(k, &fg, &bg);
+				
+		attr_map[k + 1 * ps::COL_MAX] = attr_map[k] | attr_map[ps::COL_EVEN];
+		attr_map[k + 2 * ps::COL_MAX] = attr_map[k] | attr_map[ps::COL_ODD];
+		init_pair(k + 1 * ps::COL_MAX, fg, bg == -1 ? bg_even : bg);
+		init_pair(k + 2 * ps::COL_MAX, fg, bg == -1 ? bg_odd  : bg);
 	}
 }
 
@@ -118,6 +139,8 @@ void ui_pyroscope_canvas_init() {
 
 
 void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view, display::Canvas* canvas, int pos, Range& range) {
+    int offset = (((range.first - view->begin_visible()) & 1) + 1) * ps::COL_MAX;
+
 	pos -= 3;
 	torrent::Download* item = (*range.first)->download();
 	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
@@ -140,9 +163,9 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	// download title color
 	int title_col;
 	if ((*range.first)->is_done())
-		title_col = item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE;
+		title_col = (item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE) + offset;
 	else
-		title_col = item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE;
+		title_col = (item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE) + offset;
 	canvas->set_attr(2, pos, -1, attr_map[title_col] | (range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0), title_col);
 
 	// show label for tracker in focus
@@ -173,9 +196,9 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 
 		int xpos = canvas->width() - len - 3;
 		canvas->print(xpos, pos, "{%s}", url.c_str());
-		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO], ps::COL_INFO);
-		canvas->set_attr(xpos, pos, 1, attr_map[ps::COL_INFO] ^ A_BOLD, ps::COL_INFO);
-		canvas->set_attr(canvas->width() - 2, pos, 1, attr_map[ps::COL_INFO] ^ A_BOLD, ps::COL_INFO);
+		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+		canvas->set_attr(xpos, pos, 1, attr_map[ps::COL_INFO + offset] ^ A_BOLD, ps::COL_INFO + offset);
+		canvas->set_attr(canvas->width() - 2, pos, 1, attr_map[ps::COL_INFO + offset] ^ A_BOLD, ps::COL_INFO + offset);
 	}
 
 	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
@@ -184,23 +207,23 @@ void ui_pyroscope_download_list_redraw(display::Window* window, core::View* view
 	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 78, 2, 83, 1, 87, 1, 95, 2};
 	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
 
-	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO], ps::COL_INFO);
+	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
 	for (int label_idx = 0; label_idx < sizeof(label_pos) / sizeof(int); label_idx += 2) {
 		if (labels[label_idx/2]) canvas->print(label_pos[label_idx], pos+1, labels[label_idx/2]);
-		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL], ps::COL_LABEL);
+		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL + offset], ps::COL_LABEL + offset);
 	}
 
 	// up / down
-	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING] | (item->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
-		item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL);
-	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING] | (item->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
-		item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL);
+	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (item->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+		(item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL) + offset);
+	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (item->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+		(item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL) + offset);
 
 	// message alert
 	if (!(*range.first)->message().empty() && (*range.first)->message().find("Tried all trackers") == std::string::npos) {
-		canvas->set_attr(1, pos, 1, attr_map[ps::COL_ALARM], ps::COL_ALARM);
-		canvas->set_attr(1, pos+1, 1, attr_map[ps::COL_ALARM], ps::COL_ALARM);
-		canvas->set_attr(1, pos+2, -1, attr_map[ps::COL_ALARM], ps::COL_ALARM);
+		canvas->set_attr(1, pos, 1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
+		canvas->set_attr(1, pos+1, 1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
+		canvas->set_attr(1, pos+2, -1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 	}
 }
 
@@ -227,6 +250,8 @@ void initialize_command_ui_pyroscope() {
 	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold white on red");
 	NEW_VARIABLE_STRING("ui.color.title", 		"bold bright white on gray");
 	NEW_VARIABLE_STRING("ui.color.label", 		"gray");
+	NEW_VARIABLE_STRING("ui.color.odd", 		"");
+	NEW_VARIABLE_STRING("ui.color.even", 		"");
 	NEW_VARIABLE_STRING("ui.color.info", 		"white");
 	NEW_VARIABLE_STRING("ui.color.focus", 		"reverse");
 

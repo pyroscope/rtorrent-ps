@@ -12,6 +12,8 @@ enum ColorKind {
     COL_ALARM,
     COL_TITLE,
     COL_LABEL,
+    COL_ODD,
+    COL_EVEN,
     COL_INFO,
     COL_FOCUS,
     COL_MAX
