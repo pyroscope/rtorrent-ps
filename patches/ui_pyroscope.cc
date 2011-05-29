@@ -199,17 +199,31 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 		std::string url = tracker->url();
 		int off = 0;
 
-		if (url.substr(0, 7) == "http://") url = url.substr(7);
-		if (url.substr(0, 8) == "https://") url = url.substr(8);
+		// snip url to domain name
+		if (url.compare(0, 7, "http://")  == 0) url = url.substr(7);
+		if (url.compare(0, 8, "https://") == 0) url = url.substr(8);
 		if (url.find('/') > 0) url = url.substr(0, url.find('/'));
 		if (url.find(':') > 0) url = url.substr(0, url.find(':'));
 
+		// remove some common cruft
+		const char* domain_cruft[] = {
+			"tracker", "1.", "2.", "001.", ".",
+			"www.",
+			0
+		};
+		for (const char** cruft = domain_cruft; *cruft; cruft++) {
+		    int cruft_len = strlen(*cruft);
+			if (url.compare(0,  cruft_len, *cruft) == 0) url = url.substr(cruft_len);
+		}
+
+		// shorten label if too long
 		int len = url.length();
 		if (len > TRACKER_LABEL_WIDTH) {
 			url = "…" + url.substr(len - TRACKER_LABEL_WIDTH);
 			len = TRACKER_LABEL_WIDTH + 1;
 		}
 
+		// print it right-justified and in braces
 		int xpos = canvas->width() - len - 2;
 		canvas->print(xpos, pos, "{%s}", url.c_str());
 		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO + offset] | focus_attr, ps::COL_INFO + offset);
