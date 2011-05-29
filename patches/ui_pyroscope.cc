@@ -212,7 +212,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 			0
 		};
 		for (const char** cruft = domain_cruft; *cruft; cruft++) {
-		    int cruft_len = strlen(*cruft);
+			int cruft_len = strlen(*cruft);
 			if (url.compare(0,  cruft_len, *cruft) == 0) url = url.substr(cruft_len);
 		}
 
