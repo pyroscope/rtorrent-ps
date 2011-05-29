@@ -28,12 +28,24 @@ typedef std::pair<core::View::iterator, core::View::iterator> Range;
 
 static unsigned long attr_map[3 * ps::COL_MAX] = {0};
 
+int ratio_col[] = {
+	ps::COL_PROGRESS0, ps::COL_PROGRESS20, ps::COL_PROGRESS40, ps::COL_PROGRESS60, ps::COL_PROGRESS80, 
+	ps::COL_PROGRESS100, ps::COL_PROGRESS120,
+};
+
 static const char* color_names[] = {
-    "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
+	"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
 };
 
 static const char* color_vars[ps::COL_MAX] = {
 	0,
+	"ui.color.progress0",
+	"ui.color.progress20",
+	"ui.color.progress40",
+	"ui.color.progress60",
+	"ui.color.progress80",
+	"ui.color.progress100",
+	"ui.color.progress120",
 	"ui.color.complete",
 	"ui.color.seeding",
 	"ui.color.incomplete",
@@ -207,10 +219,11 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
 	// better handling for trail of line 2 (ratio etc.)
 	int status_pos = 91;
+	int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(*range.first)) / 10;
 
 	if (status_pos < canvas->width()) {
 		canvas->print(status_pos, pos+1, "R:%5d%% [%c%c] %-4.4s  ",
-			int(rpc::call_command_value("d.get_ratio", rpc::make_target(*range.first)) + 5) / 10,
+			ratio,
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(*range.first)).empty() ? ' ' : 'T',
 			(rpc::call_command_value("d.get_ignore_commands", rpc::make_target(*range.first)) == 0) ? ' ' : 'I',
 			(*range.first)->priority() == 2 ? "" :
@@ -247,6 +260,10 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 		if (labels[label_idx/2]) canvas->print(label_pos[label_idx], pos+1, labels[label_idx/2]);
 		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL + offset], ps::COL_LABEL + offset);
 	}
+
+	int rcol = sizeof(ratio_col) / sizeof(*ratio_col) - 1;
+	rcol = ratio_col[std::min(rcol, ratio * rcol / 120)];
+	canvas->set_attr(93, pos+1, 6, attr_map[rcol + offset], rcol + offset);
 
 	// up / down
 	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (item->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
@@ -289,6 +306,13 @@ void initialize_command_ui_pyroscope() {
 		add_variable(key, key ".set", 0, \
 			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
 
+	NEW_VARIABLE_STRING("ui.color.progress0", 	"red");
+	NEW_VARIABLE_STRING("ui.color.progress20", 	"bright bold red");
+	NEW_VARIABLE_STRING("ui.color.progress40", 	"bright magenta");
+	NEW_VARIABLE_STRING("ui.color.progress60", 	"yellow");
+	NEW_VARIABLE_STRING("ui.color.progress80", 	"bright bold yellow");
+	NEW_VARIABLE_STRING("ui.color.progress100",	"green");
+	NEW_VARIABLE_STRING("ui.color.progress120",	"bright bold green");
 	NEW_VARIABLE_STRING("ui.color.complete", 	"bright green");
 	NEW_VARIABLE_STRING("ui.color.seeding", 	"bold bright green");
 	NEW_VARIABLE_STRING("ui.color.incomplete", 	"yellow");
