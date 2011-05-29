@@ -307,12 +307,12 @@ void initialize_command_ui_pyroscope() {
 			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
 
 	NEW_VARIABLE_STRING("ui.color.progress0", 	"red");
-	NEW_VARIABLE_STRING("ui.color.progress20", 	"bright bold red");
-	NEW_VARIABLE_STRING("ui.color.progress40", 	"bright magenta");
+	NEW_VARIABLE_STRING("ui.color.progress20", 	"bold bright red");
+	NEW_VARIABLE_STRING("ui.color.progress40", 	"bold bright magenta");
 	NEW_VARIABLE_STRING("ui.color.progress60", 	"yellow");
-	NEW_VARIABLE_STRING("ui.color.progress80", 	"bright bold yellow");
+	NEW_VARIABLE_STRING("ui.color.progress80", 	"bold bright yellow");
 	NEW_VARIABLE_STRING("ui.color.progress100",	"green");
-	NEW_VARIABLE_STRING("ui.color.progress120",	"bright bold green");
+	NEW_VARIABLE_STRING("ui.color.progress120",	"bold bright green");
 	NEW_VARIABLE_STRING("ui.color.complete", 	"bright green");
 	NEW_VARIABLE_STRING("ui.color.seeding", 	"bold bright green");
 	NEW_VARIABLE_STRING("ui.color.incomplete", 	"yellow");
