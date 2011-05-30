@@ -12,6 +12,7 @@
 
 #include "rpc/command_variable.h"
 #include "core/view.h"
+#include "core/manager.h"
 #include "core/download.h"
 #include "torrent/tracker.h"
 #include "torrent/tracker_list.h"
@@ -19,24 +20,30 @@
 #include "display/window.h"
 #include "display/canvas.h"
 
+#include "control.h"
 #include "command_helpers.h"
 
 
 #define TRACKER_LABEL_WIDTH 20U
 
+// definition from display/window_download_list.cc that is not in the header file
 typedef std::pair<core::View::iterator, core::View::iterator> Range;
 
+// display attribute map (normal, even, odd)
 static unsigned long attr_map[3 * ps::COL_MAX] = {0};
 
+// color indices for progress indication
 int ratio_col[] = {
 	ps::COL_PROGRESS0, ps::COL_PROGRESS20, ps::COL_PROGRESS40, ps::COL_PROGRESS60, ps::COL_PROGRESS80, 
 	ps::COL_PROGRESS100, ps::COL_PROGRESS120,
 };
 
+// basic color names
 static const char* color_names[] = {
 	"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
 };
 
+// list of color configuration variables, the order MUST correspond to the ColorKind enum
 static const char* color_vars[ps::COL_MAX] = {
 	0,
 	"ui.color.progress0",
@@ -63,11 +70,13 @@ static const char* color_vars[ps::COL_MAX] = {
 namespace display {
 
 
+// function wrapper for what possibly is a macro
 static int get_colors() {
 	return COLORS;
 }
 
 
+// split a given string into words separated by delim, and add them to the provided vector
 void split(std::vector<std::string>& words, const char* str, char delim = ' ') {
 	do {
 		const char* begin = str;
@@ -77,44 +86,58 @@ void split(std::vector<std::string>& words, const char* str, char delim = ' ') {
 }
 
 
-void ui_pyroscope_canvas_init();
+void ui_pyroscope_canvas_init(); // forward
+static bool color_init_recursion = false;
 
+// create color map from configuration strings
 void ui_pyroscope_colormap_init() {
+	// if in early startup stage (configuration), then init the screen so we can query system constants
 	if (!get_colors()) {
-		initscr();
-		ui_pyroscope_canvas_init();
+		if (color_init_recursion) {
+			color_init_recursion = false;
+			control->core()->push_log("Terminal color initialization failed, does your terminal have none?!");
+		} else {
+			color_init_recursion = true;
+			initscr();
+			ui_pyroscope_canvas_init(); // this calls us again!
+		}
+		return;
 	}
+	color_init_recursion = false;
 
-    int bg_odd = -1;
-    int bg_even = -1;
+	// Those hold the background colors of "odd" and "even"
+	int bg_odd = -1;
+	int bg_even = -1;
 
+	// read the definition for basic colors from configuration
 	for (int k = 1; k < ps::COL_MAX; k++) {
 		init_pair(k, -1, -1);
 		std::string col_def = rpc::call_command_string(color_vars[k]);
-		if (col_def.empty()) continue;
+		if (col_def.empty()) continue; // use terminal default if definition is empty
 
 		std::vector<std::string> words;
 		split(words, col_def.c_str());
 
-		short col[2] = {-1, -1};
-		short col_idx = 0;
+		short col[2] = {-1, -1}; // fg, bg
+		short col_idx = 0; // 0 = fg; 1 = bg
 		short bright = 0;
 		unsigned long attr = A_NORMAL;
-		for (int i = 0; i < words.size(); i++) {
+		for (int i = 0; i < words.size(); i++) { // look at all the words
 			if (words[i] == "bold") attr |= A_BOLD;
 			else if (words[i] == "standout") attr |= A_STANDOUT;
 			else if (words[i] == "underline") attr |= A_UNDERLINE;
 			else if (words[i] == "reverse") attr |= A_REVERSE;
 			else if (words[i] == "blink") attr |= A_BLINK;
 			else if (words[i] == "dim") attr |= A_DIM;
-			else if (words[i] == "on") { col_idx = 1; bright = 0; }
+			else if (words[i] == "on") { col_idx = 1; bright = 0; } // switch to background color
 			else if (words[i] == "gray") col[col_idx] = bright ? 7 : 8; // bright gray is white
 			else if (words[i] == "bright") bright = 8;
 			else if (words[i].find_first_not_of("0123456789") == std::string::npos) {
-			    short c; 
-			    sscanf(words[i].c_str(), "%hd", &c);
+				// handle numeric index
+				short c = -1; 
+				sscanf(words[i].c_str(), "%hd", &c);
 				col[col_idx] = c;
-			} else for (short c = 0; c < 8; c++) {
+			} else for (short c = 0; c < 8; c++) { // check for basic color names
 				if (words[i] == color_names[c]) {
 					col[col_idx] = bright + c;
 					break;
@@ -122,22 +145,27 @@ void ui_pyroscope_colormap_init() {
 			}
 		}
 
+		// check that fg & bg color index is valid
 		if (col[0] != -1 && col[0] >= get_colors() || col[1] != -1 && col[1] >= get_colors()) {
 			char buf[33];
 			sprintf(buf, "%d", get_colors());
+			Canvas::cleanup();
 			throw torrent::input_error(col_def + ": your terminal only supports " + buf + " colors.");
 		}
 
+		// store the parsed color definition
 		attr_map[k] = attr;
 		init_pair(k, col[0], col[1]);
 		if (k == ps::COL_EVEN) bg_even = col[1];
 		if (k == ps::COL_ODD)  bg_odd  = col[1];
 	}
 
+	// now make copies of the basic colors with the "odd" and "even" definitions mixed in
 	for (int k = 1; k < ps::COL_MAX; k++) {
 		short fg, bg; 
 		pair_content(k, &fg, &bg);
 				
+		// replace the background color, and mix in the attributes
 		attr_map[k + 1 * ps::COL_MAX] = attr_map[k] | attr_map[ps::COL_EVEN];
 		attr_map[k + 2 * ps::COL_MAX] = attr_map[k] | attr_map[ps::COL_ODD];
 		init_pair(k + 1 * ps::COL_MAX, fg, bg == -1 ? bg_even : bg);
@@ -146,6 +174,7 @@ void ui_pyroscope_colormap_init() {
 }
 
 
+// add color handling to canvas initialization
 void ui_pyroscope_canvas_init() {
  	start_color();
 	use_default_colors();
@@ -153,12 +182,15 @@ void ui_pyroscope_canvas_init() {
 }
 
 
+// patch hook for download list canvas redraw of a single item; "pos" is placed AFTER the item
 void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
-    int offset = (((range.first - view->begin_visible()) & 1) + 1) * ps::COL_MAX;
+	// offset into the color index table, depending on whether this is an odd or even item
+	int offset = (((range.first - view->begin_visible()) & 1) + 1) * ps::COL_MAX;
 
 	pos -= 3;
 	torrent::Download* item = (*range.first)->download();
 
+	// is this the item in focus?
 	if (range.first == view->focus()) {
 		for (int i = 0; i < 3; i++ ) {
 			canvas->set_attr(0, pos+i, 1, attr_map[ps::COL_FOCUS], ps::COL_FOCUS);
@@ -189,10 +221,10 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	torrent::Tracker* tracker = tl->at(0);
 	for (int trkidx = 0; trkidx < tl->size(); trkidx++) {
 		torrent::Tracker* tracker = tl->at(trkidx);
-	    if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP &&
-	    		tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
+		if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP &&
+				tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
 			break;
-	    }
+		}
 	}
 	if (!tracker && tl->size()) tracker = tl->at(0);
 	if (tracker && !tracker->url().empty()) {
@@ -233,11 +265,11 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
 	// better handling for trail of line 2 (ratio etc.)
 	int status_pos = 91;
-	int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(*range.first)) / 10;
+	int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(*range.first));
 
 	if (status_pos < canvas->width()) {
-		canvas->print(status_pos, pos+1, "R:%5d%% [%c%c] %-4.4s  ",
-			ratio,
+		canvas->print(status_pos, pos+1, "R:%6.2f [%c%c] %-4.4s  ",
+			float(ratio) / 1000.0,
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(*range.first)).empty() ? ' ' : 'T',
 			(rpc::call_command_value("d.get_ignore_commands", rpc::make_target(*range.first)) == 0) ? ' ' : 'I',
 			(*range.first)->priority() == 2 ? "" :
@@ -246,6 +278,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 		status_pos += 9 + 5 + 5;
 	}
 
+	// if space is left, show throttle name
 	if (status_pos < canvas->width()) {
 		std::string item_status;
 
@@ -254,6 +287,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 			item_status += rpc::call_command_string("d.get_throttle_name", rpc::make_target(*range.first)) + ' ';
 		}
 
+		// left-justifying this also overwrites any junk from the original display that we overwrite
 		int chars_left = canvas->width() - status_pos - item_status.length();
 		if (chars_left < 0) {
 			item_status = item_status.substr(0, 1-chars_left) + "…";
@@ -265,27 +299,29 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
 	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
 	//12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- R:nnnnn% [TI]
+	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- R:nnnnnn [TI]
 	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 79, 1, 91, 2, 100, 1, 103, 1};
 	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
 
+	// apply basic "info" style, and then revert static text to "label"
 	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
 	for (int label_idx = 0; label_idx < sizeof(label_pos) / sizeof(int); label_idx += 2) {
 		if (labels[label_idx/2]) canvas->print(label_pos[label_idx], pos+1, labels[label_idx/2]);
 		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL + offset], ps::COL_LABEL + offset);
 	}
 
+	// show ratio progress by color
 	int rcol = sizeof(ratio_col) / sizeof(*ratio_col) - 1;
-	rcol = ratio_col[std::min(rcol, ratio * rcol / 120)];
+	rcol = ratio_col[std::min(rcol, ratio * rcol / 1200)];
 	canvas->set_attr(93, pos+1, 6, attr_map[rcol + offset], rcol + offset);
 
-	// up / down
+	// mark active up / down ("focus", plus "seeding" or "leeching"), and dim inactive numbers (i.e. 0)
 	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (item->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
 		(item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL) + offset);
 	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (item->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
 		(item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL) + offset);
 
-	// mark alert messages
+	// mark non-trivial messages
 	if (!(*range.first)->message().empty() && (*range.first)->message().find("Tried all trackers") == std::string::npos) {
 		canvas->set_attr(1, pos, 1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 		canvas->set_attr(1, pos+1, 1, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
@@ -294,11 +330,15 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 }
 
 
-void ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view) {
+// patch hook for download list canvas redraw; if this returns true, the calling 
+// function is left immediately (i.e. true indicates we took over ALL redrawing)
+bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view) {
 	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
+	return false; // continue in calling function
 }
 
 
+// patch hook for window title canvas redraw
 void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
 	canvas->set_attr(0, 0, -1, attr_map[ps::COL_FOOTER], ps::COL_FOOTER);
 }
@@ -307,12 +347,14 @@ void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
 } // namespace
 
 
+// implementation of method we patched into rpc::CommandVariable
 const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand, cleaned_type target, const torrent::Object& rawArgs) {
 	rpc::CommandVariable::set_string(rawCommand, target, rawArgs);
 	display::ui_pyroscope_colormap_init();
 }
 
 
+// register our commands
 void initialize_command_ui_pyroscope() {
 #if defined(CMD2_ANY)
 #else
@@ -340,9 +382,9 @@ void initialize_command_ui_pyroscope() {
 	NEW_VARIABLE_STRING("ui.color.info", 		"white");
 	NEW_VARIABLE_STRING("ui.color.focus", 		"reverse");
 
-	ADD_COMMAND_VOID("system.colors.max",       rak::ptr_fun(&display::get_colors));
+	ADD_COMMAND_VOID("system.colors.max",		rak::ptr_fun(&display::get_colors));
 	ADD_COMMAND_VOID("system.colors.enabled",   rak::ptr_fun(&has_colors));
-	ADD_COMMAND_VOID("system.colors.rgb",       rak::ptr_fun(&can_change_color));
+	ADD_COMMAND_VOID("system.colors.rgb",		rak::ptr_fun(&can_change_color));
 #endif
 }
 

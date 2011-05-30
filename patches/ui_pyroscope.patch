@@ -14,13 +14,6 @@
    initialize_command_scheduler();
 +  initialize_command_ui_pyroscope();
  
---- orig/src/display/canvas.cc	2009-11-12 09:03:47.000000000 +0100
-+++ rtorrent-0.8.6/src/display/canvas.cc	2011-05-27 02:31:24.000000000 +0200
-@@ -94,2 +94,4 @@
-   initscr();
-+  extern void ui_pyroscope_canvas_init();
-+  ui_pyroscope_canvas_init();
-   raw();
 --- orig/src/rpc/command_variable.h	2009-11-12 09:03:42.000000000 +0100
 +++ rtorrent-0.8.6/src/rpc/command_variable.h	2011-05-27 04:06:44.000000000 +0200
 @@ -66,2 +66,4 @@
@@ -45,14 +38,21 @@
 +  ui_pyroscope_statusbar_redraw(this, m_canvas);
    m_lastTick = control->tick();
 --- orig/src/display/window_download_list.cc	2009-11-12 09:03:47.000000000 +0100
-+++ rtorrent-0.8.6/src/display/window_download_list.cc	2011-05-28 19:42:25.000000000 +0200
++++ rtorrent-0.8.6/src/display/window_download_list.cc	2011-05-30 20:34:59.000000000 +0200
 @@ -75,2 +75,4 @@
  
-+  void ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view);
-+  ui_pyroscope_download_list_redraw(this, m_canvas, m_view);
++  bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view);
++  if (ui_pyroscope_download_list_redraw(this, m_canvas, m_view)) return;
    if (m_view->empty_visible() || m_canvas->width() < 5 || m_canvas->height() < 2)
 @@ -107,2 +109,4 @@
  
 +    void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range);
 +    ui_pyroscope_download_list_redraw_item(this, m_canvas, m_view, pos, range);
      ++range.first;
+--- orig/src/display/canvas.cc	2009-11-12 09:03:47.000000000 +0100
++++ rtorrent-0.8.6/src/display/canvas.cc	2011-05-30 21:07:29.000000000 +0200
+@@ -94,2 +94,4 @@
+   initscr();
++  extern void ui_pyroscope_canvas_init();
++  ui_pyroscope_canvas_init();
+   raw();
