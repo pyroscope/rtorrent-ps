@@ -6,9 +6,7 @@
 #include <cstdio>
 #include <stdlib.h>
 
-//#include <rak/functional.h>
-//#include <rak/functional_fun.h>
-//#include <sigc++/adaptors/bind.h>
+#include <rak/algorithm.h>
 
 #include "rpc/command_variable.h"
 #include "core/view.h"
@@ -19,6 +17,9 @@
 #include "torrent/rate.h"
 #include "display/window.h"
 #include "display/canvas.h"
+#include "display/utils.h"
+#include "ui/root.h"
+#include "ui/download_list.h"
 
 #include "control.h"
 #include "command_helpers.h"
@@ -66,6 +67,10 @@ static const char* color_vars[ps::COL_MAX] = {
 	"ui.color.info",
 	"ui.color.focus",
 };
+
+// collapsed state of views (default is false)
+static std::map<std::string, bool> is_collapsed;
+
 
 namespace display {
 
@@ -182,30 +187,15 @@ void ui_pyroscope_canvas_init() {
 }
 
 
-// patch hook for download list canvas redraw of a single item; "pos" is placed AFTER the item
-void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
-	// offset into the color index table, depending on whether this is an odd or even item
-	int offset = (((range.first - view->begin_visible()) & 1) + 1) * ps::COL_MAX;
+// offset into the color index table, depending on whether this is an odd or even item
+static int row_offset(core::View* view, Range& range) {
+	return (((range.first - view->begin_visible()) & 1) + 1) * ps::COL_MAX;
+}
 
-	pos -= 3;
+
+static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
+	int offset = row_offset(view, range);
 	torrent::Download* item = (*range.first)->download();
-
-	// is this the item in focus?
-	if (range.first == view->focus()) {
-		for (int i = 0; i < 3; i++ ) {
-			canvas->set_attr(0, pos+i, 1, attr_map[ps::COL_FOCUS], ps::COL_FOCUS);
-		}
-	}
-
-	// show "X of Y"
-	if (pos == 1 && canvas->width() > 16) {
-		int item_idx = view->focus() - view->begin_visible();
-		if (item_idx == view->size())
-			canvas->print(canvas->width() - 16, 0, "[ none of %-5d]", view->size());
-		else
-			canvas->print(canvas->width() - 16, 0, "[%5d of %-5d]", item_idx + 1, view->size());
-		canvas->set_attr(canvas->width() - 16, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
-	}
 
 	// download title color
 	int title_col;
@@ -221,8 +211,8 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	torrent::Tracker* tracker = tl->at(0);
 	for (int trkidx = 0; trkidx < tl->size(); trkidx++) {
 		torrent::Tracker* tracker = tl->at(trkidx);
-		if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP &&
-				tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
+		if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP
+				&& tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
 			break;
 		}
 	}
@@ -245,7 +235,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 		};
 		for (const char** cruft = domain_cruft; *cruft; cruft++) {
 			int cruft_len = strlen(*cruft);
-			if (url.compare(0,  cruft_len, *cruft) == 0) url = url.substr(cruft_len);
+			if (url.compare(0, cruft_len, *cruft) == 0) url = url.substr(cruft_len);
 		}
 
 		// shorten label if too long
@@ -262,6 +252,24 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 		canvas->set_attr(xpos, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
 		canvas->set_attr(canvas->width() - 1, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
 	}
+}
+
+
+// patch hook for download list canvas redraw of a single item; "pos" is placed AFTER the item
+void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
+	int offset = row_offset(view, range);
+	torrent::Download* item = (*range.first)->download();
+
+	pos -= 3;
+
+	// is this the item in focus?
+	if (range.first == view->focus()) {
+		for (int i = 0; i < 3; i++ ) {
+			canvas->set_attr(0, pos+i, 1, attr_map[ps::COL_FOCUS], ps::COL_FOCUS);
+		}
+	}
+
+	decorate_download_title(window, canvas, view, pos, range);
 
 	// better handling for trail of line 2 (ratio etc.)
 	int status_pos = 91;
@@ -333,8 +341,49 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 // patch hook for download list canvas redraw; if this returns true, the calling 
 // function is left immediately (i.e. true indicates we took over ALL redrawing)
 bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view) {
+	// show "X of Y"
+	if (canvas->width() > 16) {
+		int item_idx = view->focus() - view->begin_visible();
+		if (item_idx == view->size())
+			canvas->print(canvas->width() - 16, 0, "[ none of %-5d]", view->size());
+		else
+			canvas->print(canvas->width() - 16, 0, "[%5d of %-5d]", item_idx + 1, view->size());
+	}
 	canvas->set_attr(0, 0, -1, attr_map[ps::COL_TITLE], ps::COL_TITLE);
-	return false; // continue in calling function
+
+	if (is_collapsed.find(view->name()) == is_collapsed.end() || !is_collapsed[view->name()])
+		return false; // continue in calling function
+
+	if (view->empty_visible() || canvas->width() < 5 || canvas->height() < 2)
+		return true;
+
+	Range range = rak::advance_bidirectional(
+			view->begin_visible(),
+			view->focus() != view->end_visible() ? view->focus() : view->begin_visible(),
+			view->end_visible(),
+			canvas->height()-1);
+
+	int pos = 1;
+
+	while (range.first != range.second) {
+		char buffer[canvas->width() + 1];
+		char* position;
+		char* last = buffer + canvas->width() - 2 + 1;
+
+		position = print_download_title(buffer, last, *range.first);
+		canvas->print(0, pos, "%c %s", range.first == view->focus() ? '*' : ' ', buffer);
+		decorate_download_title(window, canvas, view, pos, range);
+
+		// is this the item in focus?
+		if (range.first == view->focus()) {
+			canvas->set_attr(0, pos, 1, attr_map[ps::COL_FOCUS], ps::COL_FOCUS);
+		}
+
+		++pos;
+		++range.first;
+	}
+
+	return true;
 }
 
 
@@ -345,6 +394,23 @@ void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
 
 
 } // namespace
+
+
+#if defined(CMD2_ANY)
+torrent::Object cmd_view_collapsed_toggle(rpc::target_type target, const torrent::Object& rawArgs) {
+#else
+torrent::Object cmd_view_collapsed_toggle(__UNUSED rpc::target_type target, const torrent::Object& rawArgs) {
+#endif
+	std::string view_name = rawArgs.as_string();
+
+	if (view_name.empty()) {
+		view_name = control->ui()->download_list()->current_view()->name();
+	}
+
+	is_collapsed[view_name] = is_collapsed.find(view_name) == is_collapsed.end() ? true : !is_collapsed[view_name];
+
+	return is_collapsed[view_name];
+}
 
 
 // implementation of method we patched into rpc::CommandVariable
@@ -358,33 +424,40 @@ const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand
 void initialize_command_ui_pyroscope() {
 #if defined(CMD2_ANY)
 #else
-	#define NEW_VARIABLE_STRING(key, defaultValue) \
+	#define NEW_VARIABLE_COLOR(key, defaultValue) \
 		add_variable(key, key ".set", 0, \
 			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
 
-	NEW_VARIABLE_STRING("ui.color.progress0", 	"red");
-	NEW_VARIABLE_STRING("ui.color.progress20", 	"bold bright red");
-	NEW_VARIABLE_STRING("ui.color.progress40", 	"bold bright magenta");
-	NEW_VARIABLE_STRING("ui.color.progress60", 	"yellow");
-	NEW_VARIABLE_STRING("ui.color.progress80", 	"bold bright yellow");
-	NEW_VARIABLE_STRING("ui.color.progress100",	"green");
-	NEW_VARIABLE_STRING("ui.color.progress120",	"bold bright green");
-	NEW_VARIABLE_STRING("ui.color.complete", 	"bright green");
-	NEW_VARIABLE_STRING("ui.color.seeding", 	"bold bright green");
-	NEW_VARIABLE_STRING("ui.color.incomplete", 	"yellow");
-	NEW_VARIABLE_STRING("ui.color.leeching", 	"bold bright yellow");
-	NEW_VARIABLE_STRING("ui.color.alarm", 		"bold white on red");
-	NEW_VARIABLE_STRING("ui.color.title", 		"bold bright white on blue");
-	NEW_VARIABLE_STRING("ui.color.footer", 		"bold bright cyan on blue");
-	NEW_VARIABLE_STRING("ui.color.label", 		"gray");
-	NEW_VARIABLE_STRING("ui.color.odd", 		"");
-	NEW_VARIABLE_STRING("ui.color.even", 		"");
-	NEW_VARIABLE_STRING("ui.color.info", 		"white");
-	NEW_VARIABLE_STRING("ui.color.focus", 		"reverse");
+	NEW_VARIABLE_COLOR("ui.color.progress0", 	"red");
+	NEW_VARIABLE_COLOR("ui.color.progress20", 	"bold bright red");
+	NEW_VARIABLE_COLOR("ui.color.progress40", 	"bold bright magenta");
+	NEW_VARIABLE_COLOR("ui.color.progress60", 	"yellow");
+	NEW_VARIABLE_COLOR("ui.color.progress80", 	"bold bright yellow");
+	NEW_VARIABLE_COLOR("ui.color.progress100",	"green");
+	NEW_VARIABLE_COLOR("ui.color.progress120",	"bold bright green");
+	NEW_VARIABLE_COLOR("ui.color.complete", 	"bright green");
+	NEW_VARIABLE_COLOR("ui.color.seeding", 		"bold bright green");
+	NEW_VARIABLE_COLOR("ui.color.incomplete", 	"yellow");
+	NEW_VARIABLE_COLOR("ui.color.leeching", 	"bold bright yellow");
+	NEW_VARIABLE_COLOR("ui.color.alarm", 		"bold white on red");
+	NEW_VARIABLE_COLOR("ui.color.title", 		"bold bright white on blue");
+	NEW_VARIABLE_COLOR("ui.color.footer", 		"bold bright cyan on blue");
+	NEW_VARIABLE_COLOR("ui.color.label", 		"gray");
+	NEW_VARIABLE_COLOR("ui.color.odd", 			"");
+	NEW_VARIABLE_COLOR("ui.color.even", 		"");
+	NEW_VARIABLE_COLOR("ui.color.info", 		"white");
+	NEW_VARIABLE_COLOR("ui.color.focus", 		"reverse");
 
 	ADD_COMMAND_VOID("system.colors.max",		rak::ptr_fun(&display::get_colors));
 	ADD_COMMAND_VOID("system.colors.enabled",   rak::ptr_fun(&has_colors));
 	ADD_COMMAND_VOID("system.colors.rgb",		rak::ptr_fun(&can_change_color));
-#endif
-}
 
+	CMD_N_STRING("view.collapsed.toggle",		rak::ptr_fn(&cmd_view_collapsed_toggle));
+
+// macros mostly compatible to 0.8.8 syntax
+#define CMD2_VAR_BOOL(key, defaultValue) \
+	add_variable(key, key ".set", 0, &rpc::CommandVariable::get_bool, &rpc::CommandVariable::set_bool, (int64_t)defaultValue);
+#endif
+
+	//CMD2_VAR_BOOL("", false);
+}
