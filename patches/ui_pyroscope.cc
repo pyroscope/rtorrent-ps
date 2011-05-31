@@ -81,6 +81,22 @@ static int get_colors() {
 }
 
 
+std::string human_size(int64_t bytes) {
+	int exp;
+	char unit;
+	
+	if (bytes < (int64_t(1000) << 10))      { exp = 10; unit = 'K'; }
+	else if (bytes < (int64_t(1000) << 20)) { exp = 20; unit = 'M'; }
+	else if (bytes < (int64_t(1000) << 30)) { exp = 30; unit = 'G'; }
+	else                                    { exp = 40; unit = 'T'; }
+
+	char buffer[48];
+	snprintf(buffer, sizeof(buffer), "%5.1f%c", (double)bytes / (int64_t(1) << exp), unit);
+
+	return std::string(buffer);
+}
+
+
 // split a given string into words separated by delim, and add them to the provided vector
 void split(std::vector<std::string>& words, const char* str, char delim = ' ') {
 	do {
@@ -358,7 +374,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, "          Name");
+	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⚡ ⚑ ☯   Size Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -380,23 +396,30 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		bool has_alert = has_msg && d->message().find("Tried all trackers") == std::string::npos;
 		int offset = row_offset(view, range);
 
+		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 		char buffer[canvas->width() + 1];
 		char* position;
 		char* last = buffer + canvas->width() - 2 + 1;
 		position = print_download_title(buffer, last, d);
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s", 
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s %s%s", 
 			range.first == view->focus() ? "»" : " ",
-			d->download()->is_open() ? d->download()->is_active() ? "▸ " : "℗ " : "▪ ",
+			d->download()->is_open() ? d->download()->is_active() ? "▹ " : "℗ " : "▪ ",
+			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
+			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
+			prios[d->priority() % 4],
 			d->download()->down_rate()->rate() ? 
 				(d->download()->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(d->download()->up_rate()->rate() ? "↟ " : "  "),
 			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
 			ratio >= 1000 ? "☻ " : "☹ ",
+			human_size(d->download()->file_list()->size_bytes()).c_str(),
 			buffer
 		);
+
 		decorate_download_title(window, canvas, view, pos, range);
-		if (has_alert) canvas->set_attr(4*2-1, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
+		canvas->set_attr(2, pos, 1 + 7*2+1 + 7, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+		if (has_alert) canvas->set_attr(7*2-1, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
 		// is this the item in focus?
 		if (range.first == view->focus()) {
