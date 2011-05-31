@@ -357,22 +357,46 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 	if (view->empty_visible() || canvas->width() < 5 || canvas->height() < 2)
 		return true;
 
+	// show column headers
+	canvas->print(2, 1, "          Name");
+	if (canvas->width() > TRACKER_LABEL_WIDTH) {
+		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
+	}
+	canvas->set_attr(0, 1, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
+
+	// define iterator range
 	Range range = rak::advance_bidirectional(
 			view->begin_visible(),
 			view->focus() != view->end_visible() ? view->focus() : view->begin_visible(),
 			view->end_visible(),
-			canvas->height()-1);
+			canvas->height()-2);
 
-	int pos = 1;
+	int pos = 2;
 
 	while (range.first != range.second) {
+		core::Download* d = *range.first;
+		int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(d));
+		bool has_msg = !d->message().empty();
+		bool has_alert = has_msg && d->message().find("Tried all trackers") == std::string::npos;
+		int offset = row_offset(view, range);
+
 		char buffer[canvas->width() + 1];
 		char* position;
 		char* last = buffer + canvas->width() - 2 + 1;
+		position = print_download_title(buffer, last, d);
 
-		position = print_download_title(buffer, last, *range.first);
-		canvas->print(0, pos, "%c %s", range.first == view->focus() ? '*' : ' ', buffer);
+		canvas->print(0, pos, "%s  %s%s%s%s%s", 
+			range.first == view->focus() ? "»" : " ",
+			d->download()->is_open() ? d->download()->is_active() ? "▸ " : "℗ " : "▪ ",
+			d->download()->down_rate()->rate() ? 
+				(d->download()->up_rate()->rate() ? "⇅ " : "↡ ") :
+				(d->download()->up_rate()->rate() ? "↟ " : "  "),
+			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
+			ratio >= 1000 ? "☻ " : "☹ ",
+			buffer
+		);
 		decorate_download_title(window, canvas, view, pos, range);
+		if (has_alert) canvas->set_attr(4*2-1, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
 		// is this the item in focus?
 		if (range.first == view->focus()) {
