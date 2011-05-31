@@ -374,7 +374,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⚡ ⚑ ☯   Size Name");
+	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑    Size Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -397,29 +397,34 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		int offset = row_offset(view, range);
 
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
+		const char* progress[] = {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "};
+		int progress_steps = sizeof(progress) / sizeof(*progress);
 		char buffer[canvas->width() + 1];
 		char* position;
 		char* last = buffer + canvas->width() - 2 + 1;
 		position = print_download_title(buffer, last, d);
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s %s%s", 
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s%s", 
 			range.first == view->focus() ? "»" : " ",
 			d->download()->is_open() ? d->download()->is_active() ? "▹ " : "℗ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
+			d->is_done() ? "✔ " : progress[
+				d->download()->file_list()->completed_chunks() * progress_steps
+				/ d->download()->file_list()->size_chunks()],
 			d->download()->down_rate()->rate() ? 
 				(d->download()->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(d->download()->up_rate()->rate() ? "↟ " : "  "),
-			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
 			ratio >= 1000 ? "☻ " : "☹ ",
+			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
 			human_size(d->download()->file_list()->size_bytes()).c_str(),
 			buffer
 		);
 
 		decorate_download_title(window, canvas, view, pos, range);
-		canvas->set_attr(2, pos, 1 + 7*2+1 + 7, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
-		if (has_alert) canvas->set_attr(7*2-1, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
+		canvas->set_attr(2, pos, 1 + 8*2+1 + 7, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+		if (has_alert) canvas->set_attr(3 + 7*2, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
 		// is this the item in focus?
 		if (range.first == view->focus()) {
