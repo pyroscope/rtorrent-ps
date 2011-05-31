@@ -271,6 +271,13 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
 }
 
 
+// show ratio progress by color (ratio is scaled x1000)
+static int ratio_color(int ratio) {
+	int rcol = sizeof(ratio_col) / sizeof(*ratio_col) - 1;
+	return ratio_col[std::min(rcol, ratio * rcol / 1200)];
+}
+
+
 // patch hook for download list canvas redraw of a single item; "pos" is placed AFTER the item
 void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
 	int offset = row_offset(view, range);
@@ -335,8 +342,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	}
 
 	// show ratio progress by color
-	int rcol = sizeof(ratio_col) / sizeof(*ratio_col) - 1;
-	rcol = ratio_col[std::min(rcol, ratio * rcol / 1200)];
+	int rcol = ratio_color(ratio);
 	canvas->set_attr(93, pos+1, 6, attr_map[rcol + offset], rcol + offset);
 
 	// mark active up / down ("focus", plus "seeding" or "leeching"), and dim inactive numbers (i.e. 0)
@@ -398,6 +404,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 		const char* progress[] = {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "};
+		const char* ying_yang[] = {"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "};
 		int progress_steps = sizeof(progress) / sizeof(*progress);
 		char buffer[canvas->width() + 1];
 		char* position;
@@ -416,7 +423,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			d->download()->down_rate()->rate() ? 
 				(d->download()->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(d->download()->up_rate()->rate() ? "↟ " : "  "),
-			ratio >= 1000 ? "☻ " : "☹ ",
+			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
 			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
 			human_size(d->download()->file_list()->size_bytes()).c_str(),
 			buffer
@@ -425,6 +432,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		decorate_download_title(window, canvas, view, pos, range);
 		canvas->set_attr(2, pos, 1 + 8*2+1 + 7, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
 		if (has_alert) canvas->set_attr(3 + 7*2, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
+
+		// show ratio progress by color
+		int rcol = ratio_color(ratio);
+		canvas->set_attr(3 + 6*2, pos, 2, attr_map[rcol + offset], rcol + offset);
 
 		// is this the item in focus?
 		if (range.first == view->focus()) {
