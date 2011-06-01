@@ -72,6 +72,44 @@ static const char* color_vars[ps::COL_MAX] = {
 static std::map<std::string, bool> is_collapsed;
 
 
+// try to find the "right" tracker for display purposes
+torrent::Tracker* get_active_tracker(torrent::Download* item) {
+	torrent::TrackerList* tl = item->tracker_list();
+	torrent::Tracker* tracker = 0;
+
+	for (int trkidx = 0; trkidx < tl->size(); trkidx++) {
+		tracker = tl->at(trkidx);
+		if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP
+				&& tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
+			break;
+		}
+		tracker = 0;
+	}
+	if (!tracker && tl->size()) tracker = tl->at(0);
+
+	return tracker;
+}
+
+
+// return 2-digits number, or digit + dimension indicator
+std::string num2(int64_t num) {
+	if (num < 0 || 10*1000*1000 <= num) return std::string("♯♯");
+
+	char buffer[10];
+	if (num < 100) {
+		snprintf(buffer, sizeof(buffer), "%2d", num);
+	} else {
+		// Roman numeral multipliers 10, 100, 1000, 10x1000, 100x1000, 1000x1000
+		const char* roman = " xcmXCM"; 
+		int dim = 0;
+		while (num > 9) { ++dim; num /= 10; }
+		snprintf(buffer, sizeof(buffer), "%1d%c", int(num), roman[dim]);
+	}
+    
+	return std::string(buffer);
+}
+
+
 namespace display {
 
 
@@ -225,6 +263,7 @@ static int row_offset(core::View* view, Range& range) {
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
 	int offset = row_offset(view, range);
 	torrent::Download* item = (*range.first)->download();
+	torrent::Tracker* tracker = get_active_tracker(item);
 
 	// download title color
 	int title_col;
@@ -236,16 +275,6 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
 	canvas->set_attr(2, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
 	// show label for tracker in focus
-	torrent::TrackerList* tl = item->tracker_list();
-	torrent::Tracker* tracker = tl->at(0);
-	for (int trkidx = 0; trkidx < tl->size(); trkidx++) {
-		torrent::Tracker* tracker = tl->at(trkidx);
-		if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP
-				&& tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
-			break;
-		}
-	}
-	if (!tracker && tl->size()) tracker = tl->at(0);
 	if (tracker && !tracker->url().empty()) {
 		std::string url = tracker->url();
 		int off = 0;
@@ -393,7 +422,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑   ∆    ∇    ✇   Name");
+	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⬆  ⬇   ∆    ∇    ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -410,6 +439,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	while (range.first != range.second) {
 		core::Download* d = *range.first;
+		torrent::Download* item = d->download();
+		torrent::Tracker* tracker = get_active_tracker(item);
 		int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(d));
 		bool has_msg = !d->message().empty();
 		bool has_alert = has_msg && d->message().find("Tried all trackers") == std::string::npos;
@@ -427,28 +458,31 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		char* last = buffer + canvas->width() - 2 + 1;
 		position = print_download_title(buffer, last, d);
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s%s",
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s %s%s",
 			range.first == view->focus() ? "»" : " ",
-			d->download()->is_open() ? d->download()->is_active() ? "▹ " : "╍ " : "▪ ",
+			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
 			d->is_done() ? "✔ " : progress[
-				d->download()->file_list()->completed_chunks() * progress_steps
-				/ d->download()->file_list()->size_chunks()],
-			d->download()->down_rate()->rate() ? 
-				(d->download()->up_rate()->rate() ? "⇅ " : "↡ ") :
-				(d->download()->up_rate()->rate() ? "↟ " : "  "),
+				item->file_list()->completed_chunks() * progress_steps
+				/ item->file_list()->size_chunks()],
+			item->down_rate()->rate() ? 
+				(item->up_rate()->rate() ? "⇅ " : "↡ ") :
+				(item->up_rate()->rate() ? "↟ " : "  "),
 			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
 			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
-			human_size(d->download()->up_rate()->rate(), 2 | 8).c_str(),
-			human_size(d->download()->down_rate()->rate(), 2 | 8).c_str(),
-			human_size(d->download()->file_list()->size_bytes(), 2).c_str(),
+			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
+			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
+			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
+			human_size(item->up_rate()->rate(), 2 | 8).c_str(),
+			human_size(item->down_rate()->rate(), 2 | 8).c_str(),
+			human_size(item->file_list()->size_bytes(), 2).c_str(),
 			buffer
 		);
 
 		decorate_download_title(window, canvas, view, pos, range);
-		canvas->set_attr(2, pos, 1 + 8*2+1 + 3*5, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+		canvas->set_attr(2, pos, 1 + 8*2+1 + 3*3 + 3*5, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
 		if (has_alert) canvas->set_attr(3 + 7*2, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
 		// show ratio progress by color
