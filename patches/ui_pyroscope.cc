@@ -423,8 +423,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆    ∇    ✇   Name");
-
+	canvas->print(2, 1, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆    ∇    ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -448,11 +447,11 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		bool has_alert = has_msg && d->message().find("Tried all trackers") == std::string::npos;
 		int offset = row_offset(view, range);
 
-		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
+		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 		const char* progress[] = {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "};
 		//const char* ying_yang[] = {"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "};
 		//const char* ying_yang[] = {"☹ ", "➊ ", "➋ ", "➌ ", "➍ ", "➎ ", "➏ ", "➐ ", "➑ ", "➒ ", "➓ "};
-		const char* ying_yang[] = {"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "};
+		const char* ying_yang[] = {"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "};
 
 		int progress_steps = sizeof(progress) / sizeof(*progress);
 		char buffer[canvas->width() + 1];
@@ -462,21 +461,21 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s %s%s",
 			range.first == view->focus() ? "»" : " ",
-			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
-			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
-			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
+			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
+			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
+			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
 			d->is_done() ? "✔ " : progress[
 				item->file_list()->completed_chunks() * progress_steps
 				/ item->file_list()->size_chunks()],
 			item->down_rate()->rate() ? 
 				(item->up_rate()->rate() ? "⇅ " : "↡ ") :
-				(item->up_rate()->rate() ? "↟ " : "  "),
+				(item->up_rate()->rate() ? "↟ " : "  "),
 			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
-			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
-			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
-			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
-			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
+			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
+			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
+			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
+			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
 			human_size(item->up_rate()->rate(), 2 | 8).c_str(),
 			human_size(item->down_rate()->rate(), 2 | 8).c_str(),
 			human_size(item->file_list()->size_bytes(), 2).c_str(),
