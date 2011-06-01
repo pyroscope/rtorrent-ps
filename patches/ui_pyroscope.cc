@@ -94,6 +94,7 @@ torrent::Tracker* get_active_tracker(torrent::Download* item) {
 // return 2-digits number, or digit + dimension indicator
 std::string num2(int64_t num) {
 	if (num < 0 || 10*1000*1000 <= num) return std::string("♯♯");
+	if (!num) return std::string(" ·");
 
 	char buffer[10];
 	if (num < 100) {
@@ -422,7 +423,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⬆  ⬇   ∆    ∇    ✇   Name");
+	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆    ∇    ✇   Name");
+
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
