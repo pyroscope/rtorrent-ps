@@ -393,7 +393,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑   ∆    ∇   Size Name");
+	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑   ∆    ∇    ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -417,7 +417,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 		const char* progress[] = {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "};
-		const char* ying_yang[] = {"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "};
+		//const char* ying_yang[] = {"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "};
+		//const char* ying_yang[] = {"☹ ", "➊ ", "➋ ", "➌ ", "➍ ", "➎ ", "➏ ", "➐ ", "➑ ", "➒ ", "➓ "};
+		const char* ying_yang[] = {"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "};
+
 		int progress_steps = sizeof(progress) / sizeof(*progress);
 		char buffer[canvas->width() + 1];
 		char* position;
