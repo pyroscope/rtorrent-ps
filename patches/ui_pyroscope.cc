@@ -81,17 +81,30 @@ static int get_colors() {
 }
 
 
-std::string human_size(int64_t bytes) {
+// format byte size for humans, if format = 0 use 6 chars (one decimal place),
+// if = 1 just print the rounded value (4 chars), if = 2 combine the two formats
+// into 4 chars by rounding for values >= 10.
+// set bot 8 of format and 0 values will return a whitespace string of the correct length.
+std::string human_size(int64_t bytes, unsigned int format=0) {
+	if (format & 8 && bytes <= 0) return std::string((format & 7) ? 4 : 6, ' ');
+	format &= 7;
+
 	int exp;
 	char unit;
 	
-	if (bytes < (int64_t(1000) << 10))      { exp = 10; unit = 'K'; }
-	else if (bytes < (int64_t(1000) << 20)) { exp = 20; unit = 'M'; }
-	else if (bytes < (int64_t(1000) << 30)) { exp = 30; unit = 'G'; }
-	else                                    { exp = 40; unit = 'T'; }
+	if (bytes < (int64_t(1000) << 10))			{ exp = 10; unit = 'K'; }
+	else if (bytes < (int64_t(1000) << 20)) 	{ exp = 20; unit = 'M'; }
+	else if (bytes < (int64_t(1000) << 30)) 	{ exp = 30; unit = 'G'; }
+	else										{ exp = 40; unit = 'T'; }
 
 	char buffer[48];
-	snprintf(buffer, sizeof(buffer), "%5.1f%c", (double)bytes / (int64_t(1) << exp), unit);
+	double value = double(bytes) / (int64_t(1) << exp);
+	const char* formats[] = {"%5.1f%c", "%3.0f%c", "%3.1f%c"};
+
+	if (format > 2) format = 0;
+	if (format == 2 and value >= 10.0) format = 1;
+	if (format == 1) value = int(value + 0.5);
+	snprintf(buffer, sizeof(buffer), formats[format], value, unit);
 
 	return std::string(buffer);
 }
@@ -380,7 +393,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑    Size Name");
+	canvas->print(2, 1, " ☢ ☍ ⚙ ✰ ⣿ ⚡ ☯ ⚑   ∆    ∇   Size Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -411,9 +424,9 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		char* last = buffer + canvas->width() - 2 + 1;
 		position = print_download_title(buffer, last, d);
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s%s", 
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s%s",
 			range.first == view->focus() ? "»" : " ",
-			d->download()->is_open() ? d->download()->is_active() ? "▹ " : "℗ " : "▪ ",
+			d->download()->is_open() ? d->download()->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
@@ -425,12 +438,14 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 				(d->download()->up_rate()->rate() ? "↟ " : "  "),
 			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
 			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
-			human_size(d->download()->file_list()->size_bytes()).c_str(),
+			human_size(d->download()->up_rate()->rate(), 2 | 8).c_str(),
+			human_size(d->download()->down_rate()->rate(), 2 | 8).c_str(),
+			human_size(d->download()->file_list()->size_bytes(), 2).c_str(),
 			buffer
 		);
 
 		decorate_download_title(window, canvas, view, pos, range);
-		canvas->set_attr(2, pos, 1 + 8*2+1 + 7, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+		canvas->set_attr(2, pos, 1 + 8*2+1 + 3*5, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
 		if (has_alert) canvas->set_attr(3 + 7*2, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
 		// show ratio progress by color
