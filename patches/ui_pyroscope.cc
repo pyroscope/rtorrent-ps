@@ -91,6 +91,39 @@ torrent::Tracker* get_active_tracker(torrent::Download* item) {
 }
 
 
+// get timestamp of completion
+unsigned long get_completion_time(core::Download* d) {
+	try {
+		return atol(d->bencode()->get_key("rtorrent").get_key("custom").get_key_string("tm_completed").c_str());
+	} catch (torrent::bencode_error& e) {
+		return 0UL;
+	}
+}
+
+
+// convert absolute timestamp to approximate human readable time diff (5 chars wide)
+std::string elapsed_time(unsigned long dt)  {
+	if (dt == 0) return std::string("⋅ ⋅⋅ ");
+
+	const char* unit[] = {"”", "’", "h", "d", "w", "m", "y"};
+	unsigned long threshold[] = {1, 60, 3600, 86400, 7*86400, 30*86400, 365*86400, 0};
+
+	int dim = 0;
+	dt = time(NULL) - dt;
+	while (threshold[dim] && dt >= threshold[dim]) ++dim;
+	float val = float(dt) / float(threshold[--dim]);
+
+	char buffer[15];
+	if (val < 10.0 && dim) {
+		snprintf(buffer, sizeof(buffer), "%1d%s%2d%s", int(val), unit[dim], 
+			int(dt % threshold[dim] / threshold[dim-1]), unit[dim-1]);
+	} else {
+		snprintf(buffer, sizeof(buffer), "%4d%s", int(val), unit[dim]);
+	}
+	return std::string(buffer);
+}
+
+
 // return 2-digits number, or digit + dimension indicator
 std::string num2(int64_t num) {
 	if (num < 0 || 10*1000*1000 <= num) return std::string("♯♯");
@@ -423,7 +456,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆    ∇    ✇   Name");
+	canvas->print(2, 1, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -459,7 +492,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		char* last = buffer + canvas->width() - 2 + 1;
 		position = print_download_title(buffer, last, d);
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s %s%s",
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s",
 			range.first == view->focus() ? "»" : " ",
 			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
@@ -477,14 +510,16 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
 			human_size(item->up_rate()->rate(), 2 | 8).c_str(),
-			human_size(item->down_rate()->rate(), 2 | 8).c_str(),
+			d->is_done() ? "" : " ",
+			d->is_done() ? elapsed_time(get_completion_time(d)).c_str()
+			             : human_size(item->down_rate()->rate(), 2 | 8).c_str(),
 			human_size(item->file_list()->size_bytes(), 2).c_str(),
 			buffer
 		);
 
 		int x_scrape = 3 + 8*2 + 1; // lead, 8 status columns, gap
 		int x_rate = x_scrape + 3*3; // skip 3 scrape columns
-		int x_name = x_rate + 3*5; // skip 3 rate/size columns
+		int x_name = x_rate + 3*5 + 1; // skip 3 rate/size columns
 		decorate_download_title(window, canvas, view, pos, range);
 		canvas->set_attr(2, pos, x_name-2, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
 		if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
@@ -495,7 +530,12 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 		// color up/down rates
 		canvas->set_attr(x_rate+0, pos, 4, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
-		canvas->set_attr(x_rate+5, pos, 4, attr_map[ps::COL_LEECHING + offset], ps::COL_LEECHING + offset);
+		if (d->is_done()) {
+			canvas->set_attr(x_rate+5+1, pos, 1, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
+			canvas->set_attr(x_rate+5+4, pos, 1, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
+		} else {
+			canvas->set_attr(x_rate+5, pos, 5, attr_map[ps::COL_LEECHING + offset], ps::COL_LEECHING + offset);
+		}
 
 		// is this the item in focus?
 		if (range.first == view->focus()) {
