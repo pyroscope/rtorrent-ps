@@ -179,6 +179,10 @@ extend() { # Rebuild and install rTorrent with patches applied
     #echo "fix_ncurses_5.8.patch"
     #patch -uNp1 -i "${srcdir}/fix_ncurses_5.8.patch"
 
+    for backport in $SRC_DIR/patches/backport_${RT_VERSION}_*.patch; do
+        test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
+    done
+
     bold "pyroscope.patch"
     patch -uNp1 -i "$SRC_DIR/patches/pyroscope.patch"
     for i in "$SRC_DIR"/patches/*.{cc,h}; do
