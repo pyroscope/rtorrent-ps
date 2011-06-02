@@ -482,13 +482,20 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			buffer
 		);
 
+		int x_scrape = 3 + 8*2 + 1; // lead, 8 status columns, gap
+		int x_rate = x_scrape + 3*3; // skip 3 scrape columns
+		int x_name = x_rate + 3*5; // skip 3 rate/size columns
 		decorate_download_title(window, canvas, view, pos, range);
-		canvas->set_attr(2, pos, 1 + 8*2+1 + 3*3 + 3*5, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
-		if (has_alert) canvas->set_attr(3 + 7*2, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
+		canvas->set_attr(2, pos, x_name-2, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+		if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
 		// show ratio progress by color
 		int rcol = ratio_color(ratio);
-		canvas->set_attr(3 + 6*2, pos, 2, attr_map[rcol + offset], rcol + offset);
+		canvas->set_attr(x_scrape-5, pos, 2, attr_map[rcol + offset], rcol + offset);
+
+		// color up/down rates
+		canvas->set_attr(x_rate+0, pos, 4, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
+		canvas->set_attr(x_rate+5, pos, 4, attr_map[ps::COL_LEECHING + offset], ps::COL_LEECHING + offset);
 
 		// is this the item in focus?
 		if (range.first == view->focus()) {
