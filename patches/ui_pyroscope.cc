@@ -56,6 +56,8 @@ static const char* color_vars[ps::COL_MAX] = {
 	"ui.color.progress120",
 	"ui.color.complete",
 	"ui.color.seeding",
+	"ui.color.stopped",
+	"ui.color.queued",
 	"ui.color.incomplete",
 	"ui.color.leeching",
 	"ui.color.alarm",
@@ -299,14 +301,15 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
 	int offset = row_offset(view, range);
 	torrent::Download* item = (*range.first)->download();
 	torrent::Tracker* tracker = get_active_tracker(item);
+	bool active = item->is_open() && item->is_active();
 
 	// download title color
 	int title_col;
 	unsigned long focus_attr = range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0;
 	if ((*range.first)->is_done())
-		title_col = (item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE) + offset;
+		title_col = (active ? item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE : ps::COL_STOPPED) + offset;
 	else
-		title_col = (item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE) + offset;
+		title_col = (active ? item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE : ps::COL_QUEUED) + offset;
 	canvas->set_attr(2, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
 	// show label for tracker in focus
@@ -339,11 +342,13 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
 		}
 
 		// print it right-justified and in braces
+		int td_col = ps::COL_INFO;
+		//int td_col = active ? ps::COL_INFO : (*range.first)->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 		int xpos = canvas->width() - len - 2;
 		canvas->print(xpos, pos, "{%s}", url.c_str());
-		canvas->set_attr(xpos + 1, pos, len, attr_map[ps::COL_INFO + offset] | focus_attr, ps::COL_INFO + offset);
-		canvas->set_attr(xpos, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
-		canvas->set_attr(canvas->width() - 1, pos, 1, (attr_map[ps::COL_INFO + offset] | focus_attr) ^ A_BOLD, ps::COL_INFO + offset);
+		canvas->set_attr(xpos + 1, pos, len, attr_map[td_col + offset] | focus_attr, td_col + offset);
+		canvas->set_attr(xpos, pos, 1, (attr_map[td_col + offset] | focus_attr) ^ A_BOLD, td_col + offset);
+		canvas->set_attr(canvas->width() - 1, pos, 1, (attr_map[td_col + offset] | focus_attr) ^ A_BOLD, td_col + offset);
 	}
 }
 
@@ -410,9 +415,11 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- R:nnnnnn [TI]
 	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 79, 1, 91, 2, 100, 1, 103, 1};
 	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
+	int col_active = ps::COL_INFO;
+	//int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : (*range.first)->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
 	// apply basic "info" style, and then revert static text to "label"
-	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+	canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[col_active + offset], col_active + offset);
 	for (int label_idx = 0; label_idx < sizeof(label_pos) / sizeof(int); label_idx += 2) {
 		if (labels[label_idx/2]) canvas->print(label_pos[label_idx], pos+1, labels[label_idx/2]);
 		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL + offset], ps::COL_LABEL + offset);
@@ -480,6 +487,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		bool has_msg = !d->message().empty();
 		bool has_alert = has_msg && d->message().find("Tried all trackers") == std::string::npos;
 		int offset = row_offset(view, range);
+		int col_active = ps::COL_INFO;
+		//int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : d->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 		const char* progress[] = {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "};
@@ -522,7 +531,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		int x_rate = x_scrape + 3*3; // skip 3 scrape columns
 		int x_name = x_rate + 3*5 + 1; // skip 3 rate/size columns
 		decorate_download_title(window, canvas, view, pos, range);
-		canvas->set_attr(2, pos, x_name-2, attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+		canvas->set_attr(2, pos, x_name-2, attr_map[col_active + offset], col_active + offset);
 		if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
 		// show ratio progress by color
@@ -615,6 +624,8 @@ void initialize_command_ui_pyroscope() {
 	NEW_VARIABLE_COLOR("ui.color.progress120",	"bold bright green");
 	NEW_VARIABLE_COLOR("ui.color.complete", 	"bright green");
 	NEW_VARIABLE_COLOR("ui.color.seeding", 		"bold bright green");
+	NEW_VARIABLE_COLOR("ui.color.stopped", 		"blue");
+	NEW_VARIABLE_COLOR("ui.color.queued", 		"magenta");
 	NEW_VARIABLE_COLOR("ui.color.incomplete", 	"yellow");
 	NEW_VARIABLE_COLOR("ui.color.leeching", 	"bold bright yellow");
 	NEW_VARIABLE_COLOR("ui.color.alarm", 		"bold white on red");
