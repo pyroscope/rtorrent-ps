@@ -111,7 +111,8 @@ std::string elapsed_time(unsigned long dt)  {
 	int dim = 0;
 	dt = time(NULL) - dt;
 	while (threshold[dim] && dt >= threshold[dim]) ++dim;
-	float val = float(dt) / float(threshold[--dim]);
+	if (dim) --dim;
+	float val = float(dt) / float(threshold[dim]);
 
 	char buffer[15];
 	if (val < 10.0 && dim) {
