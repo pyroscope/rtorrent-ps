@@ -140,7 +140,7 @@ std::string num2(int64_t num) {
 		while (num > 9) { ++dim; num /= 10; }
 		snprintf(buffer, sizeof(buffer), "%1d%c", int(num), roman[dim]);
 	}
-    
+
 	return std::string(buffer);
 }
 
@@ -548,15 +548,16 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 	}
 
 	if (view->focus() != view->end_visible()) {
-	    char buffer[canvas->width() + 1];
-	    char* position;
-	    char* last = buffer + canvas->width() + 1;
+		char buffer[canvas->width() + 1];
+		char* position;
+		char* last = buffer + canvas->width() + 1;
 
-	    position = print_download_info(buffer, last, *view->focus());
-	    canvas->print(3, pos, "%s", buffer);
+		pos = canvas->height() - 2;
+		position = print_download_info(buffer, last, *view->focus());
+		canvas->print(3, pos, "%s", buffer);
 		canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
 		position = print_download_status(buffer, last, *view->focus());
-	    canvas->print(3, pos+1, "%s", buffer);
+		canvas->print(3, pos+1, "%s", buffer);
 		canvas->set_attr(0, pos+1, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
 	}
 
