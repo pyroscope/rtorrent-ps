@@ -1,0 +1,7 @@
+--- orig/src/command_ui.cc	2009-11-12 09:03:48.000000000 +0100
++++ rtorrent-0.8.6/src/command_ui.cc	2011-06-04 18:22:26.000000000 +0200
+@@ -241,3 +241,3 @@
+   case torrent::Object::TYPE_STRING: return result1.as_string() < result2.as_string();
+-  default: return (int64_t)false;
++  default: return (int64_t) (target.second < target.third);
+   }
