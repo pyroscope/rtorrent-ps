@@ -74,7 +74,7 @@ static const char* color_vars[ps::COL_MAX] = {
 static std::map<std::string, bool> is_collapsed;
 
 
-// try to find the "right" tracker for display purposes
+// return the "main" tracker for this download item
 torrent::Tracker* get_active_tracker(torrent::Download* item) {
 	torrent::TrackerList* tl = item->tracker_list();
 	torrent::Tracker* tracker = 0;
@@ -90,6 +90,36 @@ torrent::Tracker* get_active_tracker(torrent::Download* item) {
 	if (!tracker && tl->size()) tracker = tl->at(0);
 
 	return tracker;
+}
+
+
+// return the domain name of the "main" tracker of the given download item
+std::string get_active_tracker_domain(torrent::Download* item) {
+    std::string url;
+	torrent::Tracker* tracker = get_active_tracker(item);
+
+	if (tracker && !tracker->url().empty()) {
+		url = tracker->url();
+
+		// snip url to domain name
+		if (url.compare(0, 7, "http://")  == 0) url = url.substr(7);
+		if (url.compare(0, 8, "https://") == 0) url = url.substr(8);
+		if (url.find('/') > 0) url = url.substr(0, url.find('/'));
+		if (url.find(':') > 0) url = url.substr(0, url.find(':'));
+
+		// remove some common cruft
+		const char* domain_cruft[] = {
+			"tracker", "1.", "2.", "001.", ".",
+			"www.",
+			0
+		};
+		for (const char** cruft = domain_cruft; *cruft; cruft++) {
+			int cruft_len = strlen(*cruft);
+			if (url.compare(0, cruft_len, *cruft) == 0) url = url.substr(cruft_len);
+		}
+	}
+
+	return url;
 }
 
 
@@ -300,7 +330,6 @@ static int row_offset(core::View* view, Range& range) {
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
 	int offset = row_offset(view, range);
 	torrent::Download* item = (*range.first)->download();
-	torrent::Tracker* tracker = get_active_tracker(item);
 	bool active = item->is_open() && item->is_active();
 
 	// download title color
@@ -313,27 +342,8 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
 	canvas->set_attr(2, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
 	// show label for tracker in focus
-	if (tracker && !tracker->url().empty()) {
-		std::string url = tracker->url();
-		int off = 0;
-
-		// snip url to domain name
-		if (url.compare(0, 7, "http://")  == 0) url = url.substr(7);
-		if (url.compare(0, 8, "https://") == 0) url = url.substr(8);
-		if (url.find('/') > 0) url = url.substr(0, url.find('/'));
-		if (url.find(':') > 0) url = url.substr(0, url.find(':'));
-
-		// remove some common cruft
-		const char* domain_cruft[] = {
-			"tracker", "1.", "2.", "001.", ".",
-			"www.",
-			0
-		};
-		for (const char** cruft = domain_cruft; *cruft; cruft++) {
-			int cruft_len = strlen(*cruft);
-			if (url.compare(0, cruft_len, *cruft) == 0) url = url.substr(cruft_len);
-		}
-
+	std::string url = get_active_tracker_domain(item);
+	if (!url.empty()) {
 		// shorten label if too long
 		int len = url.length();
 		if (len > TRACKER_LABEL_WIDTH) {
