@@ -13,7 +13,6 @@
 #include "core/manager.h"
 #include "core/download.h"
 #include "torrent/tracker.h"
-#include "torrent/tracker_list.h"
 #include "torrent/rate.h"
 #include "display/window.h"
 #include "display/canvas.h"
@@ -23,6 +22,11 @@
 
 #include "control.h"
 #include "command_helpers.h"
+
+
+// from command_pyroscope.cc
+extern torrent::Tracker* get_active_tracker(torrent::Download* item);
+extern std::string get_active_tracker_domain(torrent::Download* item);
 
 
 #define TRACKER_LABEL_WIDTH 20U
@@ -72,55 +76,6 @@ static const char* color_vars[ps::COL_MAX] = {
 
 // collapsed state of views (default is false)
 static std::map<std::string, bool> is_collapsed;
-
-
-// return the "main" tracker for this download item
-torrent::Tracker* get_active_tracker(torrent::Download* item) {
-	torrent::TrackerList* tl = item->tracker_list();
-	torrent::Tracker* tracker = 0;
-
-	for (int trkidx = 0; trkidx < tl->size(); trkidx++) {
-		tracker = tl->at(trkidx);
-		if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP
-				&& tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
-			break;
-		}
-		tracker = 0;
-	}
-	if (!tracker && tl->size()) tracker = tl->at(0);
-
-	return tracker;
-}
-
-
-// return the domain name of the "main" tracker of the given download item
-std::string get_active_tracker_domain(torrent::Download* item) {
-    std::string url;
-	torrent::Tracker* tracker = get_active_tracker(item);
-
-	if (tracker && !tracker->url().empty()) {
-		url = tracker->url();
-
-		// snip url to domain name
-		if (url.compare(0, 7, "http://")  == 0) url = url.substr(7);
-		if (url.compare(0, 8, "https://") == 0) url = url.substr(8);
-		if (url.find('/') > 0) url = url.substr(0, url.find('/'));
-		if (url.find(':') > 0) url = url.substr(0, url.find(':'));
-
-		// remove some common cruft
-		const char* domain_cruft[] = {
-			"tracker", "1.", "2.", "001.", ".",
-			"www.",
-			0
-		};
-		for (const char** cruft = domain_cruft; *cruft; cruft++) {
-			int cruft_len = strlen(*cruft);
-			if (url.compare(0, cruft_len, *cruft) == 0) url = url.substr(cruft_len);
-		}
-	}
-
-	return url;
-}
 
 
 // get timestamp of completion
