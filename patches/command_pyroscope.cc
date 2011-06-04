@@ -23,6 +23,7 @@
 #include <rak/functional_fun.h>
 #include <sigc++/adaptors/bind.h>
 
+#include "core/download.h"
 #include "core/manager.h"
 #include "core/view_manager.h"
 #include "rpc/parse.h"
@@ -237,14 +238,20 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
 }
 
 
+torrent::Object cmd_d_tracker_domain(core::Download* download) {
+    return get_active_tracker_domain(download->download());
+}
+
 
 void initialize_command_pyroscope() {
 #if defined(CMD2_ANY)
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
+    CMD2_DL("d.tracker_domain", std::bind(&cmd_d_tracker_domain, std::placeholders::_1));
 #else
     ADD_ANY_LIST("compare", rak::ptr_fn(&apply_compare));
     ADD_COMMAND_LIST("ui.bind_key", rak::ptr_fn(&apply_ui_bind_key));
+    CMD_D_VOID("d.tracker_domain", &cmd_d_tracker_domain);
 #endif
 }
 
