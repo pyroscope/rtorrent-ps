@@ -469,11 +469,15 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		int col_active = ps::COL_INFO;
 		//int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : d->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
-		const char* alert = "⚠ ";
+		const char* alert = "⚠ ";
 		if (has_alert) {
-			if (d->message().find("Timeout was reached") != std::string::npos)
+			if (d->message().find("Timeout was reached") != std::string::npos
+			            || d->message().find("Timed out") != std::string::npos)
 				alert = "◔ ";
+			else if (d->message().find("Connecting to") != std::string::npos)
+				alert = "⚡ ";
 			else if (d->message().find("Could not parse bencoded data") != std::string::npos
+			            || d->message().find("Server returned nothing") != std::string::npos
 			            || d->message().find("Couldn't connect to server") != std::string::npos)
 				alert = "↯ ";
 			else if (d->message().find("not registered") != std::string::npos
