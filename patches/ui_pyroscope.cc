@@ -469,6 +469,25 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		int col_active = ps::COL_INFO;
 		//int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : d->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
+		const char* alert = "⚠ ";
+		if (has_alert) {
+			if (d->message().find("Timeout was reached") != std::string::npos)
+				alert = "◔ ";
+			else if (d->message().find("Could not parse bencoded data") != std::string::npos
+			            || d->message().find("Couldn't connect to server") != std::string::npos)
+				alert = "↯ ";
+			else if (d->message().find("not registered") != std::string::npos
+			            || d->message().find("torrent cannot be found") != std::string::npos
+			            || d->message().find("unregistered") != std::string::npos)
+				alert = "¿?";
+			else if (d->message().find("not authorized") != std::string::npos
+			            || d->message().find("blocked from") != std::string::npos
+			            || d->message().find("denied") != std::string::npos
+			            || d->message().find("limit exceeded") != std::string::npos
+			            || d->message().find("active torrents are enough") != std::string::npos)
+				alert = "⨂ ";
+		}
+
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 		const char* progress[] = {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "};
 		//const char* ying_yang[] = {"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "};
@@ -494,7 +513,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 				(D_INFO(item)->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(D_INFO(item)->up_rate()->rate() ? "↟ " : "  "),
 			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
-			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
+			has_msg ? has_alert ? alert : "♺ " : "  ",
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
