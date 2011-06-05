@@ -8,7 +8,6 @@
 
 #include <rak/algorithm.h>
 
-#include "rpc/command_variable.h"
 #include "core/view.h"
 #include "core/manager.h"
 #include "core/download.h"
@@ -23,6 +22,13 @@
 #include "control.h"
 #include "command_helpers.h"
 
+#if defined(CMD2_ANY)
+	#define D_INFO(item) (item->info())
+	#include "rpc/object_storage.h"
+#else
+	#define D_INFO(item) (item)
+	#include "rpc/command_variable.h"
+#endif
 
 // from command_pyroscope.cc
 extern torrent::Tracker* get_active_tracker(torrent::Download* item);
@@ -284,20 +290,24 @@ static int row_offset(core::View* view, Range& range) {
 
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
 	int offset = row_offset(view, range);
+#if defined(CMD2_ANY)
+	core::Download* item = *range.first;
+#else
 	torrent::Download* item = (*range.first)->download();
+#endif
 	bool active = item->is_open() && item->is_active();
 
 	// download title color
 	int title_col;
 	unsigned long focus_attr = range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0;
 	if ((*range.first)->is_done())
-		title_col = (active ? item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE : ps::COL_STOPPED) + offset;
+		title_col = (active ? D_INFO(item)->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE : ps::COL_STOPPED) + offset;
 	else
-		title_col = (active ? item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE : ps::COL_QUEUED) + offset;
+		title_col = (active ? D_INFO(item)->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE : ps::COL_QUEUED) + offset;
 	canvas->set_attr(2, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
 	// show label for tracker in focus
-	std::string url = get_active_tracker_domain(item);
+	std::string url = get_active_tracker_domain((*range.first)->download());
 	if (!url.empty()) {
 		// shorten label if too long
 		int len = url.length();
@@ -395,10 +405,10 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	canvas->set_attr(93, pos+1, 6, attr_map[rcol + offset], rcol + offset);
 
 	// mark active up / down ("focus", plus "seeding" or "leeching"), and dim inactive numbers (i.e. 0)
-	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (item->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
-		(item->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL) + offset);
-	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (item->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
-		(item->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL) + offset);
+	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (D_INFO(item)->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+		(D_INFO(item)->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL) + offset);
+	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (D_INFO(item)->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+		(D_INFO(item)->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL) + offset);
 
 	// mark non-trivial messages
 	if (!(*range.first)->message().empty() && (*range.first)->message().find("Tried all trackers") == std::string::npos) {
@@ -446,8 +456,12 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	while (range.first != range.second) {
 		core::Download* d = *range.first;
+#if defined(CMD2_ANY)
+		core::Download* item = d;
+#else
 		torrent::Download* item = d->download();
-		torrent::Tracker* tracker = get_active_tracker(item);
+#endif
+		torrent::Tracker* tracker = get_active_tracker((*range.first)->download());
 		int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(d));
 		bool has_msg = !d->message().empty();
 		bool has_alert = has_msg && d->message().find("Tried all trackers") == std::string::npos;
@@ -476,18 +490,18 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			d->is_done() ? "✔ " : progress[
 				item->file_list()->completed_chunks() * progress_steps
 				/ item->file_list()->size_chunks()],
-			item->down_rate()->rate() ? 
-				(item->up_rate()->rate() ? "⇅ " : "↡ ") :
-				(item->up_rate()->rate() ? "↟ " : "  "),
+			D_INFO(item)->down_rate()->rate() ? 
+				(D_INFO(item)->up_rate()->rate() ? "⇅ " : "↡ ") :
+				(D_INFO(item)->up_rate()->rate() ? "↟ " : "  "),
 			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
 			has_msg ? has_alert ? "⚠ " : "♺ " : "  ",
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
-			human_size(item->up_rate()->rate(), 2 | 8).c_str(),
+			human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
 			d->is_done() ? "" : " ",
 			d->is_done() ? elapsed_time(get_completion_time(d)).c_str()
-			             : human_size(item->down_rate()->rate(), 2 | 8).c_str(),
+			             : human_size(D_INFO(item)->down_rate()->rate(), 2 | 8).c_str(),
 			human_size(item->file_list()->size_bytes(), 2).c_str(),
 			buffer
 		);
@@ -549,11 +563,12 @@ void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
 
 
 #if defined(CMD2_ANY)
-torrent::Object cmd_view_collapsed_toggle(rpc::target_type target, const torrent::Object& rawArgs) {
+torrent::Object cmd_view_collapsed_toggle(const torrent::Object::string_type& args) {
+	std::string view_name = args;
 #else
 torrent::Object cmd_view_collapsed_toggle(__UNUSED rpc::target_type target, const torrent::Object& rawArgs) {
-#endif
 	std::string view_name = rawArgs.as_string();
+#endif
 
 	if (view_name.empty()) {
 		view_name = control->ui()->download_list()->current_view()->name();
@@ -565,53 +580,71 @@ torrent::Object cmd_view_collapsed_toggle(__UNUSED rpc::target_type target, cons
 }
 
 
+#if defined(CMD2_ANY)
+// implementation of method we patched into rpc::object_storage
+const torrent::Object& rpc::object_storage::set_color_string(const torrent::raw_string& key, const std::string& object) {
+	const torrent::Object& result = rpc::object_storage::set_string(key, object);
+	display::ui_pyroscope_colormap_init();
+	return result;
+}
+#else
 // implementation of method we patched into rpc::CommandVariable
 const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand, cleaned_type target, const torrent::Object& rawArgs) {
-	rpc::CommandVariable::set_string(rawCommand, target, rawArgs);
+	const torrent::Object result = rpc::CommandVariable::set_string(rawCommand, target, rawArgs);
 	display::ui_pyroscope_colormap_init();
+	return result;
 }
+#endif
 
 
 // register our commands
 void initialize_command_ui_pyroscope() {
 #if defined(CMD2_ANY)
+	#define PS_VARIABLE_COLOR(key, value) \
+		control->object_storage()->insert_c_str(key, value, rpc::object_storage::flag_string_type); \
+		CMD2_ANY(key, std::bind(&rpc::object_storage::get, control->object_storage(),   \
+			torrent::raw_string::from_c_str(key)));  \
+		CMD2_ANY_STRING(key ".set", std::bind(&rpc::object_storage::set_color_string, control->object_storage(), \
+			torrent::raw_string::from_c_str(key), std::placeholders::_2));
+
+	#define PS_CMD_ANY_FUN(key, func) \
+		CMD2_ANY(key, std::bind(&func))
+
+	CMD2_ANY_STRING("view.collapsed.toggle", std::bind(&cmd_view_collapsed_toggle, std::placeholders::_2));
 #else
-	#define NEW_VARIABLE_COLOR(key, defaultValue) \
+	#define PS_VARIABLE_COLOR(key, defaultValue) \
 		add_variable(key, key ".set", 0, \
 			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
 
-	NEW_VARIABLE_COLOR("ui.color.progress0", 	"red");
-	NEW_VARIABLE_COLOR("ui.color.progress20", 	"bold bright red");
-	NEW_VARIABLE_COLOR("ui.color.progress40", 	"bold bright magenta");
-	NEW_VARIABLE_COLOR("ui.color.progress60", 	"yellow");
-	NEW_VARIABLE_COLOR("ui.color.progress80", 	"bold bright yellow");
-	NEW_VARIABLE_COLOR("ui.color.progress100",	"green");
-	NEW_VARIABLE_COLOR("ui.color.progress120",	"bold bright green");
-	NEW_VARIABLE_COLOR("ui.color.complete", 	"bright green");
-	NEW_VARIABLE_COLOR("ui.color.seeding", 		"bold bright green");
-	NEW_VARIABLE_COLOR("ui.color.stopped", 		"blue");
-	NEW_VARIABLE_COLOR("ui.color.queued", 		"magenta");
-	NEW_VARIABLE_COLOR("ui.color.incomplete", 	"yellow");
-	NEW_VARIABLE_COLOR("ui.color.leeching", 	"bold bright yellow");
-	NEW_VARIABLE_COLOR("ui.color.alarm", 		"bold white on red");
-	NEW_VARIABLE_COLOR("ui.color.title", 		"bold bright white on blue");
-	NEW_VARIABLE_COLOR("ui.color.footer", 		"bold bright cyan on blue");
-	NEW_VARIABLE_COLOR("ui.color.label", 		"gray");
-	NEW_VARIABLE_COLOR("ui.color.odd", 			"");
-	NEW_VARIABLE_COLOR("ui.color.even", 		"");
-	NEW_VARIABLE_COLOR("ui.color.info", 		"white");
-	NEW_VARIABLE_COLOR("ui.color.focus", 		"reverse");
-
-	ADD_COMMAND_VOID("system.colors.max",		rak::ptr_fun(&display::get_colors));
-	ADD_COMMAND_VOID("system.colors.enabled",   rak::ptr_fun(&has_colors));
-	ADD_COMMAND_VOID("system.colors.rgb",		rak::ptr_fun(&can_change_color));
-
-	CMD_N_STRING("view.collapsed.toggle",		rak::ptr_fn(&cmd_view_collapsed_toggle));
-
-// macros mostly compatible to 0.8.8 syntax
-#define CMD2_VAR_BOOL(key, defaultValue) \
-	add_variable(key, key ".set", 0, &rpc::CommandVariable::get_bool, &rpc::CommandVariable::set_bool, (int64_t)defaultValue);
+	#define PS_CMD_ANY_FUN(key, func) \
+		ADD_COMMAND_VOID(key, rak::ptr_fun(&func))
+    
+	CMD_N_STRING("view.collapsed.toggle", rak::ptr_fn(&cmd_view_collapsed_toggle));
 #endif
 
-	//CMD2_VAR_BOOL("", false);
+	PS_VARIABLE_COLOR("ui.color.progress0", 	"red");
+	PS_VARIABLE_COLOR("ui.color.progress20", 	"bold bright red");
+	PS_VARIABLE_COLOR("ui.color.progress40", 	"bold bright magenta");
+	PS_VARIABLE_COLOR("ui.color.progress60", 	"yellow");
+	PS_VARIABLE_COLOR("ui.color.progress80", 	"bold bright yellow");
+	PS_VARIABLE_COLOR("ui.color.progress100",	"green");
+	PS_VARIABLE_COLOR("ui.color.progress120",	"bold bright green");
+	PS_VARIABLE_COLOR("ui.color.complete", 		"bright green");
+	PS_VARIABLE_COLOR("ui.color.seeding", 		"bold bright green");
+	PS_VARIABLE_COLOR("ui.color.stopped", 		"blue");
+	PS_VARIABLE_COLOR("ui.color.queued", 		"magenta");
+	PS_VARIABLE_COLOR("ui.color.incomplete", 	"yellow");
+	PS_VARIABLE_COLOR("ui.color.leeching", 		"bold bright yellow");
+	PS_VARIABLE_COLOR("ui.color.alarm", 		"bold white on red");
+	PS_VARIABLE_COLOR("ui.color.title", 		"bold bright white on blue");
+	PS_VARIABLE_COLOR("ui.color.footer", 		"bold bright cyan on blue");
+	PS_VARIABLE_COLOR("ui.color.label", 		"gray");
+	PS_VARIABLE_COLOR("ui.color.odd", 			"");
+	PS_VARIABLE_COLOR("ui.color.even", 			"");
+	PS_VARIABLE_COLOR("ui.color.info", 			"white");
+	PS_VARIABLE_COLOR("ui.color.focus", 		"reverse");
+
+	PS_CMD_ANY_FUN("system.colors.max",			display::get_colors);
+	PS_CMD_ANY_FUN("system.colors.enabled",		has_colors);
+	PS_CMD_ANY_FUN("system.colors.rgb",			can_change_color);
 }
