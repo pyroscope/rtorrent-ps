@@ -1,0 +1,17 @@
+--- orig/src/command_ui.cc	2011-05-07 16:11:02.000000000 +0200
++++ rtorrent-0.8.8/src/command_ui.cc	2011-06-05 12:37:11.000000000 +0200
+@@ -293,10 +293,12 @@
+ torrent::Object apply_less(rpc::target_type target, const torrent::Object::list_type& args) {
+   torrent::Object result = apply_cmp(target, args);
+-  return result.is_value() ? result.as_value() <  0 : (int64_t)false;
++  return result.is_value() ? result.as_value() <  0 : (int64_t)
++    (rpc::is_target_pair(target) ? (target.second < target.third) : false);
+ }
+ 
+ torrent::Object apply_greater(rpc::target_type target, const torrent::Object::list_type& args) {
+   torrent::Object result = apply_cmp(target, args);
+-  return result.is_value() ? result.as_value() >  0 : (int64_t)false;
++  return result.is_value() ? result.as_value() >  0 : (int64_t)
++    (rpc::is_target_pair(target) ? (target.second > target.third) : false);
+ }
+ 

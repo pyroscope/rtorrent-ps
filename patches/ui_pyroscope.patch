@@ -14,13 +14,6 @@
    initialize_command_scheduler();
 +  initialize_command_ui_pyroscope();
  
---- orig/src/rpc/command_variable.h	2009-11-12 09:03:42.000000000 +0100
-+++ rtorrent-0.8.6/src/rpc/command_variable.h	2011-05-27 04:06:44.000000000 +0200
-@@ -66,2 +66,4 @@
- 
-+  static const torrent::Object set_color_string(Command* rawCommand, cleaned_type target, const torrent::Object& args);
-+
- private:
 --- orig/src/display/canvas.h	2009-11-12 09:03:47.000000000 +0100
 +++ rtorrent-0.8.6/src/display/canvas.h	2011-05-28 13:42:58.000000000 +0200
 @@ -134,4 +134,6 @@

@@ -30,7 +30,6 @@ _keybindings=0
 
 # Keep rTorrent version, once it was built in this directory
 test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
-test -d rtorrent-0.8.7 && { export LT_VERSION=0.12.7; export RT_VERSION=0.8.7; }
 test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
 
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
@@ -168,8 +167,8 @@ extend() { # Rebuild and install rTorrent with patches applied
     # Unpack original source
     tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
 
-    # Version guards
-    [[ $RT_VERSION == 0.8.6 ]] || { _interface=0; bold "Interface patches disabled"; }
+    # Version handling
+    [ $RT_VERSION == 0.8.6 -o "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
 
     # Patch it
     pushd rtorrent-$RT_VERSION
