@@ -477,6 +477,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			else if (d->message().find("Connecting to") != std::string::npos)
 				alert = "⚡ ";
 			else if (d->message().find("Could not parse bencoded data") != std::string::npos
+			            || d->message().find("Failed sending data") != std::string::npos
 			            || d->message().find("Server returned nothing") != std::string::npos
 			            || d->message().find("Couldn't connect to server") != std::string::npos)
 				alert = "↯ ";
