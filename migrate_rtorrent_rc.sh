@@ -20,6 +20,7 @@ cp $rc_file,0.8.6 $rc_file
 # Generic
 sed -i $rc_file \
     -e 's%-086\.rc%-087\.rc%g' \
+    -e 's%^#087#%%g' \
     -e 's%^download_rate\([ =]\)%throttle.global_down.max_rate.set_kb\1%' \
     -e 's%^encoding_list\([ =]\)%encoding.add\1%' \
     -e 's%^system\.method\.insert\([ =]\)%method.insert\1%' \
