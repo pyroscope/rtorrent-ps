@@ -3,6 +3,7 @@
 # Build rTorrent including patches
 #
 
+export SVN=0
 export RT_MINOR=6
 export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
 
@@ -31,6 +32,7 @@ _keybindings=0
 # Keep rTorrent version, once it was built in this directory
 test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
 test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
+test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8-svn; export SVN=1; } 
 
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
 export CFLAGS="-I $INST_DIR/include"
@@ -43,9 +45,13 @@ XMLRPC_URL="https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced@$XMLR
 TARBALLS=$(cat <<.
 http://c-ares.haxx.se/c-ares-$CARES_VERSION.tar.gz
 http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
+http://aur.archlinux.org/packages/rtorrent-extended/rtorrent-extended.tar.gz
+.
+)
+test ${SVN:-0} = 0 && TARBALLS=$(cat <<.
+$TARBALLS
 http://libtorrent.rakshasa.no/downloads/libtorrent-$LT_VERSION.tar.gz
 http://libtorrent.rakshasa.no/downloads/rtorrent-$RT_VERSION.tar.gz
-http://aur.archlinux.org/packages/rtorrent-extended/rtorrent-extended.tar.gz
 .
 )
 
@@ -145,18 +151,44 @@ download() { # Download & unpack sources
         test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget -q $url )
         test -d ${url_base%.tar.gz} || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
     done
+    
+    if test ${SVN:-0} = 1 -a ! -d SVN-HEAD; then
+        svn co svn://rakshasa.no/libtorrent/trunk SVN-HEAD
+        ln -nfs SVN-HEAD/libtorrent libtorrent-$LT_VERSION
+        ln -nfs SVN-HEAD/rtorrent rtorrent-$RT_VERSION
+    fi
+}
+
+automagic() {
+    rm -f ltmain.sh scripts/{libtool,lt*}.m4
+    libtoolize --automake --force --copy
+    aclocal
+    autoconf
+    automake
+    ./autogen.sh
+}
+
+tag_svn_rev() {
+    if test ${SVN:-0} = 1; then
+        svnrev=$(export LANG=en_US.UTF8 && svn info SVN-HEAD/ | grep ^Revision | cut -f2 -d":" | tr -d " ")
+        sed -i "s% VERSION \"/\"% VERSION \" r$svnrev/\"%" rtorrent-$RT_VERSION/src/ui/download_list.cc
+    fi
 }
 
 build() { # Build and install all components
+    tag_svn_rev
+
     ( cd c-ares-$CARES_VERSION && ./configure && make && make prefix=$INST_DIR install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make prefix=$INST_DIR install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( cd xmlrpc-c-advanced-$XMLRPC_REV && ./configure --with-libwww-ssl && make && make install PREFIX=$INST_DIR )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
-    ( cd libtorrent-$LT_VERSION && ./configure && make && make prefix=$INST_DIR install )
+    ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
+        && ./configure && make && make prefix=$INST_DIR install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
-    ( cd rtorrent-$RT_VERSION && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make prefix=$INST_DIR install )
+    ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
+        && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make prefix=$INST_DIR install )
 
     symlink_binary -vanilla
 }
@@ -165,7 +197,12 @@ extend() { # Rebuild and install rTorrent with patches applied
     # Based on https://aur.archlinux.org/packages/rtorrent-extended/
     
     # Unpack original source
-    tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
+    if test ${SVN:-0} = 0; then
+        tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
+    else
+        ( cd rtorrent-$RT_VERSION && svn revert -R . && svn update )
+        tag_svn_rev
+    fi
 
     # Version handling
     [ $RT_VERSION == 0.8.6 -o "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
@@ -178,11 +215,11 @@ extend() { # Rebuild and install rTorrent with patches applied
     #echo "fix_ncurses_5.8.patch"
     #patch -uNp1 -i "${srcdir}/fix_ncurses_5.8.patch"
 
-    for corepatch in $SRC_DIR/patches/ps-*_${RT_VERSION}.patch; do
+    for corepatch in $SRC_DIR/patches/ps-*_${RT_VERSION%-svn}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
-    for backport in $SRC_DIR/patches/backport_${RT_VERSION}_*.patch; do
+    for backport in $SRC_DIR/patches/backport_${RT_VERSION%-svn}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -207,8 +244,7 @@ extend() { # Rebuild and install rTorrent with patches applied
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Build it
-    ( set +x ; cd rtorrent-$RT_VERSION && rm -f ltmain.sh scripts/{libtool,lt*}.m4 && \
-        libtoolize --automake --force --copy && aclocal && autoconf && automake && ./autogen.sh && \
+    ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
         ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && \
         make && \
