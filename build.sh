@@ -32,7 +32,8 @@ _keybindings=0
 # Keep rTorrent version, once it was built in this directory
 test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
 test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
-test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8-svn; export SVN=1; } 
+test -d rtorrent-0.8.9 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9; }
+test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; } 
 
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
 export CFLAGS="-I $INST_DIR/include"
@@ -214,6 +215,10 @@ extend() { # Rebuild and install rTorrent with patches applied
 
     #echo "fix_ncurses_5.8.patch"
     #patch -uNp1 -i "${srcdir}/fix_ncurses_5.8.patch"
+
+    for filename in $SRC_DIR/patches/*0.8.8.patch; do
+        test -e "${filename/0.8.8/0.8.9}" || ln -s "$(basename $filename)" "${filename/0.8.8/0.8.9}"
+    done
 
     for corepatch in $SRC_DIR/patches/ps-*_${RT_VERSION%-svn}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
