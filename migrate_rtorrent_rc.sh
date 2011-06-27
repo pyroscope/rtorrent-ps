@@ -43,40 +43,40 @@ sed -i $rc_file \
 
 # Setters
 sed -i $rc_file \
-    -e 's%^bind\([ =]\)%network.bind_address\1%' \
-    -e 's%^check_hash\([ =]\)%pieces.hash.on_completion\1%' \
-    -e 's%^connection_leech\([ =]\)%protocol.connection.leech\1%' \
-    -e 's%^connection_seed\([ =]\)%protocol.connection.seed\1%' \
-    -e 's%^dht_port\([ =]\)%dht.port\1%' \
-    -e 's%^hash_interval\([ =]\)%system.hash.interval\1%' \
-    -e 's%^hash_max_tries\([ =]\)%system.hash.max_tries\1%' \
-    -e 's%^hash_read_ahead\([ =]\)%system.hash.read_ahead\1%' \
-    -e 's%^http_cacert\([ =]\)%network.http.cacert\1%' \
-    -e 's%^http_capath\([ =]\)%network.http.capath\1%' \
-    -e 's%^http_proxy\([ =]\)%network.http.proxy_address\1%' \
-    -e 's%^ip\([ =]\)%network.local_address\1%' \
-    -e 's%^key_layout\([ =]\)%keys.layout\1%' \
-    -e 's%^max_downloads_div\([ =]\)%throttle.max_downloads.div\1%' \
-    -e 's%^max_downloads_global\([ =]\)%throttle.max_downloads.global\1%' \
-    -e 's%^max_memory_usage\([ =]\)%pieces.memory.max\1%' \
-    -e 's%^max_peers_seed\([ =]\)%throttle.max_peers.seed\1%' \
-    -e 's%^max_peers\([ =]\)%throttle.max_peers.normal\1%' \
-    -e 's%^max_uploads_div\([ =]\)%throttle.max_uploads.div\1%' \
-    -e 's%^max_uploads_global\([ =]\)%throttle.max_uploads.global\1%' \
-    -e 's%^max_uploads\([ =]\)%throttle.max_uploads\1%' \
-    -e 's%^min_peers_seed\([ =]\)%throttle.min_peers.seed\1%' \
-    -e 's%^min_peers\([ =]\)%throttle.min_peers.normal\1%' \
-    -e 's%^peer_exchange\([ =]\)%protocol.pex\1%' \
-    -e 's%^port_open\([ =]\)%network.port_open\1%' \
-    -e 's%^port_random\([ =]\)%network.port_random\1%' \
-    -e 's%^port_range\([ =]\)%network.port_range\1%' \
-    -e 's%^proxy_address\([ =]\)%network.proxy_address\1%' \
-    -e 's%^scgi_dont_route\([ =]\)%network.scgi.dont_route\1%' \
+    -e 's%^bind\([ =]\)%network.bind_address.set\1%' \
+    -e 's%^check_hash\([ =]\)%pieces.hash.on_completion.set\1%' \
+    -e 's%^connection_leech\([ =]\)%protocol.connection.leech.set\1%' \
+    -e 's%^connection_seed\([ =]\)%protocol.connection.seed.set\1%' \
+    -e 's%^dht_port\([ =]\)%dht.port.set\1%' \
+    -e 's%^hash_interval\([ =]\)%system.hash.interval.set\1%' \
+    -e 's%^hash_max_tries\([ =]\)%system.hash.max_tries.set\1%' \
+    -e 's%^hash_read_ahead\([ =]\)%system.hash.read_ahead.set\1%' \
+    -e 's%^http_cacert\([ =]\)%network.http.cacert.set\1%' \
+    -e 's%^http_capath\([ =]\)%network.http.capath.set\1%' \
+    -e 's%^http_proxy\([ =]\)%network.http.proxy_address.set\1%' \
+    -e 's%^ip\([ =]\)%network.local_address.set\1%' \
+    -e 's%^key_layout\([ =]\)%keys.layout.set\1%' \
+    -e 's%^max_downloads_div\([ =]\)%throttle.max_downloads.div.set\1%' \
+    -e 's%^max_downloads_global\([ =]\)%throttle.max_downloads.global.set\1%' \
+    -e 's%^max_memory_usage\([ =]\)%pieces.memory.max.set\1%' \
+    -e 's%^max_peers_seed\([ =]\)%throttle.max_peers.seed.set\1%' \
+    -e 's%^max_peers\([ =]\)%throttle.max_peers.normal.set\1%' \
+    -e 's%^max_uploads_div\([ =]\)%throttle.max_uploads.div.set\1%' \
+    -e 's%^max_uploads_global\([ =]\)%throttle.max_uploads.global.set\1%' \
+    -e 's%^max_uploads\([ =]\)%throttle.max_uploads.set\1%' \
+    -e 's%^min_peers_seed\([ =]\)%throttle.min_peers.seed.set\1%' \
+    -e 's%^min_peers\([ =]\)%throttle.min_peers.normal.set\1%' \
+    -e 's%^peer_exchange\([ =]\)%protocol.pex.set\1%' \
+    -e 's%^port_open\([ =]\)%network.port_open.set\1%' \
+    -e 's%^port_random\([ =]\)%network.port_random.set\1%' \
+    -e 's%^port_range\([ =]\)%network.port_range.set\1%' \
+    -e 's%^proxy_address\([ =]\)%network.proxy_address.set\1%' \
+    -e 's%^scgi_dont_route\([ =]\)%network.scgi.dont_route.set\1%' \
     -e 's%^system\.file_allocate.set\([ =]\)%system.file.allocate.set\1%' \
     -e 's%^system\.method\.set\([ =]\)%method.set\1%' \
     -e 's%^tracker_numwant\([ =]\)%trackers.numwant.set\1%' \
     -e 's%^use_udp_trackers\([ =]\)%trackers.use_udp.set\1%' \
-    -e 's%^view_set\([ =]\)%view\1%' \
+    -e 's%^view_set\([ =]\)%view.set\1%' \
     -e 's%^xmlrpc_dialect\([ =]\)%network.xmlrpc.dialect.set\1%' \
     -e 's%^xmlrpc_size_limit\([ =]\)%network.xmlrpc.size_limit.set\1%' \
     -e 's%^system.method.has_key\([ =]\)%method.has_key\1%' \
@@ -98,8 +98,8 @@ sed -i $rc_file \
 
 # Missing Mappings (not in 0.8.7 source code)
 sed -i $rc_file \
-    -e 's%^max_open_sockets\([ =]\)%network.max_open_sockets\1%' \
-    -e 's%^max_open_files\([ =]\)%network.max_open_files\1%' \
+    -e 's%^max_open_sockets\([ =]\)%network.max_open_sockets.set\1%' \
+    -e 's%^max_open_files\([ =]\)%network.max_open_files.set\1%' \
     -e 's%^umask\([ =]\)%system.umask.set\1%' \
     -r
 
