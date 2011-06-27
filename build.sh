@@ -4,7 +4,7 @@
 #
 
 export SVN=0
-export RT_MINOR=6
+export RT_MINOR=9
 export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
 
 export CARES_VERSION=1.7.3
