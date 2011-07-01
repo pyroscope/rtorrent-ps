@@ -149,7 +149,7 @@ static int get_colors() {
 
 // format byte size for humans, if format = 0 use 6 chars (one decimal place),
 // if = 1 just print the rounded value (4 chars), if = 2 combine the two formats
-// into 4 chars by rounding for values >= 10.
+// into 4 chars by rounding for values >= 9.95.
 // set bot 8 of format and 0 values will return a whitespace string of the correct length.
 std::string human_size(int64_t bytes, unsigned int format=0) {
 	if (format & 8 && bytes <= 0) return std::string((format & 7) ? 4 : 6, ' ');
@@ -168,7 +168,7 @@ std::string human_size(int64_t bytes, unsigned int format=0) {
 	const char* formats[] = {"%5.1f%c", "%3.0f%c", "%3.1f%c"};
 
 	if (format > 2) format = 0;
-	if (format == 2 and value >= 10.0) format = 1;
+	if (format == 2 and value >= 9.95) format = 1;
 	if (format == 1) value = int(value + 0.5);
 	snprintf(buffer, sizeof(buffer), formats[format], value, unit);
 
