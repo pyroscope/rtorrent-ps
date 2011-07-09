@@ -29,6 +29,9 @@ _keybindings=0
 # HERE BE DRAGONS!
 #
 
+# Fix people's broken systems
+export LANG=en_US.UTF-8
+
 # Keep rTorrent version, once it was built in this directory
 test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
 test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
