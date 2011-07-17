@@ -101,6 +101,7 @@ sed -i $rc_file \
     -e 's%^max_open_sockets\([ =]\)%network.max_open_sockets.set\1%' \
     -e 's%^max_open_files\([ =]\)%network.max_open_files.set\1%' \
     -e 's%^umask\([ =]\)%system.umask.set\1%' \
+    -e 's%^tracker_dump\([ =]\)%log.tracker.set\1%' \
     -r
 
 # Missing INLINE Mappings (not in 0.8.7 source code)
