@@ -1,0 +1,11 @@
+--- src/torrent/poll_epoll.cc
++++ src/torrent/poll_epoll.cc
+@@ -198,6 +198,6 @@
+   // same fd while in the middle of calling PollEPoll::perform.
+   for (epoll_event *itr = m_events, *last = m_events + m_waitingEvents; itr != last; ++itr)
+-    if (itr->data.ptr == event)
+-      itr->data.ptr = NULL;
++    if (itr->data.fd == event->file_descriptor())
++      itr->events = 0;
+ }
+ 

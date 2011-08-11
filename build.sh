@@ -197,13 +197,15 @@ build() { # Build and install all components
     symlink_binary -vanilla
 }
 
-extend() { # Rebuild and install rTorrent with patches applied
+extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Based on https://aur.archlinux.org/packages/rtorrent-extended/
     
     # Unpack original source
     if test ${SVN:-0} = 0; then
+        tar xfz tarballs/libtorrent-$LT_VERSION.tar.gz
         tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
     else
+        # TODO: libtorrent
         ( cd rtorrent-$RT_VERSION && svn revert -R . && svn update )
         tag_svn_rev
     fi
@@ -211,7 +213,18 @@ extend() { # Rebuild and install rTorrent with patches applied
     # Version handling
     [ $RT_VERSION == 0.8.6 -o "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
 
-    # Patch it
+
+    # Patch libtorrent
+    pushd libtorrent-$LT_VERSION
+
+    for backport in $SRC_DIR/patches/backport_${LT_VERSION%-svn}_*.patch; do
+        test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
+    done
+
+    popd
+    bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+    # Patch rTorrent
     pushd rtorrent-$RT_VERSION
     srcdir=$SRC_DIR/rtorrent-extended
     aur_patches
@@ -251,13 +264,13 @@ extend() { # Rebuild and install rTorrent with patches applied
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-    # Build it
+    # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
+    ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
+        ./configure && make clean && make && make prefix=$INST_DIR install )
+    sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
         ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
-        make clean && \
-        make && \
-        make prefix=$INST_DIR install \
-    )
+        make clean && make && make prefix=$INST_DIR install )
     symlink_binary -extended
 }
 
