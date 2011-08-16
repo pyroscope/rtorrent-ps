@@ -1,0 +1,16 @@
+--- orig/src/command_local.cc	2011-06-14 04:57:10.000000000 +0200
++++ rtorrent-0.8.9/src/command_local.cc	2011-08-16 16:45:02.000000000 +0200
+@@ -95,3 +95,3 @@
+ 
+-  if (arg.empty()) {
++  if (!arg.empty()) {
+     int logFd = open(rak::path_expand(arg).c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
+@@ -107,6 +107,6 @@
+ 
+-    control->core()->push_log("Opened log file.");
++    control->core()->push_log_std("Opened log file '" + rak::path_expand(arg) + "'.");
+ 
+   } else {
+-    control->core()->push_log("Closed log file.");
++    control->core()->push_log_std("Closed type #" + std::string("0123456789").substr(logType, 1) + " log file.");
+   }
