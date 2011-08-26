@@ -47,7 +47,7 @@ export PKG_CONFIG_PATH="$INST_DIR/lib/pkgconfig"
 SELF_URL=http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/rtorrent-extended
 XMLRPC_URL="https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced@$XMLRPC_REV"
 TARBALLS=$(cat <<.
-http://c-ares.haxx.se/c-ares-$CARES_VERSION.tar.gz
+http://c-ares.haxx.se/download/c-ares-$CARES_VERSION.tar.gz
 http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
 http://aur.archlinux.org/packages/rtorrent-extended/rtorrent-extended.tar.gz
 .
