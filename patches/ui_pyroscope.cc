@@ -556,10 +556,13 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 		// color up/down rates
 		canvas->set_attr(x_rate+0, pos, 4, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
-		if (d->is_done()) {
-			canvas->set_attr(x_rate+5+1, pos, 1, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
-			canvas->set_attr(x_rate+5+4, pos, 1, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
+		if (d->is_done() || !down_rate) {
+			// time display
+			int tm_color = (d->is_done() ? ps::COL_SEEDING : ps::COL_INCOMPLETE) + offset;
+			canvas->set_attr(x_rate+5+1, pos, 1, attr_map[tm_color], tm_color);
+			canvas->set_attr(x_rate+5+4, pos, 1, attr_map[tm_color], tm_color);
 		} else {
+			// down rate
 			canvas->set_attr(x_rate+5, pos, 5, attr_map[ps::COL_LEECHING + offset], ps::COL_LEECHING + offset);
 		}
 
