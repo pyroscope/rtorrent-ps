@@ -95,10 +95,10 @@ static const char* color_vars[ps::COL_MAX] = {
 static std::map<std::string, bool> is_collapsed;
 
 
-// get timestamp of completion
-unsigned long get_completion_time(core::Download* d) {
+// get custom field contaioning a long (time_t)
+unsigned long get_custom_long(core::Download* d, const char* name) {
 	try {
-		return atol(d->bencode()->get_key("rtorrent").get_key("custom").get_key_string("tm_completed").c_str());
+		return atol(d->bencode()->get_key("rtorrent").get_key("custom").get_key_string(name).c_str());
 	} catch (torrent::bencode_error& e) {
 		return 0UL;
 	}
@@ -511,6 +511,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		const char* ying_yang[] = {"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "};
 
 		int progress_steps = sizeof(progress) / sizeof(*progress);
+		uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 		char buffer[canvas->width() + 1];
 		char* position;
 		char* last = buffer + canvas->width() - 2 + 1;
@@ -534,9 +535,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
 			human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
-			d->is_done() ? "" : " ",
-			d->is_done() ? elapsed_time(get_completion_time(d)).c_str()
-			             : human_size(D_INFO(item)->down_rate()->rate(), 2 | 8).c_str(),
+			d->is_done() || !down_rate ? "" : " ",
+			d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
+			!down_rate   ? elapsed_time(get_custom_long(d, "tm_loaded")).c_str() :
+			               human_size(down_rate, 2 | 8).c_str(),
 			human_size(item->file_list()->size_bytes(), 2).c_str(),
 			buffer
 		);
