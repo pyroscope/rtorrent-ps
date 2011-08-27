@@ -31,6 +31,8 @@ _keybindings=0
 
 # Fix people's broken systems
 export LANG=en_US.UTF-8
+unset LC_ALL
+export LC_ALL
 
 # Keep rTorrent version, once it was built in this directory
 test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
