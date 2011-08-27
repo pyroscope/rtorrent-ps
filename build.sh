@@ -59,6 +59,19 @@ http://libtorrent.rakshasa.no/downloads/rtorrent-$RT_VERSION.tar.gz
 .
 )
 
+BUILD_DEPS=$(cat <<.
+wget:wget
+subversion:svn
+build-essential:make
+build-essential:g++
+patch:patch
+libtool:libtoolize
+automake:aclocal
+autoconf:autoconf
+automake:automake
+.
+)
+
 set -e
 set +x
 export SRC_DIR=$(cd $(dirname $0) && pwd)
@@ -73,6 +86,18 @@ OFF="$ESC[0m"
 #
 bold() {
     echo "$BOLD$1$OFF"
+}
+
+check_deps() {
+    for dep in $BUILD_DEPS; do
+        pkg=${dep%%:*}
+        cmd=${dep##*:}
+        if which $cmd >/dev/null; then :; else
+            echo "You don't have the '$cmd' command available, you likely need to:"
+            bold "    sudo apt-get install $pkg"
+            exit 1
+        fi
+    done 
 }
 
 aur_patches() {
@@ -141,6 +166,7 @@ symlink_binary() {
 # RULES
 #
 prep() { # Create directories
+    check_deps
     mkdir -p $INST_DIR/{bin,include,lib,man,share}
     mkdir -p tarballs
 }
@@ -198,7 +224,9 @@ build() { # Build and install all components
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
-    # Based on https://aur.archlinux.org/packages/rtorrent-extended/
+    # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
+    
+    test -e $INST_DIR/lib/libxmlrpc.a || { bold "You need to '$0 build' first!"; exit 1; }
     
     # Unpack original source
     if test ${SVN:-0} = 0; then
@@ -212,7 +240,6 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
 
     # Version handling
     [ $RT_VERSION == 0.8.6 -o "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
-
 
     # Patch libtorrent
     pushd libtorrent-$LT_VERSION
@@ -309,7 +336,7 @@ case "$1" in
     clean_all)  clean_all ;; 
     download)   prep; download ;;
     build)      prep; build; check ;;
-    extend)     extend; check ;;
+    extend)     prep; extend; check ;;
     check)      check ;;
     *)
         echo >&2 "Usage: $0 (all | clean | clean_all | download | build | check | extend )"
