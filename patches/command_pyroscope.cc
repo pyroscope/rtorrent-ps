@@ -18,7 +18,9 @@
 #include "config.h"
 #include "globals.h"
 
+#include <fcntl.h>
 #include <ctime>
+#include <rak/path.h>
 #include <rak/functional.h>
 #include <rak/functional_fun.h>
 #include <sigc++/adaptors/bind.h>
@@ -37,6 +39,12 @@
 #include "globals.h"
 #include "control.h"
 #include "command_helpers.h"
+
+
+// handle for message log file
+namespace core {
+int log_messages_fd = -1;
+};
 
 
 // return the "main" tracker for this download item
@@ -243,12 +251,42 @@ torrent::Object cmd_d_tracker_domain(core::Download* download) {
 }
 
 
+#if defined(CMD2_ANY)
+// 0.8.9+ only
+torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
+    if (arg.empty()) {
+        control->core()->push_log_std("Closing message log file.");
+    }
+    
+    if (core::log_messages_fd >= 0) {
+        ::close(core::log_messages_fd);
+        core::log_messages_fd = -1;
+    }
+
+    if (!arg.empty()) {
+        core::log_messages_fd = open(rak::path_expand(arg).c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644);
+
+        if (core::log_messages_fd < 0) {
+            throw torrent::input_error("Could not open message log file.");
+        }
+
+        control->core()->push_log_std("Opened message log file '" + rak::path_expand(arg) + "'.");
+    }
+
+    return torrent::Object();
+}
+#endif
+
+
 void initialize_command_pyroscope() {
 #if defined(CMD2_ANY)
+    // 0.8.9+
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_DL("d.tracker_domain", std::bind(&cmd_d_tracker_domain, std::placeholders::_1));
+    CMD2_ANY_STRING("log.messages", std::bind(&cmd_log_messages, std::placeholders::_2));
 #else
+    // 0.8.6
     ADD_ANY_LIST("compare", rak::ptr_fn(&apply_compare));
     ADD_COMMAND_LIST("ui.bind_key", rak::ptr_fn(&apply_ui_bind_key));
     CMD_D_VOID("d.tracker_domain", &cmd_d_tracker_domain);

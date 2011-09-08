@@ -1,0 +1,25 @@
+--- orig/src/core/manager.cc	2011-04-05 12:26:05.000000000 +0200
++++ rtorrent-0.8.9/src/core/manager.cc	2011-09-08 19:39:39.000000000 +0200
+@@ -38,2 +38,3 @@
+ 
++#include <ctime>
+ #include <cstdio>
+@@ -159,2 +160,18 @@
+   m_logComplete.push_front(msg);
++  
++  extern int log_messages_fd;
++  if (log_messages_fd >= 0) {
++    char buf[30];
++    time_t t = std::time(0);
++    std::tm* now = std::localtime(&t);
++
++    snprintf(buf, sizeof(buf), "%04u-%02u-%02u %2d:%02d:%02d ", 
++        1900 + now->tm_year, now->tm_mon + 1, now->tm_mday, 
++        now->tm_hour, now->tm_min, now->tm_sec);
++
++    std::string line(buf);
++    line += msg;
++    line += '\n';
++    ::write(log_messages_fd, line.c_str(), line.length());
++  }
+ }
