@@ -1,0 +1,22 @@
+--- src/download/download_constructor.cc
++++ src/download/download_constructor.cc
+@@ -344,7 +344,7 @@
+     throw input_error("Bad torrent file, \"path\" has zero entries.");
+ 
+   if (std::find_if(plist.begin(), plist.end(), std::ptr_fun(&DownloadConstructor::is_invalid_path_element)) != plist.end())
+-    throw input_error("Bad torrent file, \"path\" has zero entries or a zero lenght entry.");
++    throw input_error("Bad torrent file, \"path\" has zero entries or a zero length entry.");
+ 
+   Path p;
+   p.set_encoding(enc);
+--- src/protocol/peer_connection_base.cc
++++ src/protocol/peer_connection_base.cc
+@@ -562,7 +562,7 @@
+   }
+ 
+   if (!transfer->block()->is_transfering())
+-    throw internal_error("PeerConnectionBase::down_chunk_skip_process(...) block is not transfering, yet we have non-leaders.");
++    throw internal_error("PeerConnectionBase::down_chunk_skip_process(...) block is not transferring, yet we have non-leaders.");
+ 
+   // Temporary test.
+   if (transfer->position() > transfer->block()->leader()->position())
