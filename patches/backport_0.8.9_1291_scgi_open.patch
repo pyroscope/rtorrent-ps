@@ -1,0 +1,24 @@
+--- src/command_network.cc (revision 1286)
++++ src/command_network.cc (revision 1291/
+@@ -40,4 +40,5 @@
+ #include <fstream>
+ #include <cstdio>
++#include <unistd.h>
+ #include <rak/address_info.h>
+ #include <rak/path.h>
+@@ -215,4 +216,5 @@
+     char dummy;
+     char address[1024];
++    std::string path;
+ 
+     switch (type) {
+@@ -246,5 +248,8 @@
+     case 2:
+     default:
+-      scgi->open_named(rak::path_expand(arg));
++      path = rak::path_expand(arg);
++
++      unlink(path.c_str());
++      scgi->open_named(path);
+       break;
+     }
