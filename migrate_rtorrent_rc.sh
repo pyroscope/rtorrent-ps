@@ -100,6 +100,7 @@ sed -i $rc_file \
 sed -i $rc_file \
     -e 's%^max_open_sockets\([ =]\)%network.max_open_sockets.set\1%' \
     -e 's%^max_open_files\([ =]\)%network.max_open_files.set\1%' \
+    -e 's%^max_open_http\([ =]\)%network.http.max_open.set\1%' \
     -e 's%^umask\([ =]\)%system.umask.set\1%' \
     -e 's%^tracker_dump\([ =]\)%log.tracker.set\1%' \
     -r
