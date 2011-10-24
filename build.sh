@@ -7,9 +7,9 @@ export SVN=0
 export RT_MINOR=9
 export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
 
-export CARES_VERSION=1.7.3
-export CURL_VERSION=7.21.1
-export XMLRPC_REV=2122
+export CARES_VERSION=1.7.5
+export CURL_VERSION=7.22.0
+export XMLRPC_REV=2222
 
 # AUR Patches
 _magnet_uri=0
@@ -210,17 +210,17 @@ tag_svn_rev() {
 build() { # Build and install all components
     tag_svn_rev
 
-    ( cd c-ares-$CARES_VERSION && ./configure && make && make prefix=$INST_DIR install )
+    ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
-    ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make prefix=$INST_DIR install )
+    ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make DESTDIR=$INST_DIR install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
-    ( cd xmlrpc-c-advanced-$XMLRPC_REV && ./configure --with-libwww-ssl && make && make install PREFIX=$INST_DIR )
+    ( cd xmlrpc-c-advanced-$XMLRPC_REV && ./configure --with-libwww-ssl && make && make DESTDIR=$INST_DIR install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure && make && make prefix=$INST_DIR install )
+        && ./configure && make && make DESTDIR=$INST_DIR install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make prefix=$INST_DIR install )
+        && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR install )
 
     symlink_binary -vanilla
 }
