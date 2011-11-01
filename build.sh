@@ -210,17 +210,17 @@ tag_svn_rev() {
 build() { # Build and install all components
     tag_svn_rev
 
-    ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR install )
+    ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
-    ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make DESTDIR=$INST_DIR install )
+    ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make DESTDIR=$INST_DIR prefix= install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
-    ( cd xmlrpc-c-advanced-$XMLRPC_REV && ./configure --with-libwww-ssl && make && make DESTDIR=$INST_DIR install )
+    ( cd xmlrpc-c-advanced-$XMLRPC_REV && ./configure --with-libwww-ssl && make && make DESTDIR=$INST_DIR prefix= install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure && make && make DESTDIR=$INST_DIR install )
+        && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
     sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR install )
+        && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR prefix= install )
 
     symlink_binary -vanilla
 }
