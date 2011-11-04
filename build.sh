@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 #
 # Build rTorrent including patches
 #
@@ -33,6 +33,18 @@ _keybindings=0
 export LANG=en_US.UTF-8
 unset LC_ALL
 export LC_ALL
+
+# Platform magic
+export SED_I="sed -i -e"
+case "$(uname -s)" in
+    FreeBSD)
+        export CFLAGS="-pipe -O2 -pthread ${CFLAGS}"
+        export LDFLAGS="-s -lpthread ${LDFLAGS}"
+        export SED_I="sed -i '' -e"
+        ;;
+    Linux)
+        ;;
+esac
 
 # Keep rTorrent version, once it was built in this directory
 test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
@@ -203,7 +215,7 @@ automagic() {
 tag_svn_rev() {
     if test ${SVN:-0} = 1; then
         svnrev=$(export LANG=en_US.UTF8 && svn info SVN-HEAD/ | grep ^Revision | cut -f2 -d":" | tr -d " ")
-        sed -i "s% VERSION \"/\"% VERSION \" r$svnrev/\"%" rtorrent-$RT_VERSION/src/ui/download_list.cc
+        $SED_I "s% VERSION \"/\"% VERSION \" r$svnrev/\"%" rtorrent-$RT_VERSION/src/ui/download_list.cc
     fi
 }
 
@@ -211,14 +223,14 @@ build() { # Build and install all components
     tag_svn_rev
 
     ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
-    sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make DESTDIR=$INST_DIR prefix= install )
-    sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( cd xmlrpc-c-advanced-$XMLRPC_REV && ./configure --with-libwww-ssl && make && make DESTDIR=$INST_DIR prefix= install )
-    sed -ie s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
         && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
-    sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
         && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR prefix= install )
 
@@ -289,14 +301,14 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # svn diff -r1187:1188 svn://rakshasa.no/libtorrent/trunk/ >>patches/fix_2411_threading.patch
     [[ RT_VERSION != 0.8.7 ]] || patch -uNp1 -i "$SRC_DIR/patches/fix_2411_threading.patch"
 
-    sed -i 's/rTorrent \" VERSION/rTorrent-PS " VERSION/' src/ui/download_list.cc
+    $SED_I 's/rTorrent \" VERSION/rTorrent-PS " VERSION/' src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
     ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
         ./configure && make clean && make && make prefix=$INST_DIR install )
-    sed -ie s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
         ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && make && make prefix=$INST_DIR install )
