@@ -94,6 +94,14 @@ static const char* color_vars[ps::COL_MAX] = {
 // collapsed state of views (default is false)
 static std::map<std::string, bool> is_collapsed;
 
+// Traffic history
+static int network_history_depth = 0;
+static uint32_t network_history_count = 0;
+static uint32_t* network_history_up = 0;
+static uint32_t* network_history_down = 0;
+static std::string network_history_up_str;
+static std::string network_history_down_str;
+
 
 // get custom field contaioning a long (time_t)
 unsigned long get_custom_long(core::Download* d, const char* name) {
@@ -161,7 +169,7 @@ static int get_colors() {
 // format byte size for humans, if format = 0 use 6 chars (one decimal place),
 // if = 1 just print the rounded value (4 chars), if = 2 combine the two formats
 // into 4 chars by rounding for values >= 9.95.
-// set bot 8 of format and 0 values will return a whitespace string of the correct length.
+// set bit 8 of format and 0 values will return a whitespace string of the correct length.
 std::string human_size(int64_t bytes, unsigned int format=0) {
 	if (format & 8 && bytes <= 0) return std::string((format & 7) ? 4 : 6, ' ');
 	format &= 7;
@@ -450,21 +458,33 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	canvas->print(2, 1, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇   Name");
+	int pos = 1;
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
-	canvas->set_attr(0, 1, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
+	canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
+
+	// network traffic
+	int network_history_lines = 0;
+	if (network_history_depth) {
+		network_history_lines = 2;
+		pos = canvas->height() - 2;
+
+		canvas->print(0, pos, "%s", network_history_up_str.c_str());
+		canvas->set_attr(0, pos, -1, attr_map[ps::COL_SEEDING], ps::COL_SEEDING);
+		canvas->print(0, pos+1, "%s", network_history_down_str.c_str());
+		canvas->set_attr(0, pos+1, -1, attr_map[ps::COL_LEECHING], ps::COL_LEECHING);
+	}
 
 	// define iterator range
 	Range range = rak::advance_bidirectional(
 			view->begin_visible(),
 			view->focus() != view->end_visible() ? view->focus() : view->begin_visible(),
 			view->end_visible(),
-			canvas->height()-2-2);
+			canvas->height()-2-2-network_history_lines);
 
-	int pos = 2;
-
+	pos = 2;
 	while (range.first != range.second) {
 		core::Download* d = *range.first;
 #if defined(CMD2_ANY)
@@ -580,7 +600,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		char* position;
 		char* last = buffer + canvas->width() + 1;
 
-		pos = canvas->height() - 2;
+		pos = canvas->height() - 2 - network_history_lines;
 		position = print_download_info(buffer, last, *view->focus());
 		canvas->print(3, pos, "%s", buffer);
 		canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
@@ -637,6 +657,66 @@ const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand
 #endif
 
 
+// Traffic history (0.8.9 only)
+#if defined(CMD2_ANY)
+int network_history_depth_get() { 
+	return network_history_depth;
+}
+
+torrent::Object network_history_depth_set(int arg) { 
+	if (network_history_depth) {
+		delete[] network_history_up;   
+		delete[] network_history_down; 
+		network_history_up = network_history_down = 0;
+	}
+   
+	network_history_depth = arg;
+	network_history_count = 0;
+   
+	if (network_history_depth) {
+		network_history_up   = new uint32_t[network_history_depth];
+		network_history_down = new uint32_t[network_history_depth];
+	}
+	
+	return torrent::Object(); 
+}
+
+
+void network_history_format(std::string& buf, char kind, uint32_t* data) {
+	uint32_t samples = std::min(network_history_count, (uint32_t) network_history_depth);
+	uint32_t min_rate = *std::min_element(data, data + samples);
+	uint32_t max_rate = *std::max_element(data, data + samples);
+	char buffer[80];
+
+	snprintf(buffer, sizeof(buffer), "%c ⌈%s⌉ ⌊%s⌋ ", kind,
+		display::human_size(max_rate, 0).c_str(), display::human_size(min_rate, 0).c_str() );
+	buf = buffer;
+
+	if (max_rate > 102) {
+		const char* meter[] = {"⠀", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"};
+		for (int i = 1; i <= samples; ++i) {
+			uint32_t idx = (network_history_count - i) % network_history_depth;
+			buf += meter[std::min(8U, data[idx] * 9 / max_rate)];
+		}
+	}
+}
+
+
+torrent::Object network_history_sample() {
+	if (network_history_depth) {
+		network_history_up[network_history_count % network_history_depth] = torrent::up_rate()->rate();
+		network_history_down[network_history_count % network_history_depth] = torrent::down_rate()->rate();
+		++network_history_count;
+
+		network_history_format(network_history_up_str, 'U', network_history_up);
+		network_history_format(network_history_down_str, 'D', network_history_down);
+	}
+	
+	return torrent::Object(); 
+}
+#endif
+
+
 // register our commands
 void initialize_command_ui_pyroscope() {
 #if defined(CMD2_ANY)
@@ -650,6 +730,10 @@ void initialize_command_ui_pyroscope() {
 	#define PS_CMD_ANY_FUN(key, func) \
 		CMD2_ANY(key, std::bind(&func))
 
+	CMD2_ANY        ("network.history.depth",     std::bind(&network_history_depth_get));
+	CMD2_ANY_VALUE_V("network.history.depth.set", std::bind(&network_history_depth_set, std::placeholders::_2));
+	CMD2_ANY        ("network.history.sample",    std::bind(&network_history_sample));
+
 	CMD2_ANY_STRING("view.collapsed.toggle", std::bind(&cmd_view_collapsed_toggle, std::placeholders::_2));
 #else
 	#define PS_VARIABLE_COLOR(key, defaultValue) \
@@ -658,7 +742,7 @@ void initialize_command_ui_pyroscope() {
 
 	#define PS_CMD_ANY_FUN(key, func) \
 		ADD_COMMAND_VOID(key, rak::ptr_fun(&func))
-    
+
 	CMD_N_STRING("view.collapsed.toggle", rak::ptr_fn(&cmd_view_collapsed_toggle));
 #endif
 
