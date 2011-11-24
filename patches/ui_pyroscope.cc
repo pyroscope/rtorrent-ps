@@ -688,15 +688,20 @@ void network_history_format(std::string& buf, char kind, uint32_t* data) {
 	uint32_t max_rate = *std::max_element(data, data + samples);
 	char buffer[80];
 
-	snprintf(buffer, sizeof(buffer), "%c ⌈%s⌉ ⌊%s⌋ ", kind,
-		display::human_size(max_rate, 0).c_str(), display::human_size(min_rate, 0).c_str() );
+	snprintf(buffer, sizeof(buffer), "%c ⌈%s⌉⌊%s⌋%s", kind,
+		display::human_size(max_rate, 0).c_str(), display::human_size(min_rate, 0).c_str(),
+		rpc::call_command_value("network.history.auto_scale") ? "↨ " : "  ");
 	buf = buffer;
 
 	if (max_rate > 102) {
 		const char* meter[] = {"⠀", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"};
+		uint32_t base = rpc::call_command_value("network.history.auto_scale") ? min_rate : 0;
 		for (int i = 1; i <= samples; ++i) {
 			uint32_t idx = (network_history_count - i) % network_history_depth;
-			buf += meter[std::min(8U, data[idx] * 9 / max_rate)];
+			if (max_rate > base)
+				buf += meter[std::min(8U, (data[idx] - base) * 9 / (max_rate - base))];
+			else
+				buf += " ";
 		}
 	}
 }
@@ -730,9 +735,10 @@ void initialize_command_ui_pyroscope() {
 	#define PS_CMD_ANY_FUN(key, func) \
 		CMD2_ANY(key, std::bind(&func))
 
-	CMD2_ANY        ("network.history.depth",     std::bind(&network_history_depth_get));
-	CMD2_ANY_VALUE_V("network.history.depth.set", std::bind(&network_history_depth_set, std::placeholders::_2));
-	CMD2_ANY        ("network.history.sample",    std::bind(&network_history_sample));
+	CMD2_ANY        ("network.history.depth",      std::bind(&network_history_depth_get));
+	CMD2_ANY_VALUE_V("network.history.depth.set",  std::bind(&network_history_depth_set, std::placeholders::_2));
+	CMD2_ANY        ("network.history.sample",     std::bind(&network_history_sample));
+	CMD2_VAR_BOOL   ("network.history.auto_scale", true);
 
 	CMD2_ANY_STRING("view.collapsed.toggle", std::bind(&cmd_view_collapsed_toggle, std::placeholders::_2));
 #else
