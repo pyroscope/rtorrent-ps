@@ -707,17 +707,25 @@ void network_history_format(std::string& buf, char kind, uint32_t* data) {
 }
 
 
-torrent::Object network_history_sample() {
+// You MUST call this after changing the auto_scale flag, to see any changes immediately!
+torrent::Object network_history_refresh() {
 	if (network_history_depth) {
-		network_history_up[network_history_count % network_history_depth] = torrent::up_rate()->rate();
-		network_history_down[network_history_count % network_history_depth] = torrent::down_rate()->rate();
-		++network_history_count;
-
 		network_history_format(network_history_up_str, 'U', network_history_up);
 		network_history_format(network_history_down_str, 'D', network_history_down);
 	}
 	
 	return torrent::Object(); 
+}
+
+
+torrent::Object network_history_sample() {
+	if (network_history_depth) {
+		network_history_up[network_history_count % network_history_depth] = torrent::up_rate()->rate();
+		network_history_down[network_history_count % network_history_depth] = torrent::down_rate()->rate();
+		++network_history_count;
+	}
+	
+	return network_history_refresh(); 
 }
 #endif
 
@@ -737,6 +745,7 @@ void initialize_command_ui_pyroscope() {
 
 	CMD2_ANY        ("network.history.depth",      std::bind(&network_history_depth_get));
 	CMD2_ANY_VALUE_V("network.history.depth.set",  std::bind(&network_history_depth_set, std::placeholders::_2));
+	CMD2_ANY        ("network.history.refresh",    std::bind(&network_history_refresh));
 	CMD2_ANY        ("network.history.sample",     std::bind(&network_history_sample));
 	CMD2_VAR_BOOL   ("network.history.auto_scale", true);
 
