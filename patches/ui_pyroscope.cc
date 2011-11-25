@@ -704,6 +704,7 @@ void network_history_format(std::string& buf, char kind, uint32_t* data) {
 				buf += " ";
 		}
 	}
+	buf += " ";
 }
 
 
