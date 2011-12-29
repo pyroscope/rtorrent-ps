@@ -187,8 +187,8 @@ std::string human_size(int64_t bytes, unsigned int format=0) {
 	const char* formats[] = {"%5.1f%c", "%3.0f%c", "%3.1f%c"};
 
 	if (format > 2) format = 0;
-	if (format == 2 and value >= 9.95) format = 1;
-	if (format == 1) value = int(value + 0.5);
+	if (format == 2 and value >= 9.949999) format = 1;
+	if (format == 1) value = int(value + 0.50002);
 	snprintf(buffer, sizeof(buffer), formats[format], value, unit);
 
 	return std::string(buffer);
