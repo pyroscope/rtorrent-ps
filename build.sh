@@ -43,6 +43,8 @@ case "$(uname -s)" in
         export SED_I="sed -i '' -e"
         ;;
     Linux)
+        export CFLAGS=""
+        export LDFLAGS=""
         ;;
 esac
 
@@ -53,9 +55,9 @@ test -d rtorrent-0.8.9 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9; }
 test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; } 
 
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
-export CFLAGS="-I $INST_DIR/include"
+export CFLAGS="-I $INST_DIR/include ${CFLAGS}"
 export CXXFLAGS="$CFLAGS"
-export LDFLAGS="-L$INST_DIR/lib"
+export LDFLAGS="-L$INST_DIR/lib ${LDFLAGS}"
 export PKG_CONFIG_PATH="$INST_DIR/lib/pkgconfig"
 
 SELF_URL=http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/rtorrent-extended
