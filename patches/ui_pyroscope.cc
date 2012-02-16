@@ -530,6 +530,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		//const char* ying_yang[] = {"☹ ", "➊ ", "➋ ", "➌ ", "➍ ", "➎ ", "➏ ", "➐ ", "➑ ", "➒ ", "➓ "};
 		const char* ying_yang[] = {"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "};
 
+		int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
 		int progress_steps = sizeof(progress) / sizeof(*progress);
 		uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 		char buffer[canvas->width() + 1];
@@ -550,7 +551,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 				(D_INFO(item)->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(D_INFO(item)->up_rate()->rate() ? "↟ " : "  "),
 			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
-			has_msg ? has_alert ? alert : "♺ " : "  ",
+			has_msg ? has_alert ? alert : "♺ " : is_tagged ? "⚑ " : "  ",
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
