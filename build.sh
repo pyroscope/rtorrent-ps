@@ -65,7 +65,6 @@ XMLRPC_URL="https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced@$XMLR
 TARBALLS=$(cat <<.
 http://c-ares.haxx.se/download/c-ares-$CARES_VERSION.tar.gz
 http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
-http://aur.archlinux.org/packages/rtorrent-extended/rtorrent-extended.tar.gz
 .
 )
 test ${SVN:-0} = 0 && TARBALLS=$(cat <<.
@@ -209,6 +208,8 @@ download() { # Download & unpack sources
         ln -nfs SVN-HEAD/libtorrent libtorrent-$LT_VERSION
         ln -nfs SVN-HEAD/rtorrent rtorrent-$RT_VERSION
     fi
+
+    tar xfz patches/rtorrent-extended.tar.gz
     
     touch tarballs/DONE
 }
