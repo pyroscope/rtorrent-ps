@@ -104,6 +104,11 @@ bold() {
     echo "$BOLD$1$OFF"
 }
 
+fail() {
+    bold "$@"
+    exit 1
+}
+
 check_deps() {
     for dep in $BUILD_DEPS; do
         pkg=${dep%%:*}
@@ -196,6 +201,7 @@ download() { # Download & unpack sources
         url_base=${url##*/}
         test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget -q $url )
         test -d ${url_base%.tar.gz} || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
+        test -d ${url_base%%.tar.gz} || fail "Tarball ${url_base} could not be unpacked"
     done
     
     if test ${SVN:-0} = 1 -a ! -d SVN-HEAD; then
@@ -203,6 +209,8 @@ download() { # Download & unpack sources
         ln -nfs SVN-HEAD/libtorrent libtorrent-$LT_VERSION
         ln -nfs SVN-HEAD/rtorrent rtorrent-$RT_VERSION
     fi
+    
+    touch tarballs/DONE
 }
 
 automagic() {
@@ -222,6 +230,8 @@ tag_svn_rev() {
 }
 
 build() { # Build and install all components
+    test -e $SRC_DIR/tarballs/DONE || fail "You need to '$0 download' first!"
+
     tag_svn_rev
 
     ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
@@ -242,7 +252,8 @@ build() { # Build and install all components
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
     
-    test -e $INST_DIR/lib/libxmlrpc.a || { bold "You need to '$0 build' first!"; exit 1; }
+    test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
+    test -e $INST_DIR/lib/libxmlrpc.a || fail "You need to '$0 build' first!"
     
     # Unpack original source
     if test ${SVN:-0} = 0; then
