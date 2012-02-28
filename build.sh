@@ -43,8 +43,8 @@ case "$(uname -s)" in
         export SED_I="sed -i '' -e"
         ;;
     Linux)
-        export CFLAGS=""
-        export LDFLAGS=""
+        export CFLAGS="-pthread ${CFLAGS}"
+        export LDFLAGS="-lpthread ${LDFLAGS}"
         ;;
 esac
 
