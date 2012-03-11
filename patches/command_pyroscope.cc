@@ -251,6 +251,11 @@ torrent::Object cmd_d_tracker_domain(core::Download* download) {
 }
 
 
+torrent::Object cmd_ui_current_view() {
+    return control->ui()->download_list()->current_view()->name();
+}
+
+
 #if defined(CMD2_ANY)
 // 0.8.9+ only
 torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
@@ -285,11 +290,13 @@ void initialize_command_pyroscope() {
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_DL("d.tracker_domain", std::bind(&cmd_d_tracker_domain, std::placeholders::_1));
     CMD2_ANY_STRING("log.messages", std::bind(&cmd_log_messages, std::placeholders::_2));
+    CMD2_ANY("ui.current_view", std::bind(&cmd_ui_current_view));
 #else
     // 0.8.6
     ADD_ANY_LIST("compare", rak::ptr_fn(&apply_compare));
     ADD_COMMAND_LIST("ui.bind_key", rak::ptr_fn(&apply_ui_bind_key));
     CMD_D_VOID("d.tracker_domain", &cmd_d_tracker_domain);
+    ADD_COMMAND_VOID("ui.current_view", rak::ptr_fun(&cmd_ui_current_view));
 #endif
 }
 
