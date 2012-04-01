@@ -30,7 +30,7 @@ _keybindings=0
 #
 
 # Fix people's broken systems
-test $(tr A-Z a-z <<<${LANG/*.}) = "utf-8" || export LANG=en_US.UTF-8
+test "$(tr A-Z a-z <<<${LANG/*.})" = "utf-8" || export LANG=en_US.UTF-8
 unset LC_ALL
 export LC_ALL
 
