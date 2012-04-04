@@ -283,7 +283,54 @@ torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
 #endif
 
 
+#if (API_VERSION < 3)
+template <typename InputIterator, typename OutputIterator> OutputIterator
+pyro_transform_hex(InputIterator first, InputIterator last, OutputIterator dest) {
+  const char* hex = "0123456789abcdef";
+  while (first != last) {
+    *(dest++) = (*first >> 4)[hex];
+    *(dest++) = (*first & 15)[hex];
+
+    ++first;
+  }
+
+  return dest;
+}
+
+
+torrent::Object d_chunks_seen(core::Download* download) {
+    const uint8_t* seen = download->download()->chunks_seen();
+
+    if (seen == NULL)
+        return std::string();
+
+    uint32_t size = download->download()->file_list()->size_chunks();
+    std::string result;
+    result.resize(size * 2);
+    pyro_transform_hex((const char*)seen, (const char*)seen + size, result.begin());
+
+    return result;
+}
+#endif
+
+
 void initialize_command_pyroscope() {
+#if (API_VERSION < 3)
+    // https://github.com/rakshasa/rtorrent/commit/b28f2ea8070
+    // https://github.com/rakshasa/rtorrent/commit/020de10f38210a07a567aeebbe385a4faaf4b517
+    CMD2_DL("d.chunks_seen", std::bind(&d_chunks_seen, std::placeholders::_1));
+
+    // https://github.com/rakshasa/rtorrent/commit/5bed4f01ad
+    CMD2_TRACKER("t.is_usable",          std::bind(&torrent::Tracker::is_usable, std::placeholders::_1));
+    CMD2_TRACKER("t.is_busy",            std::bind(&torrent::Tracker::is_busy, std::placeholders::_1));
+    //CMD2_TRACKER("t.is_extra_tracker",   std::bind(&torrent::Tracker::is_extra_tracker, std::placeholders::_1));
+    //CMD2_TRACKER("t.can_scrape",         std::bind(&torrent::Tracker::can_scrape, std::placeholders::_1));
+    //CMD2_TRACKER("t.activity_time_next", std::bind(&torrent::Tracker::activity_time_next, std::placeholders::_1));
+    //CMD2_TRACKER("t.activity_time_last", std::bind(&torrent::Tracker::activity_time_last, std::placeholders::_1));
+    //CMD2_TRACKER("t.success_time_next",  std::bind(&torrent::Tracker::success_time_next, std::placeholders::_1));
+    //CMD2_TRACKER("t.failed_time_next",   std::bind(&torrent::Tracker::failed_time_next, std::placeholders::_1));
+#endif
+
 #if defined(CMD2_ANY)
     // 0.8.9+
     CMD2_ANY_LIST("compare", &apply_compare);
