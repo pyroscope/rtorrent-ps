@@ -18,6 +18,9 @@
 #include "config.h"
 #include "globals.h"
 
+#include <cstdio>
+#include <stdlib.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <ctime>
 #include <rak/path.h>

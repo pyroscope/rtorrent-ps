@@ -16,6 +16,7 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
 
 #include <cstdio>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <rak/algorithm.h>
 
