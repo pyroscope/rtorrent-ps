@@ -40,6 +40,12 @@
 #include "control.h"
 #include "command_helpers.h"
 
+#if (RT_HEX_VERSION >= 0x000901)
+    #define _cxxstd_ tr1
+#else
+    #define _cxxstd_ std
+#endif
+
 
 // handle for message log file
 namespace core {
@@ -318,26 +324,26 @@ void initialize_command_pyroscope() {
 #if (API_VERSION < 3)
     // https://github.com/rakshasa/rtorrent/commit/b28f2ea8070
     // https://github.com/rakshasa/rtorrent/commit/020de10f38210a07a567aeebbe385a4faaf4b517
-    CMD2_DL("d.chunks_seen", std::bind(&d_chunks_seen, std::placeholders::_1));
+    CMD2_DL("d.chunks_seen", _cxxstd_::bind(&d_chunks_seen, _cxxstd_::placeholders::_1));
 
     // https://github.com/rakshasa/rtorrent/commit/5bed4f01ad
-    CMD2_TRACKER("t.is_usable",          std::bind(&torrent::Tracker::is_usable, std::placeholders::_1));
-    CMD2_TRACKER("t.is_busy",            std::bind(&torrent::Tracker::is_busy, std::placeholders::_1));
-    //CMD2_TRACKER("t.is_extra_tracker",   std::bind(&torrent::Tracker::is_extra_tracker, std::placeholders::_1));
-    //CMD2_TRACKER("t.can_scrape",         std::bind(&torrent::Tracker::can_scrape, std::placeholders::_1));
-    //CMD2_TRACKER("t.activity_time_next", std::bind(&torrent::Tracker::activity_time_next, std::placeholders::_1));
-    //CMD2_TRACKER("t.activity_time_last", std::bind(&torrent::Tracker::activity_time_last, std::placeholders::_1));
-    //CMD2_TRACKER("t.success_time_next",  std::bind(&torrent::Tracker::success_time_next, std::placeholders::_1));
-    //CMD2_TRACKER("t.failed_time_next",   std::bind(&torrent::Tracker::failed_time_next, std::placeholders::_1));
+    CMD2_TRACKER("t.is_usable",          _cxxstd_::bind(&torrent::Tracker::is_usable, _cxxstd_::placeholders::_1));
+    CMD2_TRACKER("t.is_busy",            _cxxstd_::bind(&torrent::Tracker::is_busy, _cxxstd_::placeholders::_1));
+    //CMD2_TRACKER("t.is_extra_tracker",   _cxxstd_::bind(&torrent::Tracker::is_extra_tracker, _cxxstd_::placeholders::_1));
+    //CMD2_TRACKER("t.can_scrape",         _cxxstd_::bind(&torrent::Tracker::can_scrape, _cxxstd_::placeholders::_1));
+    //CMD2_TRACKER("t.activity_time_next", _cxxstd_::bind(&torrent::Tracker::activity_time_next, _cxxstd_::placeholders::_1));
+    //CMD2_TRACKER("t.activity_time_last", _cxxstd_::bind(&torrent::Tracker::activity_time_last, _cxxstd_::placeholders::_1));
+    //CMD2_TRACKER("t.success_time_next",  _cxxstd_::bind(&torrent::Tracker::success_time_next, _cxxstd_::placeholders::_1));
+    //CMD2_TRACKER("t.failed_time_next",   _cxxstd_::bind(&torrent::Tracker::failed_time_next, _cxxstd_::placeholders::_1));
 #endif
 
 #if defined(CMD2_ANY)
     // 0.8.9+
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
-    CMD2_DL("d.tracker_domain", std::bind(&cmd_d_tracker_domain, std::placeholders::_1));
-    CMD2_ANY_STRING("log.messages", std::bind(&cmd_log_messages, std::placeholders::_2));
-    CMD2_ANY("ui.current_view", std::bind(&cmd_ui_current_view));
+    CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
+    CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
+    CMD2_ANY("ui.current_view", _cxxstd_::bind(&cmd_ui_current_view));
 #else
     // 0.8.6
     ADD_ANY_LIST("compare", rak::ptr_fn(&apply_compare));

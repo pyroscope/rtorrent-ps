@@ -6,6 +6,9 @@
 export SVN=0
 export RT_MINOR=9
 export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
+# Yep, 0.9.2 does work now
+#export RT_MINOR=2
+#export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 
 export CARES_VERSION=1.7.5
 export CURL_VERSION=7.22.0
@@ -52,7 +55,11 @@ esac
 test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
 test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
 test -d rtorrent-0.8.9 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9; }
+test -d rtorrent-0.9.2 && { export LT_VERSION=0.13.2; export RT_VERSION=0.9.2; }
 test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; } 
+
+# Incompatible patches
+test $RT_VERSION = 0.9.2 && _trackerinfo=0
 
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
 export CFLAGS="-I $INST_DIR/include ${CFLAGS}"
@@ -294,6 +301,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     for filename in $SRC_DIR/patches/*0.8.8.patch; do
         test -e "${filename/0.8.8/0.8.9}" || ln -s "$(basename $filename)" "${filename/0.8.8/0.8.9}"
     done
+    test -e $SRC_DIR/patches/ps-ui_pyroscope_0.9.2.patch || ln -s ps-ui_pyroscope_0.8.8.patch $SRC_DIR/patches/ps-ui_pyroscope_0.9.2.patch
 
     for corepatch in $SRC_DIR/patches/ps-*_${RT_VERSION%-svn}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }

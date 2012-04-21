@@ -33,6 +33,12 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
 #include "control.h"
 #include "command_helpers.h"
 
+#if (RT_HEX_VERSION >= 0x000901)
+    #define _cxxstd_ tr1
+#else
+    #define _cxxstd_ std
+#endif
+
 #if defined(CMD2_ANY)
 	#define D_INFO(item) (item->info())
 	#include "rpc/object_storage.h"
@@ -737,21 +743,21 @@ void initialize_command_ui_pyroscope() {
 #if defined(CMD2_ANY)
 	#define PS_VARIABLE_COLOR(key, value) \
 		control->object_storage()->insert_c_str(key, value, rpc::object_storage::flag_string_type); \
-		CMD2_ANY(key, std::bind(&rpc::object_storage::get, control->object_storage(),   \
+		CMD2_ANY(key, _cxxstd_::bind(&rpc::object_storage::get, control->object_storage(),   \
 			torrent::raw_string::from_c_str(key)));  \
-		CMD2_ANY_STRING(key ".set", std::bind(&rpc::object_storage::set_color_string, control->object_storage(), \
-			torrent::raw_string::from_c_str(key), std::placeholders::_2));
+		CMD2_ANY_STRING(key ".set", _cxxstd_::bind(&rpc::object_storage::set_color_string, control->object_storage(), \
+			torrent::raw_string::from_c_str(key), _cxxstd_::placeholders::_2));
 
 	#define PS_CMD_ANY_FUN(key, func) \
-		CMD2_ANY(key, std::bind(&func))
+		CMD2_ANY(key, _cxxstd_::bind(&func))
 
-	CMD2_ANY        ("network.history.depth",      std::bind(&network_history_depth_get));
-	CMD2_ANY_VALUE_V("network.history.depth.set",  std::bind(&network_history_depth_set, std::placeholders::_2));
-	CMD2_ANY        ("network.history.refresh",    std::bind(&network_history_refresh));
-	CMD2_ANY        ("network.history.sample",     std::bind(&network_history_sample));
+	CMD2_ANY        ("network.history.depth",      _cxxstd_::bind(&network_history_depth_get));
+	CMD2_ANY_VALUE_V("network.history.depth.set",  _cxxstd_::bind(&network_history_depth_set, _cxxstd_::placeholders::_2));
+	CMD2_ANY        ("network.history.refresh",    _cxxstd_::bind(&network_history_refresh));
+	CMD2_ANY        ("network.history.sample",     _cxxstd_::bind(&network_history_sample));
 	CMD2_VAR_BOOL   ("network.history.auto_scale", true);
 
-	CMD2_ANY_STRING("view.collapsed.toggle", std::bind(&cmd_view_collapsed_toggle, std::placeholders::_2));
+	CMD2_ANY_STRING("view.collapsed.toggle", _cxxstd_::bind(&cmd_view_collapsed_toggle, _cxxstd_::placeholders::_2));
 #else
 	#define PS_VARIABLE_COLOR(key, defaultValue) \
 		add_variable(key, key ".set", 0, \
