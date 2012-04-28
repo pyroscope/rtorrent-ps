@@ -426,6 +426,10 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 		canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL + offset], ps::COL_LABEL + offset);
 	}
 
+	// apply progress color to completion indicator
+	int pcol = ratio_color(item->file_list()->completed_chunks() * 1000 / item->file_list()->size_chunks());
+	canvas->set_attr(76, pos+1, 3, attr_map[pcol + offset], pcol + offset);
+
 	// show ratio progress by color
 	int rcol = ratio_color(ratio);
 	canvas->set_attr(93, pos+1, 6, attr_map[rcol + offset], rcol + offset);
@@ -577,6 +581,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		decorate_download_title(window, canvas, view, pos, range);
 		canvas->set_attr(2, pos, x_name-2, attr_map[col_active + offset], col_active + offset);
 		if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
+
+		// apply progress color to completion indicator
+		int pcol = ratio_color(item->file_list()->completed_chunks() * 1000 / item->file_list()->size_chunks());
+		canvas->set_attr(x_scrape-9, pos, 2, attr_map[pcol + offset], pcol + offset);
 
 		// show ratio progress by color
 		int rcol = ratio_color(ratio);
