@@ -490,18 +490,20 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	// Styles
 	#define PROGRESS_STEPS 9
-	const char* progress[2][PROGRESS_STEPS] = {
+	const char* progress[3][PROGRESS_STEPS] = {
+		{},
 		{"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "},
 		{"⠀ ", "▁ ", "▂ ", "▃ ", "▄ ", "▅ ", "▆ ", "▇ ", "█ "},
 	};
-	unsigned int progress_style = std::min<unsigned int>(rpc::call_command_value("ui.style.progress"), 1);
+	unsigned int progress_style = std::min<unsigned int>(rpc::call_command_value("ui.style.progress"), 2);
 	#define YING_YANG_STEPS 11
-	const char* ying_yang[3][YING_YANG_STEPS] = {
+	const char* ying_yang[4][YING_YANG_STEPS] = {
+		{},
 		{"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "},
 		{"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "},
 		{"☹ ", "➊ ", "➋ ", "➌ ", "➍ ", "➎ ", "➏ ", "➐ ", "➑ ", "➒ ", "➓ "},
 	};
-	unsigned int ying_yang_style = std::min<unsigned int>(rpc::call_command_value("ui.style.ratio"), 2);
+	unsigned int ying_yang_style = std::min<unsigned int>(rpc::call_command_value("ui.style.ratio"), 3);
 
 	// define iterator range
 	Range range = rak::advance_bidirectional(
@@ -559,19 +561,30 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		char* last = buffer + canvas->width() - 2 + 1;
 		position = print_download_title(buffer, last, d);
 
+		char progress_str[3] = "##";
+		char ying_yang_str[3] = "##";
+		if (progress_style == 0) {
+			sprintf(progress_str, item->file_list()->completed_chunks() ? "%2.2d" : "--",
+				item->file_list()->completed_chunks() * 100 / item->file_list()->size_chunks());
+		}
+		if (ying_yang_style == 0 && ratio < 9949) {
+			sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
+		}
+
 		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s",
 			range.first == view->focus() ? "»" : " ",
 			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
-			d->is_done() ? "✔ " : progress[progress_style][
+			d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
 				item->file_list()->completed_chunks() * PROGRESS_STEPS
 				/ item->file_list()->size_chunks()],
 			D_INFO(item)->down_rate()->rate() ? 
 				(D_INFO(item)->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(D_INFO(item)->up_rate()->rate() ? "↟ " : "  "),
-			ratio >= YING_YANG_STEPS * 1000 ? "⊛ " : ying_yang[ying_yang_style][ratio / 1000],
+			ying_yang_style == 0 ? ying_yang_str : 
+				ratio >= YING_YANG_STEPS * 1000 ? "⊛ " : ying_yang[ying_yang_style][ratio / 1000],
 			has_msg ? has_alert ? alert : "♺ " : is_tagged ? "⚑ " : "  ",
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
@@ -792,8 +805,8 @@ void initialize_command_ui_pyroscope() {
 	CMD_N_STRING("view.collapsed.toggle", rak::ptr_fn(&cmd_view_collapsed_toggle));
 #endif
 
-	CMD2_VAR_VALUE("ui.style.progress", 0);
-	CMD2_VAR_VALUE("ui.style.ratio", 0);
+	CMD2_VAR_VALUE("ui.style.progress", 1);
+	CMD2_VAR_VALUE("ui.style.ratio", 1);
 
 	PS_VARIABLE_COLOR("ui.color.progress0", 	"red");
 	PS_VARIABLE_COLOR("ui.color.progress20", 	"bold bright red");
