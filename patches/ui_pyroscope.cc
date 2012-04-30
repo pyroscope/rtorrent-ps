@@ -488,6 +488,21 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		canvas->set_attr(0, pos+1, -1, attr_map[ps::COL_LEECHING], ps::COL_LEECHING);
 	}
 
+	// Styles
+	#define PROGRESS_STEPS 9
+	const char* progress[2][PROGRESS_STEPS] = {
+		{"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "},
+		{"⠀ ", "▁ ", "▂ ", "▃ ", "▄ ", "▅ ", "▆ ", "▇ ", "█ "},
+	};
+	unsigned int progress_style = std::min<unsigned int>(rpc::call_command_value("ui.style.progress"), 1);
+	#define YING_YANG_STEPS 11
+	const char* ying_yang[3][YING_YANG_STEPS] = {
+		{"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "},
+		{"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "},
+		{"☹ ", "➊ ", "➋ ", "➌ ", "➍ ", "➎ ", "➏ ", "➐ ", "➑ ", "➒ ", "➓ "},
+	};
+	unsigned int ying_yang_style = std::min<unsigned int>(rpc::call_command_value("ui.style.ratio"), 2);
+
 	// define iterator range
 	Range range = rak::advance_bidirectional(
 			view->begin_visible(),
@@ -536,13 +551,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		}
 
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
-		const char* progress[] = {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "};
-		//const char* ying_yang[] = {"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "};
-		//const char* ying_yang[] = {"☹ ", "➊ ", "➋ ", "➌ ", "➍ ", "➎ ", "➏ ", "➐ ", "➑ ", "➒ ", "➓ "};
-		const char* ying_yang[] = {"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "};
 
 		int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
-		int progress_steps = sizeof(progress) / sizeof(*progress);
 		uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 		char buffer[canvas->width() + 1];
 		char* position;
@@ -555,13 +565,13 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
-			d->is_done() ? "✔ " : progress[
-				item->file_list()->completed_chunks() * progress_steps
+			d->is_done() ? "✔ " : progress[progress_style][
+				item->file_list()->completed_chunks() * PROGRESS_STEPS
 				/ item->file_list()->size_chunks()],
 			D_INFO(item)->down_rate()->rate() ? 
 				(D_INFO(item)->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(D_INFO(item)->up_rate()->rate() ? "↟ " : "  "),
-			ratio >= 11000 ? "⊛ " : ying_yang[ratio / 1000],
+			ratio >= YING_YANG_STEPS * 1000 ? "⊛ " : ying_yang[ying_yang_style][ratio / 1000],
 			has_msg ? has_alert ? alert : "♺ " : is_tagged ? "⚑ " : "  ",
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
@@ -775,8 +785,15 @@ void initialize_command_ui_pyroscope() {
 	#define PS_CMD_ANY_FUN(key, func) \
 		ADD_COMMAND_VOID(key, rak::ptr_fun(&func))
 
+	#define CMD2_VAR_VALUE(key, defaultValue) \
+		rpc::add_variable(key ".get", key ".set", key, \
+			&rpc::CommandVariable::get_value, &rpc::CommandVariable::set_value, (int64_t)defaultValue);
+
 	CMD_N_STRING("view.collapsed.toggle", rak::ptr_fn(&cmd_view_collapsed_toggle));
 #endif
+
+	CMD2_VAR_VALUE("ui.style.progress", 0);
+	CMD2_VAR_VALUE("ui.style.ratio", 0);
 
 	PS_VARIABLE_COLOR("ui.color.progress0", 	"red");
 	PS_VARIABLE_COLOR("ui.color.progress20", 	"bold bright red");
