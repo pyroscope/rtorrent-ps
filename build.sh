@@ -276,9 +276,9 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Version handling
     [ $RT_VERSION == 0.8.6 -o "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
     RT_HEX_VERSION=$(printf "0x%02X%02X%02X" ${RT_VERSION//./ })
-    $SED_I "s:\\(AC_DEFINE(HAVE_CONFIG_H.*\\):\1\\nAC_DEFINE(RT_HEX_VERSION, $RT_HEX_VERSION, for CPP if checks):" rtorrent-$RT_VERSION/configure.ac
+    $SED_I "s:\\(AC_DEFINE(HAVE_CONFIG_H.*\\):\1  AC_DEFINE(RT_HEX_VERSION, $RT_HEX_VERSION, for CPP if checks):" rtorrent-$RT_VERSION/configure.ac
     grep "AC_DEFINE.*API_VERSION" rtorrent-$RT_VERSION/configure.ac >/dev/null || \
-        $SED_I "s:\\(AC_DEFINE(HAVE_CONFIG_H.*\\):\1\\nAC_DEFINE(API_VERSION, 0, api version):" rtorrent-$RT_VERSION/configure.ac
+        $SED_I "s:\\(AC_DEFINE(HAVE_CONFIG_H.*\\):\1  AC_DEFINE(API_VERSION, 0, api version):" rtorrent-$RT_VERSION/configure.ac
 
     # Patch libtorrent
     pushd libtorrent-$LT_VERSION
