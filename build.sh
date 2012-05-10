@@ -3,12 +3,12 @@
 # Build rTorrent including patches
 #
 
-export SVN=0
-export RT_MINOR=9
-export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
-# Yep, 0.9.2 does work now
-#export RT_MINOR=2
-#export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
+# Yep, 0.9.2 is the default now
+export RT_MINOR=2
+export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
+#export RT_MINOR=9
+#export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
+export SVN=0 # no git support yet!
 
 export CARES_VERSION=1.7.5
 export CURL_VERSION=7.22.0
