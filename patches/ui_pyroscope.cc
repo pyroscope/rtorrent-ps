@@ -151,7 +151,7 @@ std::string num2(int64_t num) {
 
 	char buffer[10];
 	if (num < 100) {
-		snprintf(buffer, sizeof(buffer), "%2d", num);
+		snprintf(buffer, sizeof(buffer), "%2d", int(num));
 	} else {
 		// Roman numeral multipliers 10, 100, 1000, 10x1000, 100x1000, 1000x1000
 		const char* roman = " xcmXCM"; 
