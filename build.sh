@@ -12,7 +12,7 @@ export SVN=0 # no git support yet!
 
 export CARES_VERSION=1.7.5
 export CURL_VERSION=7.22.0
-export XMLRPC_REV=2222
+export XMLRPC_REV=2366
 
 # AUR Patches
 _magnet_uri=0
