@@ -1,0 +1,9 @@
+--- src/torrent/tracker.h,orig	2012-09-25 21:56:47.607686352 +0200
++++ src/torrent/tracker.h	2012-09-25 22:01:13.731684611 +0200
+@@ -150,4 +150,4 @@
+ 
+-  void                set_normal_interval(int v)            { if (v >= 600 && v <= 3600) m_normal_interval = v; }
+-  void                set_min_interval(int v)               { if (v >= 300 && v <= 1800) m_min_interval = v; }
++  void                set_normal_interval(int v)            { m_normal_interval = std::min(std::max(642, v), 3642); }
++  void                set_min_interval(int v)               { m_min_interval = std::min(std::max(642, v), 3642); }
+ 

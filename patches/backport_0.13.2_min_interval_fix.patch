@@ -8,7 +8,7 @@
 @@ -402,3 +400,3 @@
  
 -  int32_t min_interval = std::min(tracker->min_interval(), (uint32_t)600);
-+  int32_t min_interval = std::max(tracker->min_interval(), (uint32_t)300);
++  int32_t min_interval = std::max(tracker->min_interval(), (uint32_t)2520);
    int32_t use_interval = std::min(interval, min_interval);
 @@ -487,16 +485,8 @@
  
