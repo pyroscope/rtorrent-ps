@@ -1,0 +1,34 @@
+--- src/torrent/tracker_controller.cc,orig	2012-09-25 20:14:48.000000000 +0200
++++ src/torrent/tracker_controller.cc	2012-09-25 20:26:06.000000000 +0200
+@@ -397,4 +397,2 @@
+     interval = 5 << std::min<int>(tracker->failed_counter() - 1, 6);
+-  else if (tracker->success_counter() < 2 && tracker->latest_sum_peers() < 10)
+-    interval = 10 << tracker->success_counter();
+   else
+@@ -402,3 +400,3 @@
+ 
+-  int32_t min_interval = std::min(tracker->min_interval(), (uint32_t)600);
++  int32_t min_interval = std::max(tracker->min_interval(), (uint32_t)300);
+   int32_t use_interval = std::min(interval, min_interval);
+@@ -487,16 +485,8 @@
+ 
+-    if ((m_flags & flag_send_update)) {
+-      // TODO: Also watch out for failed trackers requiring timeouts.
++    int32_t next_timeout = (*itr)->activity_time_next();
++      
++    if (next_timeout <= cachedTime.seconds())
+       m_tracker_list->send_state_itr(itr, send_state);
+-
+-    } else {
+-      TrackerList::iterator itr = m_tracker_list->find_next_to_request(m_tracker_list->begin());
+-
+-      int32_t next_timeout = (*itr)->activity_time_next();
+-
+-      if (next_timeout <= cachedTime.seconds())
+-        m_tracker_list->send_state_itr(itr, send_state);
+-      else
+-        update_timeout(next_timeout - cachedTime.seconds());
+-    }
++    else
++      update_timeout(next_timeout - cachedTime.seconds());
+   }
