@@ -1,0 +1,13 @@
+--- src/torrent/utils/thread_base.cc,orig	2013-01-10 19:42:12.000000000 +0100
++++ src/torrent/utils/thread_base.cc	2013-01-10 19:45:50.000000000 +0100
+@@ -90,2 +90,4 @@
+ thread_base::interrupt() {
++  int sleep_length = 0;
++
+   __sync_fetch_and_or(&m_flags, flag_no_timeout);
+@@ -98,3 +100,4 @@
+ 
+-    usleep(0);
++    usleep(sleep_length);
++    sleep_length = std::min(sleep_length + 50, 500);
+   }
