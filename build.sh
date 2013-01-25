@@ -223,11 +223,12 @@ download() { # Download & unpack sources
 }
 
 automagic() {
+    aclocal
     rm -f ltmain.sh scripts/{libtool,lt*}.m4
     libtoolize --automake --force --copy
     aclocal
     autoconf
-    automake
+    automake --add-missing
     ./autogen.sh
 }
 
