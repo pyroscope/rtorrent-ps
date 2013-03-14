@@ -120,6 +120,16 @@ unsigned long get_custom_long(core::Download* d, const char* name) {
 }
 
 
+// get custom field contaioning a long (time_t)
+std::string get_custom_string(core::Download* d, const char* name) {
+	try {
+		return d->bencode()->get_key("rtorrent").get_key("custom").get_key_string(name);
+	} catch (torrent::bencode_error& e) {
+		return "";
+	}
+}
+
+
 // convert absolute timestamp to approximate human readable time diff (5 chars wide)
 std::string elapsed_time(unsigned long dt)  {
 	if (dt == 0) return std::string("⋅ ⋅⋅ ");
@@ -554,12 +564,12 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 
+        std::string displayname = get_custom_string(d, "displayname");
 		int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
 		uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 		char buffer[canvas->width() + 1];
-		char* position;
 		char* last = buffer + canvas->width() - 2 + 1;
-		position = print_download_title(buffer, last, d);
+		print_download_title(buffer, last, d);
 
 		char progress_str[3] = "##";
 		char ying_yang_str[3] = "##";
@@ -571,7 +581,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
 		}
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s",
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s%s",
 			range.first == view->focus() ? "»" : " ",
 			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
@@ -595,7 +605,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			!down_rate   ? elapsed_time(get_custom_long(d, "tm_loaded")).c_str() :
 			               human_size(down_rate, 2 | 8).c_str(),
 			human_size(item->file_list()->size_bytes(), 2).c_str(),
-			buffer
+			displayname.empty() ? "" : " ",
+			displayname.empty() ? buffer : displayname.c_str()
 		);
 
 		int x_scrape = 3 + 8*2 + 1; // lead, 8 status columns, gap
@@ -636,14 +647,13 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	if (view->focus() != view->end_visible()) {
 		char buffer[canvas->width() + 1];
-		char* position;
 		char* last = buffer + canvas->width() + 1;
 
 		pos = canvas->height() - 2 - network_history_lines;
-		position = print_download_info(buffer, last, *view->focus());
+		print_download_info(buffer, last, *view->focus());
 		canvas->print(3, pos, "%s", buffer);
 		canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
-		position = print_download_status(buffer, last, *view->focus());
+		print_download_status(buffer, last, *view->focus());
 		canvas->print(3, pos+1, "%s", buffer);
 		canvas->set_attr(0, pos+1, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
 	}
