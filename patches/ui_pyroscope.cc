@@ -120,7 +120,7 @@ unsigned long get_custom_long(core::Download* d, const char* name) {
 }
 
 
-// get custom field contaioning a long (time_t)
+// get custom field contaioning a string
 std::string get_custom_string(core::Download* d, const char* name) {
 	try {
 		return d->bencode()->get_key("rtorrent").get_key("custom").get_key_string(name);
