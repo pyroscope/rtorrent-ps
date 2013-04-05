@@ -69,7 +69,7 @@ export LDFLAGS="-L$INST_DIR/lib ${LDFLAGS}"
 export PKG_CONFIG_PATH="$INST_DIR/lib/pkgconfig"
 
 SELF_URL=http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/rtorrent-extended
-XMLRPC_URL="https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/advanced@$XMLRPC_REV"
+XMLRPC_URL="http://svn.code.sf.net/p/xmlrpc-c/code/advanced@$XMLRPC_REV"
 TARBALLS=$(cat <<.
 http://c-ares.haxx.se/download/c-ares-$CARES_VERSION.tar.gz
 http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
@@ -193,7 +193,8 @@ symlink_binary() {
 #
 # RULES
 #
-prep() { # Create directories
+prep() {
+    # Create directories
     check_deps
     mkdir -p $INST_DIR/{bin,include,lib,man,share}
     mkdir -p tarballs
