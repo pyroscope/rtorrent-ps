@@ -272,7 +272,6 @@ build() { # Build and install all components
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
 
-    test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
     test -e $INST_DIR/lib/libxmlrpc.a || fail "You need to '$0 build' first!"
     
     # Unpack original source
@@ -396,6 +395,10 @@ RT_PS_XMLRPC_REV=$XMLRPC_REV
 }
 
 pkg2deb() { # Package current $PKG_INST_DIR installation
+    # You need to:
+    #   aptitude install ruby rubygems
+    #   gem install fpm
+    #   which fpm || ln -s $(ls -1 /var/lib/gems/*/bin/fpm | tail -1) /usr/local/bin
     test -n "$DEBFULLNAME" || fail "You MUST set DEBFULLNAME in your environment"
     test -n "$DEBEMAIL" || fail "You MUST set DEBEMAIL in your environment"
 
@@ -403,7 +406,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
     rm -rf "$DIST_DIR" || :
     mkdir -p "$DIST_DIR"
 
-    rm -rf "$PKG_INST_DIR/"{lib/pkgconfig,share/man,man,share,include} || :
+    rm -rf "$PKG_INST_DIR/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include} || :
     rm "$PKG_INST_DIR/bin/"{curl,*-config} || :
 
     . "$PKG_INST_DIR"/version-info.sh
@@ -442,6 +445,7 @@ case "$1" in
                 ;;
     extend)     prep
                 set_build_env
+                test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
                 extend
                 symlink_binary -extended
                 check
