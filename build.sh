@@ -62,11 +62,15 @@ test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSI
 # Incompatible patches
 test $RT_VERSION = 0.9.2 && _trackerinfo=0
 
+export PKG_INST_DIR="/opt/rtorrent"
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
-export CFLAGS="-I $INST_DIR/include ${CFLAGS}"
-export CXXFLAGS="$CFLAGS"
-export LDFLAGS="-L$INST_DIR/lib ${LDFLAGS}"
-export PKG_CONFIG_PATH="$INST_DIR/lib/pkgconfig"
+
+set_build_env() {
+    export CFLAGS="-I $INST_DIR/include ${CFLAGS}"
+    export CXXFLAGS="$CFLAGS"
+    export LDFLAGS="-L$INST_DIR/lib ${LDFLAGS}"
+    export PKG_CONFIG_PATH="$INST_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
+}
 
 SELF_URL=http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/rtorrent-extended
 XMLRPC_URL="http://svn.code.sf.net/p/xmlrpc-c/code/advanced@$XMLRPC_REV"
@@ -200,7 +204,7 @@ prep() {
     mkdir -p tarballs
 }
 
-download() { # Download & unpack sources
+download() { # Download and unpack sources
     test -d .svn || { svn co $SELF_URL tarballs/self ; rm tarballs/self/build.sh; mv tarballs/self/* tarballs/self/.svn . ; }
 
     test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
@@ -259,8 +263,6 @@ build() { # Build and install all components
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
         && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR prefix= install )
-
-    symlink_binary -vanilla
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
@@ -344,7 +346,6 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
         ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && make && make prefix=$INST_DIR install )
-    symlink_binary -extended
 }
 
 clean() { # Clean up generated files
@@ -354,7 +355,7 @@ clean() { # Clean up generated files
 }
 
 clean_all() { # Remove all downloads and created files
-    rm *.tar.gz >/dev/null || :
+    rm tarballs/*.tar.gz tarballs/DONE >/dev/null || :
     for i in $SUBDIRS; do
         test ! -d $i || rm -rf $i >/dev/null
     done
@@ -371,6 +372,42 @@ check() { # Print some diagnostic success indicators
     echo "$libs" | sed -e "s:$HOME:~:g"
 }
 
+install() { # Install to $PKG_INST_DIR
+    export INST_DIR="$PKG_INST_DIR"
+    rm -rf "$INST_DIR"/* || :
+    test "$(echo /opt/rtorrent/*)" = "/opt/rtorrent/*" || fail "Could not clean install dir '$INST_DIR'"
+    svn up .rev-stamp
+    cat >"$INST_DIR"/version-info.sh <<.
+RT_PS_VERSION=$RT_VERSION
+RT_PS_REVISION=$(svn info .rev-stamp | grep ^Revision: | cut -f2 -d' ')
+RT_PS_LT_VERSION=$LT_VERSION
+RT_PS_CARES_VERSION=$CARES_VERSION
+RT_PS_CURL_VERSION=$CURL_VERSION
+RT_PS_XMLRPC_REV=$XMLRPC_REV
+.
+    clean_all; prep; download; 
+    set_build_env; build; extend
+    #check
+}
+
+pkg2deb() { # Package current $PKG_INST_DIR installation
+    DIST_DIR=/tmp/rt-ps-dist
+    . "$PKG_INST_DIR"/version-info.sh
+    rm -rf "$DIST_DIR" || :
+    mkdir -p "$DIST_DIR"
+    rm -rf "$PKG_INST_DIR/"{lib/pkgconfig,share/man,man,share,include} || :
+    ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps \
+        -v $RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
+        -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
+        --license "GPL v2" --vendor "https://github.com/rakshasa" \
+        --description "Patched and extended ncurses BitTorrent client" \
+        --url "https://code.google.com/p/pyroscope/wiki/RtorrentExtended" \
+        -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
+    dpkg-deb -c "$DIST_DIR"/*.deb
+    echo "~~~" $(find "$DIST_DIR"/*.deb)
+    dpkg-deb -I "$DIST_DIR"/*.deb
+}
+
 
 #
 # MAIN
@@ -381,14 +418,28 @@ case "$1" in
     clean)      clean ;;
     clean_all)  clean_all ;; 
     download)   prep; download ;;
-    build)      prep; build; check ;;
-    extend)     prep; extend; check ;;
+    build)      prep
+                set_build_env
+                build
+                symlink_binary -vanilla
+                check
+                ;;
+    extend)     prep
+                set_build_env
+                extend
+                symlink_binary -extended
+                check
+                ;;
     check)      check ;;
+    install)    install;;
+    pkg2deb)    pkg2deb;;
     *)
         echo >&2 "Usage: $0 (all | clean | clean_all | download | build | check | extend )"
         echo >&2 "Build rTorrent $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INST_DIR)"
         echo >&2 
-        grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | tr @ \\t
+        grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | while read i; do
+            echo "   " $(eval "echo $i") | tr @ \\t
+        done
         exit 1
         ;;
 esac
