@@ -244,7 +244,8 @@ tag_svn_rev() {
     fi
 }
 
-build() { # Build and install all components
+build_deps() {
+    # Build direct dependencies
     test -e $SRC_DIR/tarballs/DONE || fail "You need to '$0 download' first!"
 
     tag_svn_rev
@@ -258,6 +259,9 @@ build() { # Build and install all components
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
         && make && make DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
+}
+
+build() { # Build and install all components
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
         && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
@@ -387,19 +391,25 @@ RT_PS_CURL_VERSION=$CURL_VERSION
 RT_PS_XMLRPC_REV=$XMLRPC_REV
 .
     clean_all; prep; download; 
-    set_build_env; build; extend
+    set_build_env; build_deps; extend
     #check
 }
 
 pkg2deb() { # Package current $PKG_INST_DIR installation
+    test -n "$DEBFULLNAME" || fail "You MUST set DEBFULLNAME in your environment"
+    test -n "$DEBEMAIL" || fail "You MUST set DEBEMAIL in your environment"
+
     DIST_DIR=/tmp/rt-ps-dist
-    . "$PKG_INST_DIR"/version-info.sh
     rm -rf "$DIST_DIR" || :
     mkdir -p "$DIST_DIR"
+
     rm -rf "$PKG_INST_DIR/"{lib/pkgconfig,share/man,man,share,include} || :
     rm "$PKG_INST_DIR/bin/"{curl,*-config} || :
+
+    . "$PKG_INST_DIR"/version-info.sh
     deps=$(ldd "$PKG_INST_DIR"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
+
     ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps \
         -v $RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
@@ -407,6 +417,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
         --description "Patched and extended ncurses BitTorrent client" \
         --url "https://code.google.com/p/pyroscope/wiki/RtorrentExtended" \
         $deps -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
+
     dpkg-deb -c "$DIST_DIR"/*.deb
     echo "~~~" $(find "$DIST_DIR"/*.deb)
     dpkg-deb -I "$DIST_DIR"/*.deb
@@ -424,6 +435,7 @@ case "$1" in
     download)   prep; download ;;
     build)      prep
                 set_build_env
+                build_deps
                 build
                 symlink_binary -vanilla
                 check
