@@ -374,6 +374,7 @@ check() { # Print some diagnostic success indicators
 
 install() { # Install to $PKG_INST_DIR
     export INST_DIR="$PKG_INST_DIR"
+    test -d "$INST_DIR"/. || mkdir -p "$INST_DIR"/
     rm -rf "$INST_DIR"/* || :
     test "$(echo /opt/rtorrent/*)" = "/opt/rtorrent/*" || fail "Could not clean install dir '$INST_DIR'"
     svn up .rev-stamp
@@ -396,13 +397,16 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
     rm -rf "$DIST_DIR" || :
     mkdir -p "$DIST_DIR"
     rm -rf "$PKG_INST_DIR/"{lib/pkgconfig,share/man,man,share,include} || :
+    rm "$PKG_INST_DIR/bin/"{curl,*-config} || :
+    deps=$(ldd "$PKG_INST_DIR"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
+        | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
     ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps \
         -v $RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
         --license "GPL v2" --vendor "https://github.com/rakshasa" \
         --description "Patched and extended ncurses BitTorrent client" \
         --url "https://code.google.com/p/pyroscope/wiki/RtorrentExtended" \
-        -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
+        $deps -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
     dpkg-deb -c "$DIST_DIR"/*.deb
     echo "~~~" $(find "$DIST_DIR"/*.deb)
     dpkg-deb -I "$DIST_DIR"/*.deb
