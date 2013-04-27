@@ -15,6 +15,10 @@ export CARES_VERSION=1.7.5
 export CURL_VERSION=7.22.0
 export XMLRPC_REV=2366
 
+# Extra "configure" options for libtorrent and rtorrent
+export CFG_OPTS=""
+##export CFG_OPTS="--enable-debug --enable-extra-debug"
+
 # AUR Patches (do NOT touch these)
 _magnet_uri=0
 _ipv6=0
@@ -263,10 +267,10 @@ build_deps() {
 
 build() { # Build and install all components
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
+        && ./configure $CFG_OPTS && make && make DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR prefix= install )
+        && ./configure $CFG_OPTS --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR prefix= install )
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
@@ -344,10 +348,10 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
 
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
     ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
-        ./configure && make clean && make && make prefix=$INST_DIR install )
+        ./configure $CFG_OPTS && make clean && make && make prefix=$INST_DIR install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
     ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
-        ./configure --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
+        ./configure $CFG_OPTS --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && make && make prefix=$INST_DIR install )
 }
 
