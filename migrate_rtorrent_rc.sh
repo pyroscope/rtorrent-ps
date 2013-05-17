@@ -9,6 +9,16 @@ set -e
 rc_file="$1"
 test -e $rc_file,0.8.6 || cp $rc_file $rc_file,0.8.6
 
+# Platform magic
+export SED_I="sed -i"
+case "$(uname -s)" in
+    FreeBSD)
+        export SED_I="sed -i ''"
+        ;;
+    Linux)
+        ;;
+esac
+
 #    -e 's%^ratio.max\([ =]\)%group2.seeding.ratio.max\1%' \
 #    -e 's%^ratio.min\([ =]\)%group2.seeding.ratio.min\1%' \
 #    -e 's%^ratio.upload\([ =]\)%group2.seeding.ratio.upload\1%' \
@@ -18,7 +28,7 @@ cp $rc_file $rc_file-$(date +'%Y-%m-%d-%H-%M-%S')
 cp $rc_file,0.8.6 $rc_file
 
 # Generic
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%-086\.rc%-087\.rc%g' \
     -e 's%^#087#%%g' \
     -e 's%^download_rate\([ =]\)%throttle.global_down.max_rate.set_kb\1%' \
@@ -42,7 +52,7 @@ sed -i $rc_file \
     -r
 
 # Setters
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%^bind\([ =]\)%network.bind_address.set\1%' \
     -e 's%^check_hash\([ =]\)%pieces.hash.on_completion.set\1%' \
     -e 's%^connection_leech\([ =]\)%protocol.connection.leech.set\1%' \
@@ -89,7 +99,7 @@ sed -i $rc_file \
     -r
 
 # Setters that need ".set"
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%^directory\([ =]\)%directory.default.set\1%' \
     -e 's%^session\([ =]\)%session.path.set\1%' \
     -e 's%^dht\([ =]\)%dht.mode.set\1%' \
@@ -97,7 +107,7 @@ sed -i $rc_file \
     -r
 
 # Missing Mappings (not in 0.8.7 source code)
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%^max_open_sockets\([ =]\)%network.max_open_sockets.set\1%' \
     -e 's%^max_open_files\([ =]\)%network.max_open_files.set\1%' \
     -e 's%^max_open_http\([ =]\)%network.http.max_open.set\1%' \
@@ -106,12 +116,12 @@ sed -i $rc_file \
     -r
 
 # Missing INLINE Mappings (not in 0.8.7 source code)
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%d\.save_session=%d\.save_full_session=%g' \
     -r
 
 # Inline Commands - Generic
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%to_xb=%convert.xb=%g' \
     -e 's%to_time=%convert.time=%g' \
     -e 's%to_throttle=%convert.throttle=%g' \
@@ -148,7 +158,7 @@ sed -i $rc_file \
     -r
 
 # Inline Commands - Setter
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%d\.set_connection_current=%d.connection_current.set=%g' \
     -e 's%d\.set_custom1=%d.custom1.set=%g' \
     -e 's%d\.set_custom2=%d.custom2.set=%g' \
@@ -229,7 +239,7 @@ sed -i $rc_file \
     -r
 
 # Inline Commands - Getter
-sed -i $rc_file \
+$SED_I $rc_file \
     -e 's%d\.get_base_filename=%d.base_filename=%g' \
     -e 's%d\.get_base_path=%d.base_path=%g' \
     -e 's%d\.get_bitfield=%d.bitfield=%g' \
