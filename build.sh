@@ -61,7 +61,7 @@ test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
 test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
 test -d rtorrent-0.8.9 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9; }
 test -d rtorrent-0.9.2 && { export LT_VERSION=0.13.2; export RT_VERSION=0.9.2; }
-test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; } 
+test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; }
 
 # Incompatible patches
 test $RT_VERSION = 0.9.2 && _trackerinfo=0
@@ -133,7 +133,7 @@ check_deps() {
             bold "    sudo apt-get install $pkg"
             exit 1
         fi
-    done 
+    done
 }
 
 aur_patches() {
@@ -219,7 +219,7 @@ download() { # Download and unpack sources
         test -d ${url_base%.tar.gz} || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
         test -d ${url_base%%.tar.gz} || fail "Tarball ${url_base} could not be unpacked"
     done
-    
+
     if test ${SVN:-0} = 1 -a ! -d SVN-HEAD; then
         svn co svn://rakshasa.no/libtorrent/trunk SVN-HEAD
         ln -nfs SVN-HEAD/libtorrent libtorrent-$LT_VERSION
@@ -227,7 +227,7 @@ download() { # Download and unpack sources
     fi
 
     tar xfz patches/rtorrent-extended.tar.gz
-    
+
     touch tarballs/DONE
 }
 
@@ -257,18 +257,18 @@ build_deps() {
     ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make DESTDIR=$INST_DIR prefix= install )
-    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd xmlrpc-c-advanced-$XMLRPC_REV \
-        && ./configure --with-libwww-ssl \
+        && ./configure --prefix=$INST_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
-        && make && make DESTDIR=$INST_DIR prefix= install )
+        && make && make install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
 }
 
 build() { # Build and install all components
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
         && ./configure $CFG_OPTS && make && make DESTDIR=$INST_DIR prefix= install )
-    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
         && ./configure $CFG_OPTS --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR prefix= install )
 }
@@ -277,7 +277,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
 
     test -e $INST_DIR/lib/libxmlrpc.a || fail "You need to '$0 build' first!"
-    
+
     # Unpack original source
     if test ${SVN:-0} = 0; then
         tar xfz tarballs/libtorrent-$LT_VERSION.tar.gz
@@ -349,7 +349,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
     ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
         ./configure $CFG_OPTS && make clean && make && make prefix=$INST_DIR install )
-    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la 
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
         ./configure $CFG_OPTS --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
         make clean && make && make prefix=$INST_DIR install )
@@ -393,7 +393,7 @@ RT_PS_CARES_VERSION=$CARES_VERSION
 RT_PS_CURL_VERSION=$CURL_VERSION
 RT_PS_XMLRPC_REV=$XMLRPC_REV
 .
-    clean_all; prep; download; 
+    clean_all; prep; download;
     set_build_env; build_deps; extend
     #check
 }
@@ -438,7 +438,7 @@ cd "$SRC_DIR"
 case "$1" in
     all)        prep; download; build; check ;;
     clean)      clean ;;
-    clean_all)  clean_all ;; 
+    clean_all)  clean_all ;;
     download)   prep; download ;;
     build)      prep
                 set_build_env
@@ -460,11 +460,10 @@ case "$1" in
     *)
         echo >&2 "Usage: $0 (all | clean | clean_all | download | build | check | extend )"
         echo >&2 "Build rTorrent $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INST_DIR)"
-        echo >&2 
+        echo >&2
         grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | while read i; do
             echo "   " $(eval "echo $i") | tr @ \\t
         done
         exit 1
         ;;
 esac
-
