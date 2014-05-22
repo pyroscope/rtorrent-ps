@@ -20,6 +20,9 @@ export XMLRPC_REV=2366
 export CFG_OPTS=""
 ##export CFG_OPTS="--enable-debug --enable-extra-debug"
 
+# try this when you get configure errors regarding xmlrpc-c
+#export CFLAGS="$CFLAGS -march=i586"
+
 # AUR Patches (do NOT touch these)
 _magnet_uri=0
 _ipv6=0
@@ -73,10 +76,12 @@ export PKG_INST_DIR="/opt/rtorrent"
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
 
 set_build_env() {
-    export CFLAGS="-I $INST_DIR/include ${CFLAGS}"
-    export CXXFLAGS="$CFLAGS"
-    export LDFLAGS="-L$INST_DIR/lib ${LDFLAGS}"
-    export PKG_CONFIG_PATH="$INST_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
+    local dump="$1"
+    local quot="$2"
+    $dump export CFLAGS="$quot-I $INST_DIR/include ${CFLAGS}$quot"
+    $dump export CXXFLAGS="$quot$CFLAGS$quot"
+    $dump export LDFLAGS="$quot-L$INST_DIR/lib ${LDFLAGS}$quot"
+    $dump export PKG_CONFIG_PATH="$quot$INST_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}$quot"
 }
 
 SELF_URL=http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/rtorrent-extended
@@ -110,7 +115,7 @@ automake:automake
 set -e
 set +x
 export SRC_DIR=$(cd $(dirname $0) && pwd)
-SUBDIRS="c-ares-*[0-9] curl-*[0-9] xmlrpc-c-advanced libtorrent-*[0-9] rtorrent-*[0-9]"
+SUBDIRS="c-ares-*[0-9] curl-*[0-9] xmlrpc-c-advanced-$XMLRPC_REV libtorrent-*[0-9] rtorrent-*[0-9]"
 ESC=$(echo -en \\0033)
 BOLD="$ESC[1m"
 OFF="$ESC[0m"
@@ -453,6 +458,7 @@ case "$1" in
     clean)      clean ;;
     clean_all)  clean_all ;;
     download)   prep; download ;;
+    env)        prep; set +x; set_build_env echo '"';;
     build)      prep; build_everything ;;
     extend)     prep
                 set_build_env
