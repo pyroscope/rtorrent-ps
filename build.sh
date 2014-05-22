@@ -5,6 +5,7 @@
 
 # Yep, 0.9.2 is the default now
 export RT_MINOR=2
+##export RT_MINOR=4
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 #export RT_MINOR=9
 #export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
@@ -61,10 +62,12 @@ test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
 test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
 test -d rtorrent-0.8.9 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9; }
 test -d rtorrent-0.9.2 && { export LT_VERSION=0.13.2; export RT_VERSION=0.9.2; }
+test -d rtorrent-0.9.4 && { export LT_VERSION=0.13.4; export RT_VERSION=0.9.4; }
 test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; }
 
 # Incompatible patches
 test $RT_VERSION = 0.9.2 && _trackerinfo=0
+test $RT_VERSION = 0.9.4 && _trackerinfo=0
 
 export PKG_INST_DIR="/opt/rtorrent"
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
@@ -89,6 +92,7 @@ http://libtorrent.rakshasa.no/downloads/libtorrent-$LT_VERSION.tar.gz
 http://libtorrent.rakshasa.no/downloads/rtorrent-$RT_VERSION.tar.gz
 .
 )
+
 
 BUILD_DEPS=$(cat <<.
 wget:wget
@@ -317,6 +321,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         test -e "${filename/0.8.8/0.8.9}" || ln -s "$(basename $filename)" "${filename/0.8.8/0.8.9}"
     done
     test -e $SRC_DIR/patches/ps-ui_pyroscope_0.9.2.patch || ln -s ps-ui_pyroscope_0.8.8.patch $SRC_DIR/patches/ps-ui_pyroscope_0.9.2.patch
+    test -e $SRC_DIR/patches/ps-ui_pyroscope_0.9.4.patch || ln -s ps-ui_pyroscope_0.8.8.patch $SRC_DIR/patches/ps-ui_pyroscope_0.9.4.patch
 
     for corepatch in $SRC_DIR/patches/ps-*_${RT_VERSION%-svn}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
@@ -430,23 +435,25 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
     dpkg-deb -I "$DIST_DIR"/*.deb
 }
 
+build_everything() { # Go through all build steps
+    set_build_env
+    build_deps
+    build
+    symlink_binary -vanilla
+    check
+}
+
 
 #
 # MAIN
 #
 cd "$SRC_DIR"
 case "$1" in
-    all)        prep; download; build; check ;;
+    all)        prep; download; build_everything ;;
     clean)      clean ;;
     clean_all)  clean_all ;;
     download)   prep; download ;;
-    build)      prep
-                set_build_env
-                build_deps
-                build
-                symlink_binary -vanilla
-                check
-                ;;
+    build)      prep; build_everything ;;
     extend)     prep
                 set_build_env
                 test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
