@@ -26,7 +26,9 @@
 #include <rak/path.h>
 #include <rak/functional.h>
 #include <rak/functional_fun.h>
-#include <sigc++/adaptors/bind.h>
+#if RT_HEX_VERSION < 0x000904
+    #include <sigc++/adaptors/bind.h>
+#endif
 
 #include "core/download.h"
 #include "core/manager.h"
@@ -107,11 +109,11 @@ std::string get_active_tracker_domain(torrent::Download* item) {
 
 /*  @DOC
     compare=order,command1=[,...]
-    
+
         Compares two items like `less=` or `greater=`, but allows to compare
         by several different sort criteria, and ascending or descending
         order per given field. The first parameter is a string of order
-        indicators, either `aA+` for ascending or `dD-` for descending. 
+        indicators, either `aA+` for ascending or `dD-` for descending.
         The default, i.e. when there's more fields than indicators, is
         ascending. Field types other than value or string are treated
         as equal (or in other words, they're ignored).
@@ -135,7 +137,7 @@ torrent::Object apply_compare(rpc::target_type target, const torrent::Object& ra
 
     if (!rpc::is_target_pair(target))
         throw torrent::input_error("Can only compare a target pair.");
-      
+
     if (args.size() < 2)
         throw torrent::input_error("Need at least order and one field.");
 
@@ -153,14 +155,14 @@ torrent::Object apply_compare(rpc::target_type target, const torrent::Object& ra
 
         if (result1.type() != result2.type())
             throw torrent::input_error(std::string("Type mismatch in compare of ") + field);
-        
+
         bool descending = *current == 'd' || *current == 'D' || *current == '-';
         if (*current) {
             if (!descending && !(*current == 'a' || *current == 'A' || *current == '+'))
                 throw torrent::input_error(std::string("Bad order '") + *current + "' in " + order);
             ++current;
         }
-        
+
         switch (result1.type()) {
             case torrent::Object::TYPE_VALUE:
                 if (result1.as_value() != result2.as_value())
@@ -176,7 +178,7 @@ torrent::Object apply_compare(rpc::target_type target, const torrent::Object& ra
                 break; // treat unknown types as equal
         }
     }
-  
+
     // if all else is equal, ensure stable sort order based on memory location
     return (int64_t) (target.second < target.third);
 }
@@ -188,10 +190,10 @@ static std::map<char, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_
     ui.bind_key=display,key,"command1=[,...]"
 
         Binds the given key on a specified display to execute the commands when pressed.
-        
+
         "display" must be one of "download_list", ...
         "key" can be either a single character for normal keys, or ^ plus a character for control keys.
-        
+
         Configuration example:
             # VIEW: Bind view #7 to the "rtcontrol" result
             schedule = bind_7,1,0,"ui.bind_key=download_list,7,ui.current_view.set=rtcontrol"
@@ -212,13 +214,13 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
     const std::string& keydef   = (itr++)->as_string();
     const std::string& commands = (itr++)->as_string();
 
-    // Get key index from definition    
+    // Get key index from definition
     if (keydef.empty() || keydef.size() > (keydef[0] == '^' ? 2 : 1))
         throw torrent::input_error("Bad key definition.");
     char key = keydef[0];
     if (key == '^' && keydef.size() > 1) key = keydef[1] & 31;
 
-    // Look up display    
+    // Look up display
     ui::DownloadList::Display displayType = ui::DownloadList::DISPLAY_MAX_SIZE;
     if (element == "download_list") {
         displayType = ui::DownloadList::DISPLAY_DOWNLOAD_LIST;
@@ -237,13 +239,15 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
     bound_commands[displayType][key] = commands; // keep hold of the string, so the c_str() below remains valid
     switch (displayType) {
         case ui::DownloadList::DISPLAY_DOWNLOAD_LIST:
+#if RT_HEX_VERSION < 0x000904
             display->bindings()[key] = sigc::bind(sigc::mem_fun(
                 *(ui::ElementDownloadList*)display, &ui::ElementDownloadList::receive_command), bound_commands[displayType][key].c_str());
+#endif
             break;
         default:
             return torrent::Object();
     }
-    
+
     if (!new_binding) {
         std::string msg = "Replaced key binding";
         msg += " for " + keydef + " in " + element + " with " + commands.substr(0, 30);
@@ -271,7 +275,7 @@ torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
     if (arg.empty()) {
         control->core()->push_log_std("Closing message log file.");
     }
-    
+
     if (core::log_messages_fd >= 0) {
         ::close(core::log_messages_fd);
         core::log_messages_fd = -1;
@@ -355,4 +359,3 @@ void initialize_command_pyroscope() {
     ADD_COMMAND_VOID("ui.current_view", rak::ptr_fun(&cmd_ui_current_view));
 #endif
 }
-
