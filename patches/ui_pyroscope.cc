@@ -15,6 +15,7 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
 #include "globals.h"
 
 #include <cstdio>
+#include <list>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -63,7 +64,7 @@ static unsigned long attr_map[3 * ps::COL_MAX] = {0};
 
 // color indices for progress indication
 int ratio_col[] = {
-	ps::COL_PROGRESS0, ps::COL_PROGRESS20, ps::COL_PROGRESS40, ps::COL_PROGRESS60, ps::COL_PROGRESS80, 
+	ps::COL_PROGRESS0, ps::COL_PROGRESS20, ps::COL_PROGRESS40, ps::COL_PROGRESS60, ps::COL_PROGRESS80,
 	ps::COL_PROGRESS100, ps::COL_PROGRESS120,
 };
 
@@ -145,7 +146,7 @@ std::string elapsed_time(unsigned long dt)  {
 
 	char buffer[15];
 	if (val < 10.0 && dim) {
-		snprintf(buffer, sizeof(buffer), "%1d%s%2d%s", int(val), unit[dim], 
+		snprintf(buffer, sizeof(buffer), "%1d%s%2d%s", int(val), unit[dim],
 			int(dt % threshold[dim] / threshold[dim-1]), unit[dim-1]);
 	} else {
 		snprintf(buffer, sizeof(buffer), "%4d%s", int(val), unit[dim]);
@@ -164,7 +165,7 @@ std::string num2(int64_t num) {
 		snprintf(buffer, sizeof(buffer), "%2d", int(num));
 	} else {
 		// Roman numeral multipliers 10, 100, 1000, 10x1000, 100x1000, 1000x1000
-		const char* roman = " xcmXCM"; 
+		const char* roman = " xcmXCM";
 		int dim = 0;
 		while (num > 9) { ++dim; num /= 10; }
 		snprintf(buffer, sizeof(buffer), "%1d%c", int(num), roman[dim]);
@@ -193,7 +194,7 @@ std::string human_size(int64_t bytes, unsigned int format=0) {
 
 	int exp;
 	char unit;
-	
+
 	if (bytes < (int64_t(1000) << 10))			{ exp = 10; unit = 'K'; }
 	else if (bytes < (int64_t(1000) << 20)) 	{ exp = 20; unit = 'M'; }
 	else if (bytes < (int64_t(1000) << 30)) 	{ exp = 30; unit = 'G'; }
@@ -270,7 +271,7 @@ void ui_pyroscope_colormap_init() {
 			else if (words[i] == "bright") bright = 8;
 			else if (words[i].find_first_not_of("0123456789") == std::string::npos) {
 				// handle numeric index
-				short c = -1; 
+				short c = -1;
 				sscanf(words[i].c_str(), "%hd", &c);
 				col[col_idx] = c;
 			} else for (short c = 0; c < 8; c++) { // check for basic color names
@@ -298,9 +299,9 @@ void ui_pyroscope_colormap_init() {
 
 	// now make copies of the basic colors with the "odd" and "even" definitions mixed in
 	for (int k = 1; k < ps::COL_MAX; k++) {
-		short fg, bg; 
+		short fg, bg;
 		pair_content(k, &fg, &bg);
-				
+
 		// replace the background color, and mix in the attributes
 		attr_map[k + 1 * ps::COL_MAX] = attr_map[k] | attr_map[ps::COL_EVEN];
 		attr_map[k + 2 * ps::COL_MAX] = attr_map[k] | attr_map[ps::COL_ODD];
@@ -459,7 +460,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 }
 
 
-// patch hook for download list canvas redraw; if this returns true, the calling 
+// patch hook for download list canvas redraw; if this returns true, the calling
 // function is left immediately (i.e. true indicates we took over ALL redrawing)
 bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view) {
 	// show "X of Y"
@@ -590,10 +591,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
 				item->file_list()->completed_chunks() * PROGRESS_STEPS
 				/ item->file_list()->size_chunks()],
-			D_INFO(item)->down_rate()->rate() ? 
+			D_INFO(item)->down_rate()->rate() ?
 				(D_INFO(item)->up_rate()->rate() ? "⇅ " : "↡ ") :
 				(D_INFO(item)->up_rate()->rate() ? "↟ " : "  "),
-			ying_yang_style == 0 ? ying_yang_str : 
+			ying_yang_style == 0 ? ying_yang_str :
 				ratio >= YING_YANG_STEPS * 1000 ? "⊛ " : ying_yang[ying_yang_style][ratio / 1000],
 			has_msg ? has_alert ? alert : "♺ " : is_tagged ? "⚑ " : "  ",
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
@@ -708,26 +709,26 @@ const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand
 
 // Traffic history (0.8.9 only)
 #if defined(CMD2_ANY)
-int network_history_depth_get() { 
+int network_history_depth_get() {
 	return network_history_depth;
 }
 
-torrent::Object network_history_depth_set(int arg) { 
+torrent::Object network_history_depth_set(int arg) {
 	if (network_history_depth) {
-		delete[] network_history_up;   
-		delete[] network_history_down; 
+		delete[] network_history_up;
+		delete[] network_history_down;
 		network_history_up = network_history_down = 0;
 	}
-   
+
 	network_history_depth = arg;
 	network_history_count = 0;
-   
+
 	if (network_history_depth) {
 		network_history_up   = new uint32_t[network_history_depth];
 		network_history_down = new uint32_t[network_history_depth];
 	}
-	
-	return torrent::Object(); 
+
+	return torrent::Object();
 }
 
 
@@ -763,8 +764,8 @@ torrent::Object network_history_refresh() {
 		network_history_format(network_history_up_str, 'U', network_history_up);
 		network_history_format(network_history_down_str, 'D', network_history_down);
 	}
-	
-	return torrent::Object(); 
+
+	return torrent::Object();
 }
 
 
@@ -774,8 +775,8 @@ torrent::Object network_history_sample() {
 		network_history_down[network_history_count % network_history_depth] = torrent::down_rate()->rate();
 		++network_history_count;
 	}
-	
-	return network_history_refresh(); 
+
+	return network_history_refresh();
 }
 #endif
 
