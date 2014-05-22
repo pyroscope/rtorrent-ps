@@ -239,10 +239,13 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
     bound_commands[displayType][key] = commands; // keep hold of the string, so the c_str() below remains valid
     switch (displayType) {
         case ui::DownloadList::DISPLAY_DOWNLOAD_LIST:
+            display->bindings()[key] =
 #if RT_HEX_VERSION < 0x000904
-            display->bindings()[key] = sigc::bind(sigc::mem_fun(
-                *(ui::ElementDownloadList*)display, &ui::ElementDownloadList::receive_command), bound_commands[displayType][key].c_str());
+                sigc::bind(sigc::mem_fun(*(ui::ElementDownloadList*)display, &ui::ElementDownloadList::receive_command),
+#else
+                std::tr1::bind(&ui::ElementDownloadList::receive_command, (ui::ElementDownloadList*)display,
 #endif
+                bound_commands[displayType][key].c_str());
             break;
         default:
             return torrent::Object();
