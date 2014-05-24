@@ -1,0 +1,17 @@
+# Download cache
+tarballs/
+
+# Version symlinks
+patches/ps-dns_cache_timeout_0.8.9.patch
+patches/ps-stable_sort_0.8.9.patch
+patches/ps-ui_pyroscope_0.8.9.patch
+patches/ps-ui_pyroscope_0.9.2.patch
+patches/ps-ui_pyroscope_0.9.4.patch
+
+# Component subdirs
+c-ares-*/
+curl-*/
+libtorrent-*/
+rtorrent-*/
+rtorrent-extended/
+xmlrpc-c-advanced-*/
