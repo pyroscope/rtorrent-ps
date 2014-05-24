@@ -84,7 +84,7 @@ set_build_env() {
     $dump export PKG_CONFIG_PATH="$quot$INST_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}$quot"
 }
 
-SELF_URL=http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/rtorrent-extended
+SELF_URL=https://github.com/pyroscope/rtorrent-ps.git
 XMLRPC_URL="http://svn.code.sf.net/p/xmlrpc-c/code/advanced@$XMLRPC_REV"
 TARBALLS=$(cat <<.
 http://c-ares.haxx.se/download/c-ares-$CARES_VERSION.tar.gz
@@ -218,7 +218,7 @@ prep() {
 }
 
 download() { # Download and unpack sources
-    test -d .svn || { svn co $SELF_URL tarballs/self ; rm tarballs/self/build.sh; mv tarballs/self/* tarballs/self/.svn . ; }
+    test -d .git || { git clone $SELF_URL tarballs/self ; rm tarballs/self/build.sh; mv tarballs/self/* tarballs/self/.git . ; }
 
     test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
         svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
