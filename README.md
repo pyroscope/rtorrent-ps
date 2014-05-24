@@ -3,6 +3,9 @@ rTorrent-PS
 
 Extended `rTorrent` distribution with UI enhancements, colorization, and some added features.
 
+![Extended Canvas Screenshot](http://i.imgur.com/B9qll.png)
+
+
 ## Feature Overview
 
 `rTorrent-PS` is a `rTorrent` distribution in form of a set of patches 
