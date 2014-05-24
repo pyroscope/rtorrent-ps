@@ -115,7 +115,7 @@ automake:automake
 set -e
 set +x
 export SRC_DIR=$(cd $(dirname $0) && pwd)
-SUBDIRS="c-ares-*[0-9] curl-*[0-9] xmlrpc-c-advanced-$XMLRPC_REV libtorrent-*[0-9] rtorrent-*[0-9]"
+SUBDIRS="c-ares-*[0-9] curl-*[0-9] xmlrpc-c-advanced-$XMLRPC_REV libtorrent-*[0-9] rtorrent-*[0-9] rtorrent-extended"
 ESC=$(echo -en \\0033)
 BOLD="$ESC[1m"
 OFF="$ESC[0m"
