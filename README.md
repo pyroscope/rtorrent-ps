@@ -3,12 +3,12 @@ rTorrent-PS
 
 Extended `rTorrent` distribution with UI enhancements, colorization, and some added features.
 
-![Extended Canvas Screenshot](http://i.imgur.com/B9qll.png)
+![Extended Canvas Screenshot](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/images/rT-PS-094-2014-05-24-shadow.png)
 
 
 ## Feature Overview
 
-`rTorrent-PS` is a `rTorrent` distribution in form of a set of patches 
+`rTorrent-PS` is a `rTorrent` distribution in form of a set of patches
 that improves the user experience and stability of official `rTorrent` releases.
 
 The main changes are these:
@@ -23,9 +23,9 @@ The main changes are these:
     * collapsed 1-line item display.
     * network bandwidth graph.
     * displaying the tracker domain for each item.
-    * some more minor modifications to the download list view. 
+    * some more minor modifications to the download list view.
 
-To get those, you just need to either follow the build instructions, or download and install a package from Bintray — assuming one is available for your platform. 
+To get those, you just need to either follow the build instructions, or download and install a package from Bintray — assuming one is available for your platform.
 
 
 For more details, see the [wiki page at Google code](https://code.google.com/p/pyroscope/wiki/RtorrentExtended).
