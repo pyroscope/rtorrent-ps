@@ -34,3 +34,9 @@ For more details, see the [wiki page at Google code](https://code.google.com/p/p
 ## Installation
 
 See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/DebianInstallFromSource#rTorrent_installation), for either package based installation, or building from source.
+
+
+## References
+
+  * https://github.com/rakshasa/rtorrent
+  * http://wiki.rtorrent.org/
