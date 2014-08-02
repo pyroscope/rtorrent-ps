@@ -5,6 +5,12 @@ Extended `rTorrent` distribution with UI enhancements, colorization, and some ad
 
 ![Extended Canvas Screenshot](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/images/rT-PS-094-2014-05-24-shadow.png)
 
+`rTorrent-PS` is *not* the same as the `PyroScope`
+[command line utilities](https://code.google.com/p/pyroscope/wiki/CommandLineTools),
+and doesn't depend on them; the same is true the other way 'round.
+It's just that both unsurprisingly have synergies if used together,
+and some features *do* only work when both are present.
+
 
 ## Feature Overview
 
