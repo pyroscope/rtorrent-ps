@@ -33,7 +33,14 @@ For more details, see the [wiki page at Google code](https://code.google.com/p/p
 
 ## Installation
 
+### General
+
 See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/DebianInstallFromSource#rTorrent_installation), for either package based installation, or building from source.
+
+### Packages
+
+* The build script is able to build a DEB package (living in `/opt/rtorrent`), pre-built ones for some Debian and Ubuntu versions can be found on [Bintray](https://bintray.com/pyroscope/rtorrent-ps).
+* There is an AUR package [rtorrent-pyro-git](https://aur.archlinux.org/packages/rtorrent-pyro-git/) for Arch Linux.
 
 
 ## References
