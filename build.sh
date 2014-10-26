@@ -3,18 +3,25 @@
 # Build rTorrent including patches
 #
 
-# Yep, 0.9.2 is the default now
-export RT_MINOR=2
-##export RT_MINOR=4
+# Yep, 0.9.4 is the default now
+export RT_MINOR=4
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 #export RT_MINOR=9
 #export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
 export SVN=0 # no git support yet!
 
-# On Ubuntu 12.10, try curl 7.27.0 and xmlrpc-c 2451 instead
+# Fitting / tested dependency versions for major platforms
 export CARES_VERSION=1.7.5
 export CURL_VERSION=7.22.0
 export XMLRPC_REV=2366
+
+case "$(lsb_release -cs)" in
+    trusty)
+        export CARES_VERSION=1.10.0
+        export CURL_VERSION=7.38.0
+        export XMLRPC_REV=2626 # Release 1.38.04
+        ;;
+esac
 
 # Extra "configure" options for libtorrent and rtorrent
 export CFG_OPTS=""
@@ -55,8 +62,8 @@ case "$(uname -s)" in
         export SED_I="sed -i '' -e"
         ;;
     Linux)
-        export CFLAGS="-pthread ${CFLAGS}"
-        export LDFLAGS="-lpthread ${LDFLAGS}"
+        export CPPFLAGS="-pthread ${CPPFLAGS}"
+        export LIBS="-lpthread ${LIBS}"
         ;;
 esac
 
@@ -78,7 +85,7 @@ export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
 set_build_env() {
     local dump="$1"
     local quot="$2"
-    $dump export CFLAGS="$quot-I $INST_DIR/include ${CFLAGS}$quot"
+    $dump export CPPFLAGS="$quot-I $INST_DIR/include ${CPPFLAGS}$quot"
     $dump export CXXFLAGS="$quot$CFLAGS$quot"
     $dump export LDFLAGS="$quot-L$INST_DIR/lib ${LDFLAGS}$quot"
     $dump export PKG_CONFIG_PATH="$quot$INST_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}$quot"
