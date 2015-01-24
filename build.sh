@@ -116,6 +116,7 @@ libtool:libtoolize
 automake:aclocal
 autoconf:autoconf
 automake:automake
+pkg-config:pkg-config
 .
 )
 
