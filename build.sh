@@ -402,10 +402,9 @@ install() { # Install to $PKG_INST_DIR
     test -d "$INST_DIR"/. || mkdir -p "$INST_DIR"/
     rm -rf "$INST_DIR"/* || :
     test "$(echo /opt/rtorrent/*)" = "/opt/rtorrent/*" || fail "Could not clean install dir '$INST_DIR'"
-    svn up .rev-stamp
     cat >"$INST_DIR"/version-info.sh <<.
 RT_PS_VERSION=$RT_VERSION
-RT_PS_REVISION=$(svn info .rev-stamp | grep ^Revision: | cut -f2 -d' ')
+RT_PS_REVISION=$(date +'%Y%m%d')-$(git rev-parse --short HEAD)
 RT_PS_LT_VERSION=$LT_VERSION
 RT_PS_CARES_VERSION=$CARES_VERSION
 RT_PS_CURL_VERSION=$CURL_VERSION
