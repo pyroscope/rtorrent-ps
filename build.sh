@@ -27,8 +27,18 @@ esac
 export CFG_OPTS=""
 ##export CFG_OPTS="--enable-debug --enable-extra-debug"
 
-# try this when you get configure errors regarding xmlrpc-c
+# Try this when you get configure errors regarding xmlrpc-c
+# ... on a Intel PC type system with certain types of CPUs:
 #export CFLAGS="$CFLAGS -march=i586"
+GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
+case "$GCC_TYPE" in
+    # Raspberry Pi 2 with GCC "gcc (Raspbian 4.8.2-21~rpi3rpi1) 4.8.2"
+    Raspbian)
+        if uname -a | grep 'armv7' >/dev/null; then
+            export CFLAGS="$CFLAGS -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard"
+        fi
+        ;;
+esac
 
 # AUR Patches (do NOT touch these)
 _magnet_uri=0
