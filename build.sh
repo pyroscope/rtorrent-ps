@@ -427,7 +427,7 @@ RT_PS_XMLRPC_REV=$XMLRPC_REV
 
 pkg2deb() { # Package current $PKG_INST_DIR installation
     # You need to:
-    #   aptitude install ruby rubygems
+    #   aptitude install ruby ruby-dev
     #   gem install fpm
     #   which fpm || ln -s $(ls -1 /var/lib/gems/*/bin/fpm | tail -1) /usr/local/bin
     test -n "$DEBFULLNAME" || fail "You MUST set DEBFULLNAME in your environment"
