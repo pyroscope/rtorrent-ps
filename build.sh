@@ -24,8 +24,13 @@ case "$(lsb_release -cs)" in
 esac
 
 # Extra "configure" options for libtorrent and rtorrent
+#
+# MIPS | PowerPC | ARM users, read https://github.com/rakshasa/rtorrent/issues/156
 export CFG_OPTS=""
-##export CFG_OPTS="--enable-debug --enable-extra-debug"
+##export CFG_OPTS="$CFG_OPTS --enable-debug --enable-extra-debug"
+export CFG_OPTS_LT="$CFG_OPTS"
+##export CFG_OPTS_LT="$CFG_OPTS_LT --disable-instrumentation"
+export CFG_OPTS_RT="$CFG_OPTS"
 
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
@@ -294,10 +299,11 @@ build_deps() {
 
 build() { # Build and install all components
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure $CFG_OPTS && make && make DESTDIR=$INST_DIR prefix= install )
+        && ./configure $CFG_OPTS_LT && make && make DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd rtorrent-$RT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
-        && ./configure $CFG_OPTS --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && make && make DESTDIR=$INST_DIR prefix= install )
+        && ./configure $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config \
+        && make && make DESTDIR=$INST_DIR prefix= install )
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
