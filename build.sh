@@ -35,12 +35,19 @@ export CFG_OPTS_RT="$CFG_OPTS"
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
 #export CFLAGS="$CFLAGS -march=i586"
-GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
+if command which dpkg-architecture >/dev/null && dpkg-architecture -earmhf; then
+    GCC_TYPE="Raspbian"
+else
+    GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
+fi
 case "$GCC_TYPE" in
-    # Raspberry Pi 2 with GCC "gcc (Raspbian 4.8.2-21~rpi3rpi1) 4.8.2"
+    # Raspberry Pi 2 with one of
+    #   gcc (Debian 4.6.3-14+rpi1) 4.6.3
+    #   gcc (Raspbian 4.8.2-21~rpi3rpi1) 4.8.2
     Raspbian)
         if uname -a | grep 'armv7' >/dev/null; then
             export CFLAGS="$CFLAGS -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard"
+            export CFG_OPTS_LT="$CFG_OPTS_LT --disable-instrumentation"
         fi
         ;;
 esac
