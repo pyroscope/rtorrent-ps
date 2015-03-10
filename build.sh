@@ -150,6 +150,11 @@ ESC=$(echo -en \\0033)
 BOLD="$ESC[1m"
 OFF="$ESC[0m"
 
+echo "${BOLD}Building rTorrent $RT_VERSION/$LT_VERSION$OFF"
+set_build_env echo '"'
+echo "export CFG_OPTS_LT=\"$CFG_OPTS_LT\""
+echo "export CFG_OPTS_RT=\"$CFG_OPTS_RT\""
+
 
 #
 # HELPERS
@@ -470,7 +475,8 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
     dpkg-deb -I "$DIST_DIR"/*.deb
 }
 
-build_everything() { # Go through all build steps
+build_everything() {
+    # Go through all build steps
     set_build_env
     build_deps
     build
