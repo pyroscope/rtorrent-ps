@@ -120,12 +120,32 @@ http://c-ares.haxx.se/download/c-ares-$CARES_VERSION.tar.gz
 http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
 .
 )
-test ${SVN:-0} = 0 && TARBALLS=$(cat <<.
+
+test ${SVN:-0} = 0 && case $RT_VERSION-$LT_VERSION in
+    # use reliable download links for 0.9.4
+    0.9.4-0.13.4) TARBALLS=$(cat <<.
+$TARBALLS
+http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/libtorrent-0.13.4.tar.gz/e82f380a9d4b55b379e0e73339c73895/libtorrent-0.13.4.tar.gz
+http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/rtorrent-0.9.4.tar.gz/fd9490a2ac67d0fa2a567c6267845876/rtorrent-0.9.4.tar.gz
+.
+)
+    ;;
+    # use reliable download links for 0.9.2
+    0.9.2-0.13.2) TARBALLS=$(cat <<.
+$TARBALLS
+http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/libtorrent-0.13.2.tar.gz/96c0b81501357df402ab592f59ecaeab/libtorrent-0.13.2.tar.gz
+http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/rtorrent-0.9.2.tar.gz/72c3e9ab859bda7cc8aa96c0b508b09f/rtorrent-0.9.2.tar.gz
+.
+)
+    ;;
+    *) TARBALLS=$(cat <<.
 $TARBALLS
 http://libtorrent.rakshasa.no/downloads/libtorrent-$LT_VERSION.tar.gz
 http://libtorrent.rakshasa.no/downloads/rtorrent-$RT_VERSION.tar.gz
 .
 )
+    ;;
+esac
 
 
 BUILD_DEPS=$(cat <<.
