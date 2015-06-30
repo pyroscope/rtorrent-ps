@@ -79,8 +79,11 @@ export LC_ALL
 export SED_I="sed -i -e"
 case "$(uname -s)" in
     FreeBSD)
-        export CFLAGS="-pipe -O2 -pthread ${CFLAGS}"
-        export LDFLAGS="-s -lpthread ${LDFLAGS}"
+	read -p "You need to install bash gmake libidn librtmp cppunit"
+	read -p "You need to symlink clang --> gcc, clang++ --> g++, gmake --> make"
+	read -p "You need to update your ports"
+        export CFLAGS="-pipe -O2 -pthread -I/usr/include -I/usr/local/include ${CFLAGS}"
+        export LDFLAGS="-s -lpthread -L/usr/lib -lz -L/usr/local/lib ${LDFLAGS}"
         export SED_I="sed -i '' -e"
         ;;
     Linux)
@@ -108,7 +111,7 @@ set_build_env() {
     local dump="$1"
     local quot="$2"
     $dump export CPPFLAGS="$quot-I $INST_DIR/include ${CPPFLAGS}$quot"
-    $dump export CXXFLAGS="$quot$CFLAGS$quot"
+    $dump export CXXFLAGS="$quot$CFLAGS -std=c++11$quot"
     $dump export LDFLAGS="$quot-L$INST_DIR/lib ${LDFLAGS}$quot"
     $dump export PKG_CONFIG_PATH="$quot$INST_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}$quot"
 }
@@ -330,6 +333,31 @@ build_deps() {
 }
 
 build() { # Build and install all components
+
+if [ $(uname -s) == "FreeBSD" ]
+	then 
+		#patch for FreeBSD 10.1
+		cd libtorrent-$LT_VERSION
+		patch -p0 < /usr/ports/net-p2p/libtorrent/files/*
+		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
+		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
+		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
+		   -exec sed -i -e '/namespace tr1/d' {} \; \
+		   -exec sed -i -e '/include/s,tr1/,,' {} \;
+		sed -i -e 's/\.assign/.fill/' \
+		    ./src/torrent/utils/extents.h \
+		    ./src/torrent/utils/log.cc    
+		
+		cd ../rtorrent-$RT_VERSION
+		patch -p0 < /usr/ports/net-p2p/rtorrent/files/*
+		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
+		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
+		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
+		   -exec sed -i -e '/namespace tr1/d' {} \; \
+		   -exec sed -i -e '/include/s,tr1/,,' {} \;
+		cd ../
+fi
+
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
         && ./configure $CFG_OPTS_LT && make && make DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
@@ -411,6 +439,30 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     $SED_I 's/rTorrent \" VERSION/rTorrent-PS " VERSION/' src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+if [ $(uname -s) == "FreeBSD" ]
+	then 
+		#patch for FreeBSD 10.1
+		cd libtorrent-$LT_VERSION
+		patch -p0 < /usr/ports/net-p2p/libtorrent/files/*
+		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
+		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
+		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
+		   -exec sed -i -e '/namespace tr1/d' {} \; \
+		   -exec sed -i -e '/include/s,tr1/,,' {} \;
+		sed -i -e 's/\.assign/.fill/' \
+		    ./src/torrent/utils/extents.h \
+		    ./src/torrent/utils/log.cc    
+		
+		cd ../rtorrent-$RT_VERSION
+		patch -p0 < /usr/ports/net-p2p/rtorrent/files/*
+		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
+		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
+		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
+		   -exec sed -i -e '/namespace tr1/d' {} \; \
+		   -exec sed -i -e '/include/s,tr1/,,' {} \;
+		cd ../
+fi
 
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
     ( set +x ; cd libtorrent-$LT_VERSION && automagic && \

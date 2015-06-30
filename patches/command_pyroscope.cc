@@ -45,11 +45,11 @@
 #include "control.h"
 #include "command_helpers.h"
 
-#if (RT_HEX_VERSION >= 0x000901)
-    #define _cxxstd_ tr1
-#else
+//#if (RT_HEX_VERSION >= 0x000901)
+//    #define _cxxstd_ tr1
+//#else
     #define _cxxstd_ std
-#endif
+//#endif
 
 
 // handle for message log file
