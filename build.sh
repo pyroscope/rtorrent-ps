@@ -105,7 +105,7 @@ test $RT_VERSION = 0.9.2 && _trackerinfo=0
 test $RT_VERSION = 0.9.4 && _trackerinfo=0
 
 export PKG_INST_DIR="/opt/rtorrent"
-export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
+export INST_DIR="$HOME/liba/rtorrent-$RT_VERSION"
 
 set_build_env() {
     local dump="$1"
@@ -333,12 +333,15 @@ build_deps() {
 }
 
 build() { # Build and install all components
-
+set -x
 if [ $(uname -s) == "FreeBSD" ]
 	then 
 		#patch for FreeBSD 10.1
 		cd libtorrent-$LT_VERSION
-		patch -p0 < /usr/ports/net-p2p/libtorrent/files/*
+		for i in /usr/ports/net-p2p/libtorrent/files/*;
+			do
+				patch -p0 -i $i
+			done
 		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
 		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
 		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
@@ -349,7 +352,13 @@ if [ $(uname -s) == "FreeBSD" ]
 		    ./src/torrent/utils/log.cc    
 		
 		cd ../rtorrent-$RT_VERSION
-		patch -p0 < /usr/ports/net-p2p/rtorrent/files/*
+		for i in /usr/ports/net-p2p/rtorrent/files/*;
+			do
+				if [ $i == "/usr/ports/net-p2p/rtorrent/files/pkg-message.in" ]; then
+					break
+				fi
+				patch -p0 -i $i
+			done
 		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
 		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
 		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
@@ -440,11 +449,15 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+set -x
 if [ $(uname -s) == "FreeBSD" ]
 	then 
 		#patch for FreeBSD 10.1
 		cd libtorrent-$LT_VERSION
-		patch -p0 < /usr/ports/net-p2p/libtorrent/files/*
+		for i in /usr/ports/net-p2p/libtorrent/files/*;
+			do
+				patch -p0 -i $i
+			done
 		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
 		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
 		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
@@ -455,13 +468,80 @@ if [ $(uname -s) == "FreeBSD" ]
 		    ./src/torrent/utils/log.cc    
 		
 		cd ../rtorrent-$RT_VERSION
-		patch -p0 < /usr/ports/net-p2p/rtorrent/files/*
+		for i in /usr/ports/net-p2p/rtorrent/files/*;
+			do
+				if [ $i == "/usr/ports/net-p2p/rtorrent/files/pkg-message.in" ]; then
+					break
+				fi
+				patch -p0 -i $i
+			done
 		find ./ \( -name '*.h' -o -name '*.cc' \) -type f \
 		   -exec sed -i -e 's/tr1::/std::/g' {} \; \
 		   -exec sed -i -e 's/std::std::/std::/g' {} \; \
 		   -exec sed -i -e '/namespace tr1/d' {} \; \
 		   -exec sed -i -e '/include/s,tr1/,,' {} \;
+
+		cd ../patches
+cat <<'EOF' > freebsd.command_pyroscope.patch
+diff --git a/patches/command_pyroscope.cc b/patches/command_pyroscope.cc
+index 99a195f..6b08c71 100644
+--- a/patches/command_pyroscope.cc
++++ b/patches/command_pyroscope.cc
+@@ -45,11 +45,11 @@
+ #include "control.h"
+ #include "command_helpers.h"
+
+-#if (RT_HEX_VERSION >= 0x000901)
+-    #define _cxxstd_ tr1
+-#else
++//#if (RT_HEX_VERSION >= 0x000901)
++//    #define _cxxstd_ tr1
++//#else
+     #define _cxxstd_ std
+-#endif
++//#endif
+	
+
+ // handle for message log file
+EOF
+
+cat <<'EOF2' > freebsd.ui_pyroscope.cc
+diff --git a/patches/ui_pyroscope.cc b/patches/ui_pyroscope.cc
+index ddc6bfc..f044258 100644
+--- a/patches/ui_pyroscope.cc
++++ b/patches/ui_pyroscope.cc
+@@ -35,11 +35,11 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
+ #include "control.h"
+ #include "command_helpers.h"
+ 
+-#if (RT_HEX_VERSION >= 0x000901)
+-    #define _cxxstd_ tr1
+-#else
++//#if (RT_HEX_VERSION >= 0x000901)
++//    #define _cxxstd_ tr1
++//#else
+     #define _cxxstd_ std
+-#endif
++//#endif
+ 
+ #if defined(CMD2_ANY)
+        #define D_INFO(item) (item->info())
+@@ -785,7 +785,7 @@ torrent::Object network_history_sample() {
+ void initialize_command_ui_pyroscope() {
+ #if defined(CMD2_ANY)
+        #define PS_VARIABLE_COLOR(key, value) \
+-               control->object_storage()->insert_c_str(key, value, rpc::object_storage::flag_string_type); \
++               control->object_storage()->insert_c_str(key, value, rpc::flag_string_type); \
+                CMD2_ANY(key, _cxxstd_::bind(&rpc::object_storage::get, control->object_storage(),   \
+                        torrent::raw_string::from_c_str(key)));  \
+                CMD2_ANY_STRING(key ".set", _cxxstd_::bind(&rpc::object_storage::set_color_string, control->object_storage(), \
+EOF2
+
+		patch -p0 -i freebsd.command_pyroscope.cc
+		patch -p0 -i freebsd.ui_pyroscope.cc
+
 		cd ../
+
 fi
 
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
@@ -570,7 +650,7 @@ case "$1" in
     build)      prep; build_everything ;;
     extend)     prep
                 set_build_env
-                test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
+                #test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
                 extend
                 symlink_binary -extended
                 check
