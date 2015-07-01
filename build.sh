@@ -82,8 +82,8 @@ case "$(uname -s)" in
 	read -p "You need to install bash gmake libidn librtmp cppunit"
 	read -p "You need to symlink clang --> gcc, clang++ --> g++, gmake --> make"
 	read -p "You need to update your ports"
-        export CFLAGS="-pipe -O2 -pthread -I/usr/include -I/usr/local/include ${CFLAGS}"
-        export LDFLAGS="-s -lpthread -L/usr/lib -lz -L/usr/local/lib ${LDFLAGS}"
+        export CFLAGS="-pipe -O2 -pthread -I/usr/include ${CFLAGS}"
+        export LDFLAGS="-s -lpthread -L/usr/lib -lz ${LDFLAGS}"
         export SED_I="sed -i '' -e"
         ;;
     Linux)
@@ -365,6 +365,9 @@ if [ $(uname -s) == "FreeBSD" ]
 		   -exec sed -i -e '/namespace tr1/d' {} \; \
 		   -exec sed -i -e '/include/s,tr1/,,' {} \;
 		cd ../
+		
+		export LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+		export CFLAGS="${CFLAGS} -I/usr/local/include"
 fi
 
     ( cd libtorrent-$LT_VERSION && ( test ${SVN:-0} = 0 || automagic ) \
