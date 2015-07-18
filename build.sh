@@ -121,6 +121,14 @@ http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
 .
 )
 
+XMLRPC_SVN=true
+case $XMLRPC_REV in
+    2366)
+        TARBALLS="$TARBALLS https://bintray.com/artifact/download/pyroscope/rtorrent-ps/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz"
+        XMLRPC_SVN=false
+        ;;
+esac
+
 test ${SVN:-0} = 0 && case $RT_VERSION-$LT_VERSION in
     # use reliable download links for 0.9.4
     0.9.4-0.13.4) TARBALLS=$(cat <<.
@@ -275,13 +283,17 @@ prep() {
 download() { # Download and unpack sources
     test -d .git || { git clone $SELF_URL tarballs/self ; rm tarballs/self/build.sh; mv tarballs/self/* tarballs/self/.git . ; }
 
-    test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
-        svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
+    if $XMLRPC_SVN; then
+        test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
+            svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
+    fi
     for url in $TARBALLS; do
         url_base=${url##*/}
+        tarball_dir=${url_base%.tar.gz}
+        tarball_dir=${tarball_dir%-src.tgz}
         test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget -q $url )
-        test -d ${url_base%.tar.gz} || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
-        test -d ${url_base%%.tar.gz} || fail "Tarball ${url_base} could not be unpacked"
+        test -d $tarball_dir || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
+        test -d $tarball_dir || fail "Tarball ${url_base} could not be unpacked"
     done
 
     if test ${SVN:-0} = 1 -a ! -d SVN-HEAD; then
