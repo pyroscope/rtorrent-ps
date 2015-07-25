@@ -380,7 +380,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
             ln -s ps-ui_pyroscope_0.8.8.patch $SRC_DIR/patches/ps-ui_pyroscope_$v.patch
     done
 
-    for corepatch in $SRC_DIR/patches/ps-*_${RT_VERSION%-svn}.patch; do
+    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION%-svn},all}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
