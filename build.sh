@@ -462,7 +462,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
         --license "GPL v2" --vendor "https://github.com/rakshasa" \
         --description "Patched and extended ncurses BitTorrent client" \
-        --url "https://code.google.com/p/pyroscope/wiki/RtorrentExtended" \
+        --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
         $deps -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
 
     dpkg-deb -c "$DIST_DIR"/*.deb
