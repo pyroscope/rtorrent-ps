@@ -267,6 +267,70 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
 }
 
 
+torrent::Object cmd_ui_focus_home() {
+    ui::DownloadList* dl_list = control->ui()->download_list();
+    core::View* dl_view = dl_list->current_view();
+
+    if (!dl_view->empty_visible()) {
+        dl_view->set_focus(dl_view->begin_visible());
+        dl_view->set_last_changed();
+    }
+
+    return torrent::Object();
+}
+
+
+torrent::Object cmd_ui_focus_end() {
+    ui::DownloadList* dl_list = control->ui()->download_list();
+    core::View* dl_view = dl_list->current_view();
+
+    if (!dl_view->empty_visible()) {
+        dl_view->set_focus(dl_view->end_visible() - 1);
+        dl_view->set_last_changed();
+    }
+
+    return torrent::Object();
+}
+
+
+torrent::Object cmd_ui_focus_pgup() {
+    ui::DownloadList* dl_list = control->ui()->download_list();
+    core::View* dl_view = dl_list->current_view();
+
+    int skip = rpc::call_command_value("ui.focus.page_size");
+    if (!dl_view->empty_visible()) {
+        if (dl_view->focus() == dl_view->end_visible())
+            dl_view->set_focus(dl_view->end_visible() - 1);
+        else if (dl_view->focus() - dl_view->begin_visible() >= skip)
+            dl_view->set_focus(dl_view->focus() - skip);
+        else
+            dl_view->set_focus(dl_view->begin_visible());
+        dl_view->set_last_changed();
+    }
+
+    return torrent::Object();
+}
+
+
+torrent::Object cmd_ui_focus_pgdn() {
+    ui::DownloadList* dl_list = control->ui()->download_list();
+    core::View* dl_view = dl_list->current_view();
+
+    int skip = rpc::call_command_value("ui.focus.page_size");
+    if (!dl_view->empty_visible()) {
+        if (dl_view->focus() == dl_view->end_visible())
+            dl_view->set_focus(dl_view->begin_visible());
+        else if (dl_view->end_visible() - dl_view->focus() > skip)
+            dl_view->set_focus(dl_view->focus() + skip);
+        else
+            dl_view->set_focus(dl_view->end_visible() - 1);
+        dl_view->set_last_changed();
+    }
+
+    return torrent::Object();
+}
+
+
 torrent::Object cmd_d_tracker_domain(core::Download* download) {
     return get_active_tracker_domain(download->download());
 }
@@ -359,6 +423,11 @@ void initialize_command_pyroscope() {
     CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
     CMD2_ANY("ui.current_view", _cxxstd_::bind(&cmd_ui_current_view));
+    CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
+    CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));
+    CMD2_ANY("ui.focus.pgup", _cxxstd_::bind(&cmd_ui_focus_pgup));
+    CMD2_ANY("ui.focus.pgdn", _cxxstd_::bind(&cmd_ui_focus_pgdn));
+    CMD2_VAR_VALUE("ui.focus.page_size", 50);
 #else
     // 0.8.6
     ADD_ANY_LIST("compare", rak::ptr_fn(&apply_compare));
