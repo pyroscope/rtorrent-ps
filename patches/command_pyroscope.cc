@@ -184,7 +184,7 @@ torrent::Object apply_compare(rpc::target_type target, const torrent::Object& ra
 }
 
 
-static std::map<char, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_SIZE];
+static std::map<int, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_SIZE];
 
 /*  @DOC
     ui.bind_key=display,key,"command1=[,...]"
@@ -215,10 +215,15 @@ torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
     const std::string& commands = (itr++)->as_string();
 
     // Get key index from definition
-    if (keydef.empty() || keydef.size() > (keydef[0] == '^' ? 2 : 1))
+    if (keydef.empty() || keydef.size() > (keydef[0] == '0' ? 4 : keydef[0] == '^' ? 2 : 1))
         throw torrent::input_error("Bad key definition.");
-    char key = keydef[0];
+    int key = keydef[0];
     if (key == '^' && keydef.size() > 1) key = keydef[1] & 31;
+    if (key == '0' && keydef.size() != 1) {
+        if (keydef.size() != 4)
+            throw torrent::input_error("Bad key definition (expected 4 digit octal code).");
+        key = (int) strtol(keydef.c_str(), (char **) NULL, 8);
+    }
 
     // Look up display
     ui::DownloadList::Display displayType = ui::DownloadList::DISPLAY_MAX_SIZE;
