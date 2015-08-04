@@ -20,6 +20,9 @@ case "$(lsb_release -cs)" in
         ;;
 esac
 
+WGET_OPTS="-q"
+#WGET_OPTS="$WGET_OPTS --no-check-certificate"
+
 # Extra "configure" options for libtorrent and rtorrent
 #
 # MIPS | PowerPC | ARM users, read https://github.com/rakshasa/rtorrent/issues/156
@@ -270,7 +273,7 @@ download() { # Download and unpack sources
         url_base=${url##*/}
         tarball_dir=${url_base%.tar.gz}
         tarball_dir=${tarball_dir%-src.tgz}
-        test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget -q $url )
+        test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget $WGET_OPTS $url )
         test -d $tarball_dir || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
         test -d $tarball_dir || fail "Tarball ${url_base} could not be unpacked"
     done
