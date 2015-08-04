@@ -41,13 +41,8 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
     #define _cxxstd_ std
 #endif
 
-#if defined(CMD2_ANY)
-	#define D_INFO(item) (item->info())
-	#include "rpc/object_storage.h"
-#else
-	#define D_INFO(item) (item)
-	#include "rpc/command_variable.h"
-#endif
+#define D_INFO(item) (item->info())
+#include "rpc/object_storage.h"
 
 // from command_pyroscope.cc
 extern torrent::Tracker* get_active_tracker(torrent::Download* item);
@@ -327,11 +322,7 @@ static int row_offset(core::View* view, Range& range) {
 
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
 	int offset = row_offset(view, range);
-#if defined(CMD2_ANY)
 	core::Download* item = *range.first;
-#else
-	torrent::Download* item = (*range.first)->download();
-#endif
 	bool active = item->is_open() && item->is_active();
 
 	// download title color
@@ -526,11 +517,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 	pos = 2;
 	while (range.first != range.second) {
 		core::Download* d = *range.first;
-#if defined(CMD2_ANY)
 		core::Download* item = d;
-#else
-		torrent::Download* item = d->download();
-#endif
 		torrent::Tracker* tracker = get_active_tracker((*range.first)->download());
 		int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(d));
 		bool has_msg = !d->message().empty();
@@ -672,13 +659,8 @@ void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
 } // namespace
 
 
-#if defined(CMD2_ANY)
 torrent::Object cmd_view_collapsed_toggle(const torrent::Object::string_type& args) {
 	std::string view_name = args;
-#else
-torrent::Object cmd_view_collapsed_toggle(__UNUSED rpc::target_type target, const torrent::Object& rawArgs) {
-	std::string view_name = rawArgs.as_string();
-#endif
 
 	if (view_name.empty()) {
 		view_name = control->ui()->download_list()->current_view()->name();
@@ -690,25 +672,15 @@ torrent::Object cmd_view_collapsed_toggle(__UNUSED rpc::target_type target, cons
 }
 
 
-#if defined(CMD2_ANY)
 // implementation of method we patched into rpc::object_storage
 const torrent::Object& rpc::object_storage::set_color_string(const torrent::raw_string& key, const std::string& object) {
 	const torrent::Object& result = rpc::object_storage::set_string(key, object);
 	display::ui_pyroscope_colormap_init();
 	return result;
 }
-#else
-// implementation of method we patched into rpc::CommandVariable
-const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand, cleaned_type target, const torrent::Object& rawArgs) {
-	const torrent::Object result = rpc::CommandVariable::set_string(rawCommand, target, rawArgs);
-	display::ui_pyroscope_colormap_init();
-	return result;
-}
-#endif
 
 
-// Traffic history (0.8.9 only)
-#if defined(CMD2_ANY)
+// Traffic history
 int network_history_depth_get() {
 	return network_history_depth;
 }
@@ -778,12 +750,10 @@ torrent::Object network_history_sample() {
 
 	return network_history_refresh();
 }
-#endif
 
 
 // register our commands
 void initialize_command_ui_pyroscope() {
-#if defined(CMD2_ANY)
 	#define PS_VARIABLE_COLOR(key, value) \
 		control->object_storage()->insert_c_str(key, value, rpc::object_storage::flag_string_type); \
 		CMD2_ANY(key, _cxxstd_::bind(&rpc::object_storage::get, control->object_storage(),   \
@@ -801,20 +771,6 @@ void initialize_command_ui_pyroscope() {
 	CMD2_VAR_BOOL   ("network.history.auto_scale", true);
 
 	CMD2_ANY_STRING("view.collapsed.toggle", _cxxstd_::bind(&cmd_view_collapsed_toggle, _cxxstd_::placeholders::_2));
-#else
-	#define PS_VARIABLE_COLOR(key, defaultValue) \
-		add_variable(key, key ".set", 0, \
-			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
-
-	#define PS_CMD_ANY_FUN(key, func) \
-		ADD_COMMAND_VOID(key, rak::ptr_fun(&func))
-
-	#define CMD2_VAR_VALUE(key, defaultValue) \
-		rpc::add_variable(key ".get", key ".set", key, \
-			&rpc::CommandVariable::get_value, &rpc::CommandVariable::set_value, (int64_t)defaultValue);
-
-	CMD_N_STRING("view.collapsed.toggle", rak::ptr_fn(&cmd_view_collapsed_toggle));
-#endif
 
 	CMD2_VAR_VALUE("ui.style.progress", 1);
 	CMD2_VAR_VALUE("ui.style.ratio", 1);

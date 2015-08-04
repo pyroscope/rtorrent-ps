@@ -128,13 +128,7 @@ std::string get_active_tracker_domain(torrent::Download* item) {
             view_sort_current = active,"compare=----,d.is_open=,d.get_complete=,d.get_up_rate=,d.get_down_rate="
             schedule = filter_active,12,20,"view_filter = active,\"or={d.get_up_rate=,d.get_down_rate=,not=$d.get_complete=}\" ;view_sort=active"
 */
-#if defined(CMD2_ANY)
 torrent::Object apply_compare(rpc::target_type target, const torrent::Object::list_type& args) {
-#else
-torrent::Object apply_compare(rpc::target_type target, const torrent::Object& rawArgs) {
-    const torrent::Object::list_type& args = rawArgs.as_list();
-#endif
-
     if (!rpc::is_target_pair(target))
         throw torrent::input_error("Can only compare a target pair.");
 
@@ -198,11 +192,7 @@ static std::map<int, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_S
             # VIEW: Bind view #7 to the "rtcontrol" result
             schedule = bind_7,1,0,"ui.bind_key=download_list,7,ui.current_view.set=rtcontrol"
 */
-#if defined(CMD2_ANY)
 torrent::Object apply_ui_bind_key(rpc::target_type target, const torrent::Object& rawArgs) {
-#else
-torrent::Object apply_ui_bind_key(const torrent::Object& rawArgs) {
-#endif
     const torrent::Object::list_type& args = rawArgs.as_list();
 
     if (args.size() != 3)
@@ -341,8 +331,6 @@ torrent::Object cmd_ui_current_view() {
 }
 
 
-#if defined(CMD2_ANY)
-// 0.8.9+ only
 torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
     if (arg.empty()) {
         control->core()->push_log_std("Closing message log file.");
@@ -365,7 +353,6 @@ torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
 
     return torrent::Object();
 }
-#endif
 
 
 #if (API_VERSION < 3)
@@ -416,8 +403,6 @@ void initialize_command_pyroscope() {
     //CMD2_TRACKER("t.failed_time_next",   _cxxstd_::bind(&torrent::Tracker::failed_time_next, _cxxstd_::placeholders::_1));
 #endif
 
-#if defined(CMD2_ANY)
-    // 0.8.9+
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
@@ -428,11 +413,4 @@ void initialize_command_pyroscope() {
     CMD2_ANY("ui.focus.pgup", _cxxstd_::bind(&cmd_ui_focus_pgup));
     CMD2_ANY("ui.focus.pgdn", _cxxstd_::bind(&cmd_ui_focus_pgdn));
     CMD2_VAR_VALUE("ui.focus.page_size", 50);
-#else
-    // 0.8.6
-    ADD_ANY_LIST("compare", rak::ptr_fn(&apply_compare));
-    ADD_COMMAND_LIST("ui.bind_key", rak::ptr_fn(&apply_ui_bind_key));
-    CMD_D_VOID("d.tracker_domain", &cmd_d_tracker_domain);
-    ADD_COMMAND_VOID("ui.current_view", rak::ptr_fun(&cmd_ui_current_view));
-#endif
 }
