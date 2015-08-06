@@ -56,4 +56,4 @@ See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/D
 ## References
 
   * https://github.com/rakshasa/rtorrent
-  * http://wiki.rtorrent.org/
+  * [rTorrent Community Wiki](http://community.rutorrent.org/)
