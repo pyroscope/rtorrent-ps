@@ -455,6 +455,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
 
     rm -rf "$PKG_INST_DIR/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include} || :
     rm "$PKG_INST_DIR/bin/"{curl,*-config} || :
+    chmod -R a+rX "$PKG_INST_DIR/"
 
     . "$PKG_INST_DIR"/version-info.sh
     deps=$(ldd "$PKG_INST_DIR"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
