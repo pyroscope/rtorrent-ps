@@ -468,6 +468,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
         --description "Patched and extended ncurses BitTorrent client" \
         --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
         $deps -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
+    chmod a+rX "$DIST_DIR"
     chmod a+r "$DIST_DIR"/*.deb
 
     dpkg-deb -c "$DIST_DIR"/*.deb
