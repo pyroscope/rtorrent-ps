@@ -1,6 +1,9 @@
 /*
  ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ∆ ⌚ ≀∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺
 
+ ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳
+
+
 python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 " \
     u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u2206 \u231a \u2240\u2207 \u2707 " \
     u"\u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 \u21e1  \u2801 \u2809 " \
@@ -416,8 +419,9 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
 	//12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- R:nnnnnn [TI]
-	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 79, 1, 91, 2, 100, 1, 103, 1};
-	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
+	// [CLOSED]    0.0K /   0.0K     U/D:   0.0K /   0.0K  Uploaded:   0.0K                     R:  0.00 [T ]
+	int label_pos[] = {19, 1, 31, 5, 44, 1, 54, 9, 75, 1, 79, 1, 91, 2, 100, 1, 103, 1};
+	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, " U/D:"};
 	int col_active = ps::COL_INFO;
 	//int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : (*range.first)->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
@@ -437,9 +441,9 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	canvas->set_attr(93, pos+1, 6, attr_map[rcol + offset], rcol + offset);
 
 	// mark active up / down ("focus", plus "seeding" or "leeching"), and dim inactive numbers (i.e. 0)
-	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (D_INFO(item)->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+	canvas->set_attr(37, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (D_INFO(item)->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
 		(D_INFO(item)->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL) + offset);
-	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (D_INFO(item)->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+	canvas->set_attr(46, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (D_INFO(item)->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
 		(D_INFO(item)->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL) + offset);
 
 	// mark non-trivial messages
