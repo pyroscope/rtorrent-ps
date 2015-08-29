@@ -13,7 +13,7 @@ export CURL_VERSION=7.22.0
 export XMLRPC_REV=2366
 
 case "$(lsb_release -cs)" in
-    trusty | wheezy | jessie)
+    trusty | utopic | vivid | wily | wheezy | jessie)
         export CARES_VERSION=1.10.0
         export CURL_VERSION=7.38.0
         export XMLRPC_REV=2626 # Release 1.38.04
