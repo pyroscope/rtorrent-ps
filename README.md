@@ -49,7 +49,7 @@ See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/D
 for either package based installation, or building from source.
 
 Also take note of the [pimp-my-box](https://github.com/pyroscope/pimp-my-box) project
-that does it all (almost) automatically for Debian-type system (and is the preferred way to install on those systems).
+that does it all (almost) automatically for Debian-type systems (and is the preferred way to install on those systems).
 The automation is done using [Ansible](http://docs.ansible.com/),
 which implies you can easily admin several systems with it, and also maintain them –
 so it's not a one-shot installation bash script creating a setup that can never be changed again.
