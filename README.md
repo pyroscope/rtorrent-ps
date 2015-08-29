@@ -48,6 +48,12 @@ For more details, see the [wiki page at Google code](https://code.google.com/p/p
 See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/DebianInstallFromSource#rTorrent_installation),
 for either package based installation, or building from source.
 
+Also take note of the [pimp-my-box](https://github.com/pyroscope/pimp-my-box) project
+that does it all (almost) automatically for Debian-type system (and is the preferred way to install on those systems).
+The automation is done using [Ansible](http://docs.ansible.com/),
+which implies you can easily admin several systems with it, and also maintain them –
+so it's not a one-shot installation bash script creating a setup that can never be changed again.
+
 ### Packages
 
 * The build script is able to build a DEB package (living in `/opt/rtorrent`), pre-built ones for some Debian and Ubuntu versions can be found on [Bintray](https://bintray.com/pyroscope/rtorrent-ps).
