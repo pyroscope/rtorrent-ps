@@ -69,7 +69,7 @@ Then you need to prepare the install target, as follows (we assume building unde
 
 ```sh
 mkdir -p /opt/rtorrent
-chmod 755 /opt/rtorrent
+chmod 0755 /opt/rtorrent
 chown -R rtorrent.rtorrent /opt/rtorrent
 ```
 
