@@ -4,6 +4,7 @@
 #
 
 export RT_MINOR=4
+#export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export SVN=0 # no git support yet!
 
@@ -13,7 +14,7 @@ export CURL_VERSION=7.22.0
 export XMLRPC_REV=2366
 
 case "$(lsb_release -cs)" in
-    trusty | utopic | vivid | wily | wheezy | jessie)
+    precise|trusty|utopic|vivid|wily|wheezy|jessie)
         export CARES_VERSION=1.10.0
         export CURL_VERSION=7.38.0
         export XMLRPC_REV=2626 # Release 1.38.04
@@ -93,12 +94,11 @@ esac
 test -d rtorrent-0.9.2 && { export LT_VERSION=0.13.2; export RT_VERSION=0.9.2; }
 test -d rtorrent-0.9.4 && { export LT_VERSION=0.13.4; export RT_VERSION=0.9.4; }
 test -d rtorrent-0.9.5 && { export LT_VERSION=0.13.5; export RT_VERSION=0.9.5; }
+test -d rtorrent-0.9.6 && { export LT_VERSION=0.13.6; export RT_VERSION=0.9.6; }
 test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; }
 
 # Incompatible patches
-test $RT_VERSION = 0.9.2 && _trackerinfo=0
-test $RT_VERSION = 0.9.4 && _trackerinfo=0
-test $RT_VERSION = 0.9.5 && _trackerinfo=0
+_trackerinfo=0
 
 export PKG_INST_DIR="/opt/rtorrent"
 export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
@@ -129,6 +129,7 @@ case $XMLRPC_REV in
 esac
 
 # Other sources:
+#   http://rtorrent.net/downloads/
 #   http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/
 #   http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/
 test ${SVN:-0} = 0 && TARBALLS=$(cat <<.
