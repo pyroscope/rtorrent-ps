@@ -13,7 +13,7 @@ export CARES_VERSION=1.7.5
 export CURL_VERSION=7.22.0
 export XMLRPC_REV=2366
 
-case "$(lsb_release -cs)" in
+case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
     precise|trusty|utopic|vivid|wily|wheezy|jessie)
         export CARES_VERSION=1.10.0
         export CURL_VERSION=7.38.0
@@ -38,8 +38,10 @@ export CFG_OPTS_RT="$CFG_OPTS"
 #export CFLAGS="$CFLAGS -march=i586"
 if command which dpkg-architecture >/dev/null && dpkg-architecture -earmhf; then
     GCC_TYPE="Raspbian"
-else
+elif command which gcc >/dev/null; then
     GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
+else
+    GCC_TYPE=none
 fi
 case "$GCC_TYPE" in
     # Raspberry Pi 2 with one of
