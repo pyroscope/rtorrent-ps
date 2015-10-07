@@ -80,11 +80,13 @@ export LC_ALL
 
 # Platform magic
 export SED_I="sed -i -e"
+export MAKE=make
 case "$(uname -s)" in
     FreeBSD)
         export CFLAGS="-pipe -O2 -pthread ${CFLAGS}"
         export LDFLAGS="-s -lpthread ${LDFLAGS}"
         export SED_I="sed -i '' -e"
+        export MAKE=gmake
         ;;
     Linux)
         export CPPFLAGS="-pthread ${CPPFLAGS}"
@@ -144,7 +146,7 @@ https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION
 BUILD_DEPS=$(cat <<.
 wget:wget
 subversion:svn
-build-essential:make
+build-essential:$MAKE
 build-essential:g++
 patch:patch
 libtool:libtoolize
@@ -315,14 +317,14 @@ build_deps() {
 
     tag_svn_rev
 
-    ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
+    ( cd c-ares-$CARES_VERSION && ./configure && $MAKE && $MAKE DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
-    ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make DESTDIR=$INST_DIR prefix= install )
+    ( cd curl-$CURL_VERSION && ./configure --enable-ares && $MAKE && $MAKE DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd xmlrpc-c-advanced-$XMLRPC_REV \
         && ./configure --prefix=$INST_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
-        && make && make install )
+        && $MAKE && $MAKE install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
 }
 
@@ -341,11 +343,11 @@ core_unpack() { # Unpack original LT/RT source
 
 build() { # Build and install all components
     ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
-        ./configure $CFG_OPTS_LT && make clean && make && make prefix=$INST_DIR install )
+        ./configure $CFG_OPTS_LT && $MAKE clean && $MAKE && $MAKE prefix=$INST_DIR install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
         ./configure $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && \
-        make clean && make && make prefix=$INST_DIR install )
+        $MAKE clean && $MAKE && $MAKE prefix=$INST_DIR install )
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
@@ -404,7 +406,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
 
 clean() { # Clean up generated files
     for i in $SUBDIRS; do
-        ( cd $i && make clean )
+        ( cd $i && $MAKE clean )
     done
 }
 
