@@ -1,0 +1,9 @@
+@@ -785,7 +785,7 @@
+ void initialize_command_ui_pyroscope() {
+ #if defined(CMD2_ANY)
+        #define PS_VARIABLE_COLOR(key, value) \
+-               control->object_storage()->insert_c_str(key, value, rpc::object_storage::flag_string_type); \
++               control->object_storage()->insert_c_str(key, value, rpc::flag_string_type); \
+                CMD2_ANY(key, _cxxstd_::bind(&rpc::object_storage::get, control->object_storage(),   \
+                        torrent::raw_string::from_c_str(key)));  \
+                CMD2_ANY_STRING(key ".set", _cxxstd_::bind(&rpc::object_storage::set_color_string, control->object_storage(), \

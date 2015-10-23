@@ -1,9 +1,6 @@
 /*
  ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ∆ ⌚ ≀∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺
 
- ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳
-
-
 python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 " \
     u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u2206 \u231a \u2240\u2207 \u2707 " \
     u"\u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 \u21e1  \u2801 \u2809 " \
@@ -38,14 +35,19 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
 #include "control.h"
 #include "command_helpers.h"
 
-#if (RT_HEX_VERSION >= 0x000901)
-    #define _cxxstd_ tr1
-#else
+//#if (RT_HEX_VERSION >= 0x000901)
+//    #define _cxxstd_ tr1
+//#else
     #define _cxxstd_ std
-#endif
+//#endif
 
-#define D_INFO(item) (item->info())
-#include "rpc/object_storage.h"
+#if defined(CMD2_ANY)
+	#define D_INFO(item) (item->info())
+	#include "rpc/object_storage.h"
+#else
+	#define D_INFO(item) (item)
+	#include "rpc/command_variable.h"
+#endif
 
 // from command_pyroscope.cc
 extern torrent::Tracker* get_active_tracker(torrent::Download* item);
@@ -325,7 +327,11 @@ static int row_offset(core::View* view, Range& range) {
 
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
 	int offset = row_offset(view, range);
+#if defined(CMD2_ANY)
 	core::Download* item = *range.first;
+#else
+	torrent::Download* item = (*range.first)->download();
+#endif
 	bool active = item->is_open() && item->is_active();
 
 	// download title color
@@ -419,9 +425,8 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	//.........1.........2.........3.........4.........5.........6.........7.........8.........9.........0.........1
 	//12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 	// [CLOSED]     0,0 /   15,9 MB Rate:   0,0 /   0,0 KB Uploaded:     0,0 MB [ 0%] --d --:-- R:nnnnnn [TI]
-	// [CLOSED]    0.0K /   0.0K     U/D:   0.0K /   0.0K  Uploaded:   0.0K                     R:  0.00 [T ]
-	int label_pos[] = {19, 1, 31, 5, 44, 1, 54, 9, 75, 1, 79, 1, 91, 2, 100, 1, 103, 1};
-	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, " U/D:"};
+	int label_pos[] = {19, 1, 28, 2, 31, 5, 43, 1, 51, 12, 72, 4, 79, 1, 91, 2, 100, 1, 103, 1};
+	const char* labels[sizeof(label_pos) / sizeof(int) / 2] = {0, 0, " U/D:"};
 	int col_active = ps::COL_INFO;
 	//int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : (*range.first)->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
@@ -441,9 +446,9 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 	canvas->set_attr(93, pos+1, 6, attr_map[rcol + offset], rcol + offset);
 
 	// mark active up / down ("focus", plus "seeding" or "leeching"), and dim inactive numbers (i.e. 0)
-	canvas->set_attr(37, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (D_INFO(item)->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+	canvas->set_attr(36, pos+1, 6, attr_map[ps::COL_SEEDING + offset] | (D_INFO(item)->up_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
 		(D_INFO(item)->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_LABEL) + offset);
-	canvas->set_attr(46, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (D_INFO(item)->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
+	canvas->set_attr(44, pos+1, 6, attr_map[ps::COL_LEECHING + offset] | (D_INFO(item)->down_rate()->rate() ? attr_map[ps::COL_FOCUS] : 0),
 		(D_INFO(item)->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_LABEL) + offset);
 
 	// mark non-trivial messages
@@ -521,7 +526,11 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 	pos = 2;
 	while (range.first != range.second) {
 		core::Download* d = *range.first;
+#if defined(CMD2_ANY)
 		core::Download* item = d;
+#else
+		torrent::Download* item = d->download();
+#endif
 		torrent::Tracker* tracker = get_active_tracker((*range.first)->download());
 		int ratio = rpc::call_command_value("d.get_ratio", rpc::make_target(d));
 		bool has_msg = !d->message().empty();
@@ -663,8 +672,13 @@ void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas) {
 } // namespace
 
 
+#if defined(CMD2_ANY)
 torrent::Object cmd_view_collapsed_toggle(const torrent::Object::string_type& args) {
 	std::string view_name = args;
+#else
+torrent::Object cmd_view_collapsed_toggle(__UNUSED rpc::target_type target, const torrent::Object& rawArgs) {
+	std::string view_name = rawArgs.as_string();
+#endif
 
 	if (view_name.empty()) {
 		view_name = control->ui()->download_list()->current_view()->name();
@@ -676,15 +690,25 @@ torrent::Object cmd_view_collapsed_toggle(const torrent::Object::string_type& ar
 }
 
 
+#if defined(CMD2_ANY)
 // implementation of method we patched into rpc::object_storage
 const torrent::Object& rpc::object_storage::set_color_string(const torrent::raw_string& key, const std::string& object) {
 	const torrent::Object& result = rpc::object_storage::set_string(key, object);
 	display::ui_pyroscope_colormap_init();
 	return result;
 }
+#else
+// implementation of method we patched into rpc::CommandVariable
+const torrent::Object rpc::CommandVariable::set_color_string(Command* rawCommand, cleaned_type target, const torrent::Object& rawArgs) {
+	const torrent::Object result = rpc::CommandVariable::set_string(rawCommand, target, rawArgs);
+	display::ui_pyroscope_colormap_init();
+	return result;
+}
+#endif
 
 
-// Traffic history
+// Traffic history (0.8.9 only)
+#if defined(CMD2_ANY)
 int network_history_depth_get() {
 	return network_history_depth;
 }
@@ -754,12 +778,14 @@ torrent::Object network_history_sample() {
 
 	return network_history_refresh();
 }
+#endif
 
 
 // register our commands
 void initialize_command_ui_pyroscope() {
+#if defined(CMD2_ANY)
 	#define PS_VARIABLE_COLOR(key, value) \
-		control->object_storage()->insert_c_str(key, value, rpc::object_storage::flag_string_type); \
+		control->object_storage()->insert_c_str(key, value, rpc::flag_string_type); \
 		CMD2_ANY(key, _cxxstd_::bind(&rpc::object_storage::get, control->object_storage(),   \
 			torrent::raw_string::from_c_str(key)));  \
 		CMD2_ANY_STRING(key ".set", _cxxstd_::bind(&rpc::object_storage::set_color_string, control->object_storage(), \
@@ -775,6 +801,20 @@ void initialize_command_ui_pyroscope() {
 	CMD2_VAR_BOOL   ("network.history.auto_scale", true);
 
 	CMD2_ANY_STRING("view.collapsed.toggle", _cxxstd_::bind(&cmd_view_collapsed_toggle, _cxxstd_::placeholders::_2));
+#else
+	#define PS_VARIABLE_COLOR(key, defaultValue) \
+		add_variable(key, key ".set", 0, \
+			&rpc::CommandVariable::get_string, &rpc::CommandVariable::set_color_string, std::string(defaultValue));
+
+	#define PS_CMD_ANY_FUN(key, func) \
+		ADD_COMMAND_VOID(key, rak::ptr_fun(&func))
+
+	#define CMD2_VAR_VALUE(key, defaultValue) \
+		rpc::add_variable(key ".get", key ".set", key, \
+			&rpc::CommandVariable::get_value, &rpc::CommandVariable::set_value, (int64_t)defaultValue);
+
+	CMD_N_STRING("view.collapsed.toggle", rak::ptr_fn(&cmd_view_collapsed_toggle));
+#endif
 
 	CMD2_VAR_VALUE("ui.style.progress", 1);
 	CMD2_VAR_VALUE("ui.style.ratio", 1);

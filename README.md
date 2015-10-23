@@ -45,7 +45,14 @@ For more details, see the [wiki page at Google code](https://code.google.com/p/p
 
 ### General
 
-See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/DebianInstallFromSource#rTorrent_installation), for either package based installation, or building from source.
+See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/DebianInstallFromSource#rTorrent_installation),
+for either package based installation, or building from source.
+
+Also take note of the [pimp-my-box](https://github.com/pyroscope/pimp-my-box) project
+that does it all (almost) automatically for Debian-type systems (and is the preferred way to install on those systems).
+The automation is done using [Ansible](http://docs.ansible.com/),
+which implies you can easily admin several systems with it, and also maintain them –
+so it's not a one-shot installation bash script creating a setup that can never be changed again.
 
 ### Packages
 
@@ -53,7 +60,37 @@ See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/D
 * There is an AUR package [rtorrent-pyro-git](https://aur.archlinux.org/packages/rtorrent-pyro-git/) for Arch Linux.
 
 
+## Building the Debian Package
+
+A Debian package for easy installation is built using [fpm](https://github.com/jordansissel/fpm),
+so you have to install that first on the build machine, if you don't have it yet:
+
+```sh
+apt-get install ruby ruby-dev
+gem install fpm
+fpm -h | grep fpm.version
+```
+
+Then you need to prepare the install target, as follows (we assume building under the `rtorrent` user here):
+
+```sh
+mkdir -p /opt/rtorrent
+chmod 0755 /opt/rtorrent
+chown -R rtorrent.rtorrent /opt/rtorrent
+```
+
+Then, the contents of the package are built by calling `./build.sh install`,
+which will populate the `/opt/rtorrent` directory. When that is done, you can test
+the resulting executable located at `/opt/rtorrent/bin/rtorrent`.
+
+Finally, `./build.sh pkg2deb` creates the Debian package in `/tmp`.
+The script expects the packager's name and email in the usual environment variables,
+namely `DEBFULLNAME` and `DEBEMAIL`.
+For a few platforms (recent Debian and Ubuntu), you can find pre-built ones
+at [Bintray](https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps).
+
+
 ## References
 
   * https://github.com/rakshasa/rtorrent
-  * http://wiki.rtorrent.org/
+  * [rTorrent Community Wiki](http://community.rutorrent.org/)

@@ -3,11 +3,9 @@
 # Build rTorrent including patches
 #
 
-# Yep, 0.9.4 is the default now
 export RT_MINOR=4
+#export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
-#export RT_MINOR=9
-#export LT_VERSION=0.12.$RT_MINOR; export RT_VERSION=0.8.$RT_MINOR;
 export SVN=0 # no git support yet!
 
 # Fitting / tested dependency versions for major platforms
@@ -15,13 +13,16 @@ export CARES_VERSION=1.7.5
 export CURL_VERSION=7.22.0
 export XMLRPC_REV=2366
 
-case "$(lsb_release -cs)" in
-    trusty | wheezy)
+case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
+    precise|trusty|utopic|vivid|wily|wheezy|jessie)
         export CARES_VERSION=1.10.0
         export CURL_VERSION=7.38.0
         export XMLRPC_REV=2626 # Release 1.38.04
         ;;
 esac
+
+WGET_OPTS="-q"
+#WGET_OPTS="$WGET_OPTS --no-check-certificate"
 
 # Extra "configure" options for libtorrent and rtorrent
 #
@@ -37,8 +38,10 @@ export CFG_OPTS_RT="$CFG_OPTS"
 #export CFLAGS="$CFLAGS -march=i586"
 if command which dpkg-architecture >/dev/null && dpkg-architecture -earmhf; then
     GCC_TYPE="Raspbian"
-else
+elif command which gcc >/dev/null; then
     GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
+else
+    GCC_TYPE=none
 fi
 case "$GCC_TYPE" in
     # Raspberry Pi 2 with one of
@@ -77,6 +80,7 @@ export LC_ALL
 
 # Platform magic
 export SED_I="sed -i -e"
+export MAKE=make
 case "$(uname -s)" in
     FreeBSD)
 	read -p "You need to install bash gmake libidn librtmp cppunit"
@@ -85,6 +89,7 @@ case "$(uname -s)" in
         export CFLAGS="-pipe -O2 -pthread -I/usr/include ${CFLAGS}"
         export LDFLAGS="-s -lpthread -L/usr/lib -lz ${LDFLAGS}"
         export SED_I="sed -i '' -e"
+        export MAKE=gmake
         ;;
     Linux)
         export CPPFLAGS="-pthread ${CPPFLAGS}"
@@ -93,16 +98,14 @@ case "$(uname -s)" in
 esac
 
 # Keep rTorrent version, once it was built in this directory
-test -d rtorrent-0.8.6 && { export LT_VERSION=0.12.6; export RT_VERSION=0.8.6; }
-test -d rtorrent-0.8.8 && { export LT_VERSION=0.12.8; export RT_VERSION=0.8.8; }
-test -d rtorrent-0.8.9 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9; }
 test -d rtorrent-0.9.2 && { export LT_VERSION=0.13.2; export RT_VERSION=0.9.2; }
 test -d rtorrent-0.9.4 && { export LT_VERSION=0.13.4; export RT_VERSION=0.9.4; }
+test -d rtorrent-0.9.5 && { export LT_VERSION=0.13.5; export RT_VERSION=0.9.5; }
+test -d rtorrent-0.9.6 && { export LT_VERSION=0.13.6; export RT_VERSION=0.9.6; }
 test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; }
 
 # Incompatible patches
-test $RT_VERSION = 0.9.2 && _trackerinfo=0
-test $RT_VERSION = 0.9.4 && _trackerinfo=0
+_trackerinfo=0
 
 export PKG_INST_DIR="/opt/rtorrent"
 export INST_DIR="$HOME/liba/rtorrent-$RT_VERSION"
@@ -124,37 +127,29 @@ http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
 .
 )
 
-test ${SVN:-0} = 0 && case $RT_VERSION-$LT_VERSION in
-    # use reliable download links for 0.9.4
-    0.9.4-0.13.4) TARBALLS=$(cat <<.
-$TARBALLS
-http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/libtorrent-0.13.4.tar.gz/e82f380a9d4b55b379e0e73339c73895/libtorrent-0.13.4.tar.gz
-http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/rtorrent-0.9.4.tar.gz/fd9490a2ac67d0fa2a567c6267845876/rtorrent-0.9.4.tar.gz
-.
-)
-    ;;
-    # use reliable download links for 0.9.2
-    0.9.2-0.13.2) TARBALLS=$(cat <<.
-$TARBALLS
-http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/libtorrent-0.13.2.tar.gz/96c0b81501357df402ab592f59ecaeab/libtorrent-0.13.2.tar.gz
-http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/rtorrent-0.9.2.tar.gz/72c3e9ab859bda7cc8aa96c0b508b09f/rtorrent-0.9.2.tar.gz
-.
-)
-    ;;
-    *) TARBALLS=$(cat <<.
-$TARBALLS
-http://libtorrent.rakshasa.no/downloads/libtorrent-$LT_VERSION.tar.gz
-http://libtorrent.rakshasa.no/downloads/rtorrent-$RT_VERSION.tar.gz
-.
-)
-    ;;
+XMLRPC_SVN=true
+case $XMLRPC_REV in
+    2366|2626)
+        TARBALLS="$TARBALLS https://bintray.com/artifact/download/pyroscope/rtorrent-ps/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz"
+        XMLRPC_SVN=false
+        ;;
 esac
 
+# Other sources:
+#   http://rtorrent.net/downloads/
+#   http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/
+#   http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/
+test ${SVN:-0} = 0 && TARBALLS=$(cat <<.
+$TARBALLS
+https://bintray.com/artifact/download/pyroscope/rtorrent-ps/libtorrent-$LT_VERSION.tar.gz
+https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION.tar.gz
+.
+)
 
 BUILD_DEPS=$(cat <<.
 wget:wget
 subversion:svn
-build-essential:make
+build-essential:$MAKE
 build-essential:g++
 patch:patch
 libtool:libtoolize
@@ -278,13 +273,17 @@ prep() {
 download() { # Download and unpack sources
     test -d .git || { git clone $SELF_URL tarballs/self ; rm tarballs/self/build.sh; mv tarballs/self/* tarballs/self/.git . ; }
 
-    test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
-        svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
+    if $XMLRPC_SVN; then
+        test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
+            svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
+    fi
     for url in $TARBALLS; do
         url_base=${url##*/}
-        test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget -q $url )
-        test -d ${url_base%.tar.gz} || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
-        test -d ${url_base%%.tar.gz} || fail "Tarball ${url_base} could not be unpacked"
+        tarball_dir=${url_base%.tar.gz}
+        tarball_dir=${tarball_dir%-src.tgz}
+        test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget $WGET_OPTS $url )
+        test -d $tarball_dir || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
+        test -d $tarball_dir || fail "Tarball ${url_base} could not be unpacked"
     done
 
     if test ${SVN:-0} = 1 -a ! -d SVN-HEAD; then
@@ -321,17 +320,18 @@ build_deps() {
 
     tag_svn_rev
 
-    ( cd c-ares-$CARES_VERSION && ./configure && make && make DESTDIR=$INST_DIR prefix= install )
+    ( cd c-ares-$CARES_VERSION && ./configure && $MAKE && $MAKE DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
-    ( cd curl-$CURL_VERSION && ./configure --enable-ares && make && make DESTDIR=$INST_DIR prefix= install )
+    ( cd curl-$CURL_VERSION && ./configure --enable-ares && $MAKE && $MAKE DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd xmlrpc-c-advanced-$XMLRPC_REV \
         && ./configure --prefix=$INST_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
-        && make && make install )
+        && $MAKE && $MAKE install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
 }
 
+<<<<<<< HEAD
 build() { # Build and install all components
 if [ $(uname -s) == "FreeBSD" ]
 	then 
@@ -380,9 +380,11 @@ fi
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
 
+=======
+core_unpack() { # Unpack original LT/RT source
+>>>>>>> upstream/master
     test -e $INST_DIR/lib/libxmlrpc.a || fail "You need to '$0 build' first!"
 
-    # Unpack original source
     if test ${SVN:-0} = 0; then
         tar xfz tarballs/libtorrent-$LT_VERSION.tar.gz
         tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
@@ -391,9 +393,24 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         ( cd rtorrent-$RT_VERSION && svn revert -R . && svn update )
         tag_svn_rev
     fi
+}
+
+build() { # Build and install all components
+    ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
+        ./configure $CFG_OPTS_LT && $MAKE clean && $MAKE && $MAKE prefix=$INST_DIR install )
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
+    ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
+        ./configure $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && \
+        $MAKE clean && $MAKE && $MAKE prefix=$INST_DIR install )
+}
+
+extend() { # Rebuild and install libtorrent and rTorrent with patches applied
+    # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
+
+    core_unpack
 
     # Version handling
-    [ $RT_VERSION == 0.8.6 -o "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
+    [ "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
     RT_HEX_VERSION=$(printf "0x%02X%02X%02X" ${RT_VERSION//./ })
     $SED_I "s:\\(AC_DEFINE(HAVE_CONFIG_H.*\\):\1  AC_DEFINE(RT_HEX_VERSION, $RT_HEX_VERSION, for CPP if checks):" rtorrent-$RT_VERSION/configure.ac
     grep "AC_DEFINE.*API_VERSION" rtorrent-$RT_VERSION/configure.ac >/dev/null || \
@@ -414,20 +431,11 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     srcdir=$SRC_DIR/rtorrent-extended
     aur_patches
 
-    #echo "fix_ncurses_5.8.patch"
-    #patch -uNp1 -i "${srcdir}/fix_ncurses_5.8.patch"
-
-    for filename in $SRC_DIR/patches/*0.8.8.patch; do
-        test -e "${filename/0.8.8/0.8.9}" || ln -s "$(basename $filename)" "${filename/0.8.8/0.8.9}"
-    done
-    test -e $SRC_DIR/patches/ps-ui_pyroscope_0.9.2.patch || ln -s ps-ui_pyroscope_0.8.8.patch $SRC_DIR/patches/ps-ui_pyroscope_0.9.2.patch
-    test -e $SRC_DIR/patches/ps-ui_pyroscope_0.9.4.patch || ln -s ps-ui_pyroscope_0.8.8.patch $SRC_DIR/patches/ps-ui_pyroscope_0.9.4.patch
-
-    for corepatch in $SRC_DIR/patches/ps-*_${RT_VERSION%-svn}.patch; do
+    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION%-svn},all}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
-    for backport in $SRC_DIR/patches/{backport,trac,misc}_${RT_VERSION%-svn}_*.patch; do
+    for backport in $SRC_DIR/patches/{backport,misc}_${RT_VERSION%-svn}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -441,11 +449,6 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         bold "ui_pyroscope.patch"
         patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
     fi
-
-    # http://libtorrent.rakshasa.no/ticket/2411
-    # svn diff -r1184:1186 svn://rakshasa.no/libtorrent/trunk/  >patches/fix_2411_threading.patch
-    # svn diff -r1187:1188 svn://rakshasa.no/libtorrent/trunk/ >>patches/fix_2411_threading.patch
-    [[ RT_VERSION != 0.8.7 ]] || patch -uNp1 -i "$SRC_DIR/patches/fix_2411_threading.patch"
 
     $SED_I 's/rTorrent \" VERSION/rTorrent-PS " VERSION/' src/ui/download_list.cc
     popd
@@ -547,17 +550,12 @@ EOF2
 fi
 
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
-    ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
-        ./configure $CFG_OPTS_LT && make clean && make && make prefix=$INST_DIR install )
-    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
-    ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
-        ./configure $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config >/dev/null && \
-        make clean && make && make prefix=$INST_DIR install )
+    build
 }
 
 clean() { # Clean up generated files
     for i in $SUBDIRS; do
-        ( cd $i && make clean )
+        ( cd $i && $MAKE clean )
     done
 }
 
@@ -611,6 +609,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
 
     rm -rf "$PKG_INST_DIR/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include} || :
     rm "$PKG_INST_DIR/bin/"{curl,*-config} || :
+    chmod -R a+rX "$PKG_INST_DIR/"
 
     . "$PKG_INST_DIR"/version-info.sh
     deps=$(ldd "$PKG_INST_DIR"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
@@ -621,8 +620,10 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
         --license "GPL v2" --vendor "https://github.com/rakshasa" \
         --description "Patched and extended ncurses BitTorrent client" \
-        --url "https://code.google.com/p/pyroscope/wiki/RtorrentExtended" \
+        --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
         $deps -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
+    chmod a+rX "$DIST_DIR"
+    chmod a+r "$DIST_DIR"/*.deb
 
     dpkg-deb -c "$DIST_DIR"/*.deb
     echo "~~~" $(find "$DIST_DIR"/*.deb)
@@ -632,7 +633,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation
 build_everything() {
     # Go through all build steps
     set_build_env
-    build_deps
+    ${NODEPS:-false} || build_deps
     build
     symlink_binary -vanilla
     check
@@ -650,6 +651,7 @@ case "$1" in
     download)   prep; download ;;
     env)        prep; set +x; set_build_env echo '"';;
     build)      prep; build_everything ;;
+    rtorrent)   prep; core_unpack; NODEPS=true; build_everything ;;
     extend)     prep
                 set_build_env
                 test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
