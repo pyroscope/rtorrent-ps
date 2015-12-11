@@ -20,8 +20,8 @@ case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
         ;;
 esac
 
-WGET_OPTS="-q"
-#WGET_OPTS="$WGET_OPTS --no-check-certificate"
+CURL_OPTS="-sLS"
+#CURL_OPTS="$CURL_OPTS --insecure"
 
 # Extra "configure" options for libtorrent and rtorrent
 #
@@ -143,7 +143,7 @@ https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION
 )
 
 BUILD_DEPS=$(cat <<.
-wget:wget
+curl:curl
 subversion:svn
 build-essential:$MAKE
 build-essential:g++
@@ -277,7 +277,7 @@ download() { # Download and unpack sources
         url_base=${url##*/}
         tarball_dir=${url_base%.tar.gz}
         tarball_dir=${tarball_dir%-src.tgz}
-        test -f tarballs/${url_base} || ( echo "Getting $url_base" && cd tarballs && wget $WGET_OPTS $url )
+        test -f tarballs/${url_base} || ( echo "Getting $url_base" && command cd tarballs && curl -O $CURL_OPTS $url )
         test -d $tarball_dir || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
         test -d $tarball_dir || fail "Tarball ${url_base} could not be unpacked"
     done
