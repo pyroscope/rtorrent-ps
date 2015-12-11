@@ -3,8 +3,7 @@
 # Build rTorrent including patches
 #
 
-export RT_MINOR=4
-#export RT_MINOR=6
+export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export SVN=0 # no git support yet!
 
