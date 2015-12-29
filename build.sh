@@ -142,7 +142,7 @@ https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION
 .
 )
 
-BUILD_DEPS=$(cat <<.
+BUILD_CMD_DEPS=$(cat <<.
 curl:curl
 subversion:svn
 build-essential:$MAKE
@@ -155,6 +155,7 @@ automake:automake
 pkg-config:pkg-config
 .
 )
+BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libsigc++-2.0-dev libssl-dev libcppunit-dev locales )
 
 set -e
 set +x
@@ -183,7 +184,7 @@ fail() {
 }
 
 check_deps() {
-    for dep in $BUILD_DEPS; do
+    for dep in $BUILD_CMD_DEPS; do
         pkg=${dep%%:*}
         cmd=${dep##*:}
         if which $cmd >/dev/null; then :; else
@@ -192,6 +193,15 @@ check_deps() {
             exit 1
         fi
     done
+    if which dpkg >/dev/null; then
+        for dep in ${BUILD_PKG_DEPS[@]}; do
+            if ! dpkg -l "$dep" >/dev/null; then
+                echo "You don't have the '$dep' package installed, you likely need to:"
+                bold "    sudo apt-get install $dep"
+                exit 1
+            fi
+        done
+    fi
 }
 
 aur_patches() {
