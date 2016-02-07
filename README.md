@@ -38,14 +38,17 @@ The main changes are these:
 To get those, you just need to either follow the build instructions, or download and install a package from Bintray — assuming one is available for your platform.
 
 
-For more details, see the [wiki page at Google code](https://code.google.com/p/pyroscope/wiki/RtorrentExtended).
+For more details, see
+[RtorrentExtended](https://github.com/pyroscope/pyroscope/blob/wiki/RtorrentExtended.md)
+and
+[RtorrentExtendedCanvas](https://github.com/pyroscope/pyroscope/blob/wiki/RtorrentExtendedCanvas.md).
 
 
 ## Installation
 
 ### General
 
-See the [instructions on Google code](https://code.google.com/p/pyroscope/wiki/DebianInstallFromSource#rTorrent_installation),
+See the [instructions here](https://github.com/pyroscope/pyroscope/blob/wiki/DebianInstallFromSource.md#rtorrent-installation),
 for either package based installation, or building from source.
 
 Also take note of the [pimp-my-box](https://github.com/pyroscope/pimp-my-box) project
