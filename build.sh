@@ -7,16 +7,33 @@ export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export SVN=0 # no git support yet!
 
+BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libsigc++-2.0-dev libssl-dev libcppunit-dev locales )
+
 # Fitting / tested dependency versions for major platforms
-export CARES_VERSION=1.7.5
-export CURL_VERSION=7.22.0
-export XMLRPC_REV=2366
+#export CARES_VERSION=1.7.5
+#export CURL_VERSION=7.22.0
+#export XMLRPC_REV=2366
+
+#export CARES_VERSION=1.10.0
+#export CURL_VERSION=7.38.0
+#export XMLRPC_REV=2626 # Release 1.38.04 2014-07
+
+export CARES_VERSION=1.10.0
+export CURL_VERSION=7.47.1 # 2016-02
+export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 
 case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
-    precise|trusty|utopic|vivid|wily|wheezy|jessie)
-        export CARES_VERSION=1.10.0
-        export CURL_VERSION=7.38.0
-        export XMLRPC_REV=2626 # Release 1.38.04
+    precise|trusty|utopic|wily|wheezy)
+        ;;
+    vivid|xenial|jessie)
+        export CARES_VERSION=1.11.0 # 2016-02
+        ;;
+    NonLinux)
+        # Place tests for MacOSX etc. here
+        BUILD_PKG_DEPS=( )
+        echo
+        echo "*** Build dependencies are NOT pre-checked on this platform! ***"
+        echo
         ;;
 esac
 
@@ -155,7 +172,6 @@ automake:automake
 pkg-config:pkg-config
 .
 )
-BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libsigc++-2.0-dev libssl-dev libcppunit-dev locales )
 
 set -e
 set +x
