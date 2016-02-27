@@ -94,15 +94,17 @@ test "$(tr A-Z a-z <<<${LANG/*.})" = "utf-8" || export LANG=en_US.UTF-8
 unset LC_ALL
 export LC_ALL
 
+# Select build tools (prefer 'g' variants if there)
+command which gmake && export MAKE=gmake || export MAKE=make
+command which glibtoolize && export LIBTOOLIZE=glibtoolize || export LIBTOOLIZE=libtoolize
+
 # Platform magic
 export SED_I="sed -i -e"
-export MAKE=make
 case "$(uname -s)" in
     FreeBSD)
         export CFLAGS="-pipe -O2 -pthread ${CFLAGS}"
         export LDFLAGS="-s -lpthread ${LDFLAGS}"
         export SED_I="sed -i '' -e"
-        export MAKE=gmake
         ;;
     Linux)
         export CPPFLAGS="-pthread ${CPPFLAGS}"
@@ -165,7 +167,7 @@ subversion:svn
 build-essential:$MAKE
 build-essential:g++
 patch:patch
-libtool:libtoolize
+libtool:$LIBTOOLIZE
 automake:aclocal
 autoconf:autoconf
 automake:automake
@@ -322,7 +324,7 @@ download() { # Download and unpack sources
 automagic() {
     aclocal
     rm -f ltmain.sh scripts/{libtool,lt*}.m4
-    libtoolize --automake --force --copy
+    $LIBTOOLIZE --automake --force --copy
     aclocal
     autoconf
     automake --add-missing
