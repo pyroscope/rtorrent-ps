@@ -37,17 +37,13 @@ case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
         ;;
 esac
 
-CURL_OPTS="-sLS"
-#CURL_OPTS="$CURL_OPTS --insecure"
-
-# Extra "configure" options for libtorrent and rtorrent
-#
-# MIPS | PowerPC | ARM users, read https://github.com/rakshasa/rtorrent/issues/156
-export CFG_OPTS=""
-##export CFG_OPTS="$CFG_OPTS --enable-debug --enable-extra-debug"
-export CFG_OPTS_LT="$CFG_OPTS"
-##export CFG_OPTS_LT="$CFG_OPTS_LT --disable-instrumentation"
-export CFG_OPTS_RT="$CFG_OPTS"
+# Extra options handling
+: ${CURL_OPTS:=-sLS}
+: ${MAKE_OPTS:=}
+: ${CFG_OPTS:=}
+: ${CFG_OPTS_LT:=}
+: ${CFG_OPTS_RT:=}
+export CURL_OPTS MAKE_OPTS CFG_OPTS CFG_OPTS_LT CFG_OPTS_RT
 
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
@@ -183,10 +179,14 @@ ESC=$(echo -en \\0033)
 BOLD="$ESC[1m"
 OFF="$ESC[0m"
 
-echo "${BOLD}Building rTorrent $RT_VERSION/$LT_VERSION$OFF"
+echo "${BOLD}Env for building rTorrent $RT_VERSION/$LT_VERSION$OFF"
 set_build_env echo '"'
+echo "export CURL_OPTS=\"$CURL_OPTS\""
+echo "export MAKE_OPTS=\"$MAKE_OPTS\""
+echo "export CFG_OPTS=\"$CFG_OPTS\""
 echo "export CFG_OPTS_LT=\"$CFG_OPTS_LT\""
 echo "export CFG_OPTS_RT=\"$CFG_OPTS_RT\""
+echo
 
 
 #
@@ -344,14 +344,14 @@ build_deps() {
 
     tag_svn_rev
 
-    ( cd c-ares-$CARES_VERSION && ./configure && $MAKE && $MAKE DESTDIR=$INST_DIR prefix= install )
+    ( cd c-ares-$CARES_VERSION && ./configure && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
-    ( cd curl-$CURL_VERSION && ./configure --enable-ares && $MAKE && $MAKE DESTDIR=$INST_DIR prefix= install )
+    ( cd curl-$CURL_VERSION && ./configure --enable-ares && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INST_DIR prefix= install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( cd xmlrpc-c-advanced-$XMLRPC_REV \
         && ./configure --prefix=$INST_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
-        && $MAKE && $MAKE install )
+        && $MAKE $MAKE_OPTS && $MAKE install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/bin/xmlrpc-c-config
 }
 
@@ -370,11 +370,11 @@ core_unpack() { # Unpack original LT/RT source
 
 build() { # Build and install all components
     ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
-        ./configure $CFG_OPTS_LT && $MAKE clean && $MAKE && $MAKE prefix=$INST_DIR install )
+        ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INST_DIR install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
     ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
-        ./configure $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && \
-        $MAKE clean && $MAKE && $MAKE prefix=$INST_DIR install )
+        ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && \
+        $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INST_DIR install )
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
@@ -473,7 +473,7 @@ RT_PS_XMLRPC_REV=$XMLRPC_REV
     #check
 }
 
-pkg2deb() { # Package current $PKG_INST_DIR installation
+pkg2deb() { # Package current $PKG_INST_DIR installation [needs fpm]
     # You need to:
     #   aptitude install ruby ruby-dev
     #   gem install fpm
@@ -541,9 +541,18 @@ case "$1" in
     install)    install;;
     pkg2deb)    pkg2deb;;
     *)
-        echo >&2 "Usage: $0 (all | clean | clean_all | download | build | check | extend )"
+        echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
         echo >&2 "Build rTorrent $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INST_DIR)"
         echo >&2
+        echo >&2 "Custom environment variables:"
+        echo >&2 "    CURL_OPTS=\"${CURL_OPTS}\" (e.g. --insecure)"
+        echo >&2 "    MAKE_OPTS=\"${MAKE_OPTS}\""
+        echo >&2 "    CFG_OPTS=\"${CFG_OPTS}\" (e.g. --enable-debug --enable-extra-debug)"
+        echo >&2 "    CFG_OPTS_LT=\"${CFG_OPTS_LT}\" (e.g. --disable-instrumentation for MIPS, PowerPC, ARM)"
+        # MIPS | PowerPC | ARM users, read https://github.com/rakshasa/rtorrent/issues/156
+        echo >&2 "    CFG_OPTS_RT=\"${CFG_OPTS_RT}\""
+        echo >&2
+        echo >&2 "Build actions:"
         grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | while read i; do
             echo "   " $(eval "echo $i") | tr @ \\t
         done
