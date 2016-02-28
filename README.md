@@ -79,6 +79,11 @@ or link it into ``/usr/local`` like this:
 ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
 ```
 
+### Homebrew Tap for Mac OSX
+
+See the [homebrew-rtorrent-ps](https://github.com/pyroscope/homebrew-rtorrent-ps) repository
+for instructions to build *rTorrent-PS* and related dependencies on Mac OSX.
+
 ### Installation on Arch Linux
 
 There is an AUR package [rtorrent-pyro-git](https://aur.archlinux.org/packages/rtorrent-pyro-git/)
