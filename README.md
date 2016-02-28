@@ -46,10 +46,15 @@ and
 
 ## Installation
 
-### General
+### General Installation Options
 
-See the [instructions here](https://github.com/pyroscope/pyroscope/blob/wiki/DebianInstallFromSource.md#rtorrent-installation),
-for either package based installation, or building from source.
+See the
+[instructions here](https://github.com/pyroscope/pyroscope/blob/wiki/DebianInstallFromSource.md#build-rtorrent-and-core-dependencies-from-source)
+for building from source using the provided ``build.sh`` script,
+which will install *rTorrent-PS* into ``~/lib/rtorrent-‹version›``.
+
+:exclamation: | If you also install the [PyroScope command line utilities](https://github.com/pyroscope/pyrocore), do not forget to activate the extended features available together with *rTorrent-PS*, as mentioned in the [Configuration Guide](https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc).
+----: | :----
 
 Also take note of the [pimp-my-box](https://github.com/pyroscope/pimp-my-box) project
 that does it all (almost) automatically for Debian-type systems (and is the preferred way to install on those systems).
@@ -57,10 +62,27 @@ The automation is done using [Ansible](http://docs.ansible.com/),
 which implies you can easily admin several systems with it, and also maintain them –
 so it's not a one-shot installation bash script creating a setup that can never be changed again.
 
-### Packages
+### Installation Using Debian Packages
 
-* The build script is able to build a DEB package (living in `/opt/rtorrent`), pre-built ones for some Debian and Ubuntu versions can be found on [Bintray](https://bintray.com/pyroscope/rtorrent-ps).
-* There is an AUR package [rtorrent-pyro-git](https://aur.archlinux.org/packages/rtorrent-pyro-git/) for Arch Linux.
+For a limited set of Debian-derived platforms, there are packages available that
+contain pre-compiled binaries (and only those, no configuration or init scripts).
+You can download and install such a package from
+[Bintray](https://bintray.com/pyroscope/rtorrent-ps) —
+assuming one is available for your platform.
+The packages install the *rTorrent-PS* binary including some libraries into ``/opt/rtorrent``.
+
+After installation, you must provide a configuration file (``~/.rtorrent.rc``),
+and either use the absolute path to the binary to start it,
+or link it into ``/usr/local`` like this:
+
+```sh
+ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
+```
+
+### Installation on Arch Linux
+
+There is an AUR package [rtorrent-pyro-git](https://aur.archlinux.org/packages/rtorrent-pyro-git/)
+for Arch Linux. If you have problems installing it, contact *the maintainer* of the package.
 
 
 ## Building the Debian Package
