@@ -39,9 +39,9 @@ To get those, you just need to either follow the build instructions, or download
 
 
 For more details, see
-[RtorrentExtended](https://github.com/pyroscope/pyroscope/blob/wiki/RtorrentExtended.md)
+[RtorrentExtended](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md)
 and
-[RtorrentExtendedCanvas](https://github.com/pyroscope/pyroscope/blob/wiki/RtorrentExtendedCanvas.md).
+[RtorrentExtendedCanvas](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md).
 
 
 ## Installation
