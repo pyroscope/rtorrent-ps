@@ -188,6 +188,13 @@ The commands added are <code>network.history.depth[.set]=</code>,  <code>network
 See the RtorrentExtendedCanvas page on how to use them.<br>
 </dd>
 
+<dt>
+<h2><code>system.env=«name»</code></h2>
+</dt>
+<dd>
+Returns the value of the given environment variable, or an empty string if it does not exist.
+</dd>
+
 </dl>
 
 

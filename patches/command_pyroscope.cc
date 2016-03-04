@@ -331,6 +331,16 @@ torrent::Object cmd_ui_current_view() {
 }
 
 
+torrent::Object cmd_system_env(const torrent::Object::string_type& arg) {
+    if (arg.empty()) {
+        throw torrent::input_error("system.env: Missing variable name.");
+    }
+
+    char* val = getenv(arg.c_str());
+    return std::string(val ? val : "");
+}
+
+
 torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
     if (arg.empty()) {
         control->core()->push_log_std("Closing message log file.");
@@ -406,6 +416,7 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
+    CMD2_ANY_STRING("system.env", _cxxstd_::bind(&cmd_system_env, _cxxstd_::placeholders::_2));
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
     CMD2_ANY("ui.current_view", _cxxstd_::bind(&cmd_ui_current_view));
     CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
