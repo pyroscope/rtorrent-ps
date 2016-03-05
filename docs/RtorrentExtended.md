@@ -67,25 +67,23 @@ you will get the following additional features in your `rTorrent-PS` installatio
 > ✪ _Do not forget to set the value of `pyro.extended` to 1!_
 
 
-## Command extensions
+## Command Extensions
+
 The following new commands are available.
 
-<dl>
-<dt>
-<h2><code>compare=order,command1=[,...]</code></h2>
-</dt>
-<dd>
-Compares two items like <code>less=</code> or <code>greater=</code>, but allows to compare<br>
-by several different sort criteria, and ascending or descending<br>
-order per given field.<br>
-<br>
-The first parameter is a string of order<br>
-indicators, either <code>aA+</code> for ascending or <code>dD-</code> for descending.<br>
-The default, i.e. when there's more fields than indicators, is<br>
-ascending. Field types other than value or string are treated<br>
-as equal (or in other words, they're ignored).<br>
-If all fields are equal, then items are ordered in a random, but<br>
-stable fashion.<br>
+### compare=order,command1=[,...]
+
+Compares two items like ``less=`` or ``greater=``, but allows to compare
+by several different sort criteria, and ascending or descending
+order per given field.
+
+The first parameter is a string of order
+indicators, either ``aA+`` for ascending or ``dD-`` for descending.
+The default, i.e. when there's more fields than indicators, is
+ascending. Field types other than value or string are treated
+as equal (or in other words, they're ignored).
+If all fields are equal, then items are ordered in a random, but
+stable fashion.
 
 Configuration example:
 
@@ -97,18 +95,15 @@ view_sort_current = active,"compare=----,d.is_open=,d.get_complete=,d.get_up_rat
 schedule = filter_active,12,20,"view_filter = active,\"or={d.get_up_rate=,d.get_down_rate=,not=$d.get_complete=}\" ;view_sort=active"
 ```
 
-</dd>
 
-<dt>
-<h2><code>ui.bind_key=display,key,"command1=[,...]"</code></h2>
-</dt>
-<dd>
-<br /> <b>⚠ WARNING: This currently can NOT be used immediately when <code>rtorrent.rc</code> is parsed, so it has to be scheduled once shortly after startup (see below example).</b>
+### ui.bind_key=display,key,"command1=[,...]"
 
-Binds the given key on a specified display to execute the commands when pressed.<br>
-<br>
-<ul><li><code>display</code> must be equal to <code>download_list</code> (currently, no other displays are supported).<br>
-</li><li><code>key</code> can be either a single character for normal keys, or <code>^</code> plus a character for control keys.</li></ul>
+<b>⚠ WARNING: This currently can NOT be used immediately when ``rtorrent.rc`` is parsed, so it has to be scheduled once shortly after startup (see below example).</b>
+
+Binds the given key on a specified display to execute the commands when pressed.
+
+  * ``display`` must be equal to ``download_list`` (currently, no other displays are supported).
+  * ``key`` can be either a single character for normal keys, or ``^`` plus a character for control keys.
 
 Configuration example:
 
@@ -117,112 +112,134 @@ Configuration example:
 schedule = bind_7,0,0,"ui.bind_key=download_list,7,ui.current_view.set=rtcontrol"
 ```
 
-</dd>
 
-<dt>
-<h2><code>view.collapsed.toggle=«VIEW NAME»</code></h2>
-</dt>
-<dd>
-This command changes between the normal item display where each item takes up three lines to a more condensed form where each item only takes up one line. Note that each view has its own state, and that if the view name is empty, the current view is toggled. You can set the default state in your configuration, by adding a toggle command for each view you want collapsed after startup (the default is expanded).<br>
-<br>
-Also, you should bind the current view toggle to a key, like this:<br>
-<pre><code>schedule = bind_collapse,0,0,"ui.bind_key=download_list,*,view.collapsed.toggle="<br>
-</code></pre>
+### view.collapsed.toggle=«VIEW NAME»
 
-Further explanations on what the columns show and what forms of abbreviations are used, to get a display as compact as possible while still showing all the important stuff, can be found on RtorrentExtendedCanvas. That page also contains hints on <b>how to correctly setup your terminal</b>.<br>
-<br>
-</dd>
+This command changes between the normal item display where each item takes up
+three lines to a more condensed form where each item only takes up one line.
+Note that each view has its own state, and that if the view name is empty,
+the current view is toggled. You can set the default state in your configuration,
+by adding a toggle command for each view you want collapsed after startup
+(the default is expanded).
 
-<dt>
-<h2><code>ui.color.«TYPE».set="«COLOR DEF»"</code></h2>
-</dt>
-<dd>
-These commands allow you to set colors for selected elements of the user interface, in some cases depending on their status. You can either provide colors by specifying the numerical index in the terminal's color table, or by name (for the first 16 colors). The possible color names are "black", "red", "green", "yellow", "blue", "magenta", "cyan", "gray", and "white"; you can use them for both text and background color, in the form "«fg» on «bg»", and you can add "bright" in front of a color to select a more luminous version. If you don't specify a color, the default of your terminal is used.<br>
-<br>
-Also, these additional modifiers can be placed in the color definitions, but it depends on the terminal you're using whether they have an effect: "bold", "standout", "underline", "reverse", "blink", and "dim".<br>
-<br>
-Here's a configuration example showing all the commands and their defaults:<br>
-<br>
-<pre><code># UI/VIEW: Colors<br>
-ui.color.alarm.set="bold white on red"<br>
-ui.color.complete.set="bright green"<br>
-ui.color.even.set=""<br>
-ui.color.focus.set="reverse"<br>
-ui.color.footer.set="bold bright cyan on blue"<br>
-ui.color.incomplete.set="yellow"<br>
-ui.color.info.set="white"<br>
-ui.color.label.set="gray"<br>
-ui.color.leeching.set="bold bright yellow"<br>
-ui.color.odd.set=""<br>
-ui.color.progress0.set="red"<br>
-ui.color.progress20.set="bold bright red"<br>
-ui.color.progress40.set="bold bright magenta"<br>
-ui.color.progress60.set="yellow"<br>
-ui.color.progress80.set="bold bright yellow"<br>
-ui.color.progress100.set="green"<br>
-ui.color.progress120.set="bold bright green"<br>
-ui.color.queued.set="magenta"<br>
-ui.color.seeding.set="bold bright green"<br>
-ui.color.stopped.set="blue"<br>
-ui.color.title.set="bold bright white on blue"<br>
-</code></pre>
+Also, you should bind the current view toggle to a key, like this:
 
-Note that you might need to enable support for 256 colors in your terminal, see <a href='http://askubuntu.com/questions/67/how-do-i-enable-full-color-support-in-terminal'>this article</a> for a description. In a nutshell, you need to install the <code>ncurses-term</code> package if you don't have it already, and also add these commands to your rTorrent start script:<br>
-<br>
-<pre><code>if [ "$TERM" = "${TERM%-256color}" ]; then<br>
-    export TERM="$TERM-256color"<br>
-fi<br>
-</code></pre>
+```ini
+schedule = bind_collapse,0,0,"ui.bind_key=download_list,*,view.collapsed.toggle="
+```
 
-Also consider the hints at the end of the RtorrentExtendedCanvas page.<br>
-<br>
-If everything worked so far, and you now want to find you own coloring theme, the easiest way is to use a second shell and <code>rtxmlrpc</code>. Try out some colors, and add the combinations you like to your <code>~/.rtorrent.rc</code>.<br>
-<br>
-<pre><code># For people liking candy stores...<br>
-rtxmlrpc ui.color.title.set "bold magenta on bright cyan"<br>
-</code></pre>
+Further explanations on what the columns show and what forms of abbreviations are used,
+to get a display as compact as possible while still showing all the important stuff,
+can be found on
+[Extended Canvas Explained](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#extended-canvas-explained).
+That page also contains hints on **how to correctly setup your terminal**.
 
 
-The <a href='https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/term-256color.py'>term-256color</a> script can help you with showing the colors your terminal supports, an example output using Gnome's terminal looks like the following...<br>
-<br>
+### ui.color.«TYPE».set="«COLOR DEF»"
+
+These commands allow you to set colors for selected elements of the user interface,
+in some cases depending on their status. You can either provide colors by specifying
+the numerical index in the terminal's color table, or by name (for the first 16 colors).
+The possible color names are "black", "red", "green", "yellow", "blue", "magenta",
+"cyan", "gray", and "white"; you can use them for both text and background color,
+in the form "«fg» on «bg»", and you can add "bright" in front of a color to select
+a more luminous version. If you don't specify a color, the default of your terminal is used.
+
+Also, these additional modifiers can be placed in the color definitions,
+but it depends on the terminal you're using whether they have an effect:
+"bold", "standout", "underline", "reverse", "blink", and "dim".
+
+Here's a configuration example showing all the commands and their defaults:
+
+```ini
+# UI/VIEW: Colors
+ui.color.alarm.set="bold white on red"
+ui.color.complete.set="bright green"
+ui.color.even.set=""
+ui.color.focus.set="reverse"
+ui.color.footer.set="bold bright cyan on blue"
+ui.color.incomplete.set="yellow"
+ui.color.info.set="white"
+ui.color.label.set="gray"
+ui.color.leeching.set="bold bright yellow"
+ui.color.odd.set=""
+ui.color.progress0.set="red"
+ui.color.progress20.set="bold bright red"
+ui.color.progress40.set="bold bright magenta"
+ui.color.progress60.set="yellow"
+ui.color.progress80.set="bold bright yellow"
+ui.color.progress100.set="green"
+ui.color.progress120.set="bold bright green"
+ui.color.queued.set="magenta"
+ui.color.seeding.set="bold bright green"
+ui.color.stopped.set="blue"
+ui.color.title.set="bold bright white on blue"
+```
+
+Note that you might need to enable support for 256 colors in your terminal,
+see <a href='http://askubuntu.com/questions/67/how-do-i-enable-full-color-support-in-terminal'>this article</a>
+for a description. In a nutshell, you need to install the ``ncurses-term`` package
+if you don't have it already, and also add these commands to your rTorrent start script:
+
+```sh
+if [ "$TERM" = "${TERM%-256color}" ]; then
+    export TERM="$TERM-256color"
+fi
+```
+
+Also consider the hints at the end of the
+[Extended Canvas Explained](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#extended-canvas-explained) page.
+
+If everything worked so far, and you now want to find you own coloring theme,
+the easiest way is to use a second shell and ``rtxmlrpc``. Try out some colors,
+and add the combinations you like to your ``~/.rtorrent.rc``.
+
+```ini
+# For people liking candy stores...
+rtxmlrpc ui.color.title.set "bold magenta on bright cyan"
+```
+
+
+The <a href='https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/term-256color.py'>term-256color</a>
+script can help you with showing the colors your terminal supports,
+an example output using Gnome's terminal looks like the following...
+
 <img src='http://i.imgur.com/iu8nY.png' />
-</dd>
 
-<dt>
-<h2><code>d.tracker_domain=</code></h2>
-</dt>
-<dd>
-Returns the (shortened) <i>tracker domain</i> of the given download item. The chosen tracker is the first HTTP one with active peers (seeders or leechers), or else the first one.<br>
-</dd>
 
-<dt>
-<h2><code>ui.current_view=</code></h2>
-</dt>
-<dd>
-Returns the currently selected view, the official release only has a setter. Needed if you want to use »<code>-</code>« as a view name in <code>rtcontrol</code>.<br>
-</dd>
+### d.tracker_domain=
 
-<dt>
-<h2><code>log.messages=«path»</code> (0.8.9+ only)</h2>
-</dt>
-<dd>
-(Re-)opens a log file that contains the messages normally only visible on the main panel and via the <code>l</code> key. Each line is prefixed with the current date and time in ISO8601 format.<br>
-If an empty path is passed, the file is closed.<br>
-</dd>
+Returns the (shortened) <i>tracker domain</i> of the given download item.
+The chosen tracker is the first HTTP one with active peers (seeders or leechers),
+or else the first one.
 
-<dt>
-<h2><code>network.history.*=</code> (0.8.9+ only)</h2>
-</dt>
-<dd>
-Commands to add network traffic charts to the bottom of the collapsed download display.<br>
-The commands added are <code>network.history.depth[.set]=</code>,  <code>network.history.sample=</code>,  <code>network.history.refresh=</code>, and <code>network.history.auto_scale=</code>.<br>
-See the RtorrentExtendedCanvas page on how to use them.<br>
-</dd>
 
-<dt>
-<h2><code>system.env=«name»</code></h2>
-</dt>
-<dd>
+### ui.current_view=
+
+Returns the currently selected view, the official release only has a setter.
+Needed if you want to use »``-``« as a view name in ``rtcontrol``.
+
+
+### log.messages=«path» (0.8.9+ only)
+
+(Re-)opens a log file that contains the messages normally only visible on
+the main panel and via the ``l`` key. Each line is prefixed with the
+current date and time in ISO8601 format.
+If an empty path is passed, the file is closed.
+
+
+### network.history.*= (0.8.9+ only)
+
+Commands to add network traffic charts to the bottom of the collapsed download display.
+The commands added are ``network.history.depth[.set]=``,  ``network.history.sample=``,
+``network.history.refresh=``, and ``network.history.auto_scale=``.
+See the
+[Extended Canvas Explained](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#extended-canvas-explained)
+page on how to use them.
+
+
+### system.env=«name»
+
 Returns the value of the given environment variable, or an empty string if it does not exist.
 
 Configuration example:
