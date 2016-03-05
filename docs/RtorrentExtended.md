@@ -236,21 +236,6 @@ session.path.set="$cat=\"$system.env=RTORRENT_HOME\",\"/.session\""
 </dl>
 
 
-## Backports of 0.8.8 features to 0.8.6
-The following features of newer versions are patched into the 0.8.6 version of rTorrent-PS:
-  * [Changeset #1206](http://libtorrent.rakshasa.no/changeset/1206): `network.http.ssl_verify_peer.set` used to disable checking of self-signed SSL certificates.
-
-## Backports of git `master` fixes and features to 0.8.9
-The following fixes and features of the development version are patched into the 0.8.9 version of rTorrent-PS:
-
-  * a fix in libtorrent for a problem located in the epoll event handling code (#1246).
-  * fixed check of the XML-RPC task queue length (#1246).
-  * a possible busy loop when trying to interrupt the main loop (#1263).
-  * `log.execute` is fixed, and stays open.
-  * no more zombies with `execute.*.bg`.
-  * backports of these new commands: `d.chunks_seen`, `t.is_usable`, and `t.is_busy`.
-
-
 ## Backports of git `master` fixes and features to 0.9.2
 The following fixes and features of the development version are patched into the 0.9.2 version of rTorrent-PS:
   * [Wait for disowned HTTP requests to finish, to ensure stopped event gets sent to tracker on client shutdown](https://github.com/rakshasa/rtorrent/commit/b79dea94b2f537eda620ed48207369c076fcd11f).
