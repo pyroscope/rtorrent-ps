@@ -226,7 +226,7 @@ sed -e "s:RT_HOME:$RT_HOME:" <~/lib/pyroscope/pyrocore/docs/examples/rtorrent.rc
 bash ~/lib/pyroscope/pyrocore/src/scripts/migrate_rtorrent_rc.sh $RT_HOME/rtorrent.rc
 ```
 
-:bulb: | Change the value of `pyro.extended` to 1 so the extended `rTorrent-PS` features are actually activated, in case you plan to use `pyrocore`!
+:bulb: | Change the value of `pyro.extended` to 1 so the extended `rTorrent-PS` features are actually activated!
 ---: | :---
 
 
