@@ -3,7 +3,7 @@ rTorrent-PS
 
 Extended `rTorrent` distribution with UI enhancements, colorization, and some added features.
 
-![Extended Canvas Screenshot](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/images/rT-PS-094-2014-05-24-shadow.png)
+![Extended Canvas Screenshot](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png)
 
 `rTorrent-PS` is *not* the same as the `PyroScope`
 [command line utilities](https://github.com/pyroscope/pyrocore#pyrocore),
