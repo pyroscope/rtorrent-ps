@@ -12,10 +12,10 @@ and not really maintained any more (if you run into problems, join the
 freenode IRC channel for help).
 
 While the package names and the use of `apt-get` are somewhat dependant on
-Debian, the _Preparatory steps_ commands which are executed under `root`
+Debian, the _Preparatory Steps_ commands which are executed under `root`
 are similar for other distributions, and the compilation instructions should
 work as-is on practically any Linux and (F)BSD. These instructions are explicitly
-known to work on Ubuntu Lucid and Precise.
+known to work on *Debian Jessie*, and *Ubuntu Lucid + Precise*.
 
 :book: | If you don't understand a word of what follows, hit [The Debian Administrator's Handbook](http://static.debian-handbook.info/browse/stable/short-remedial-course.html) so then you do.
 ---: | :---
@@ -27,7 +27,7 @@ which means you can easily delete any installed software, and also run several v
 
 For shared multi-user setups, this works fine also — compile and install to `/opt/rtorrent`
 using `./build.sh install`, then provide access to all users by calling `chmod -R go+rX /opt/rtorrent`.
-Perform the steps from "rTorrent configuration" onwards for each user repeatedly,
+Perform the steps from *rTorrent Configuration* onwards for each user repeatedly,
 so they get their own instance.
 
 :computer: | Most of the command blocks further below can be cut & pasted wholesale into a terminal. Note that `bash` _here documents_ (`... <<'EOF'`) **MUST** be pasted at once, up to and including the line having a single `EOF` on it.
@@ -58,7 +58,8 @@ apt-get install tmux wget build-essential subversion git \
 Note that you can always show Debian's current build dependencies for rTorrent using this command:
 
 ```sh
-echo $(apt-cache showsrc rtorrent libtorrent-dev | grep Build-Depends: | cut -f2 -d: | tr ",)" " \\n" | cut -f1 -d"(")
+echo $(apt-cache showsrc rtorrent libtorrent-dev | \
+    grep Build-Depends: | cut -f2 -d: | tr ",)" " \\n" | cut -f1 -d"(")
 ```
 
 
@@ -104,7 +105,8 @@ chmod a+x /usr/local/sbin/load-domain-certificate
 ### `rtorrent-ps` Debian Packages
 
 For a limited set of platforms, there are packages available that contain pre-compiled
-binaries (and only those). You can download and install such a package from
+binaries (and only those, configuration must be provided on top).
+You can download and install such a package from
 [Bintray](https://bintray.com/pkg/show/general/pyroscope/rtorrent-ps/rtorrent-ps)
 — assuming one is available for your platform.
 It installs the [rTorrent-PS](https://github.com/pyroscope/rtorrent-ps)
@@ -115,18 +117,25 @@ after installation is to symlink the executable into your path:
 ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
 ```
 
-Then skip the next section and continue with “PyroScope installation”.
+Then skip the next section and continue with *PyroScope Installation*.
 
-> ✪ _During rTorrent instance setup, do not forget to change the value of `pyro.extended` to 1 so the extended features are actually activated!_
+:bulb: | During rTorrent instance setup, do not forget to change the value of `pyro.extended` to 1 so the extended features are actually activated!
+---: | :---
 
 
 ### Build `rtorrent` and Core Dependencies From Source
 
-Get the [build script](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/build.sh) as shown below and call it with the `all` parameter; the script will then download, build, and install all necessary components, storing temporary files in the current directory. You can pass the `clean_all` parameter to remove those temporary files later on, after everything works. Make sure you followed the "Preparatory steps" in the section further up on this page.
+Get the [build script](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/build.sh)
+and call it with the `all` parameter as shown below; the script will then download, build, and install
+all necessary components, storing temporary files in the current directory.
+You can pass the `clean_all` parameter to remove those temporary files later on,
+after everything works. Make sure you followed the *Preparatory Steps* in the section further up on this page.
 
-All installations go to `~/lib/rtorrent-«version»/`, and disturb neither any host setup nor another version of rTorrent you've installed the same way.
+:bangbang: | Be sure to select the version of rTorrent you want to compile, as determined by the settings at the start of the script. If you have no preference otherwise, stick to the default set in the script. Note that such a choice is sticky once you performed the `download` step, until you call `clean_all` again.
+---: | :---
 
-**⚠ Be sure to select the version of rTorrent you want to compile, as determined by the settings at the start of the script. If you have no preference otherwise, stick to the stable 0.9.2 release, which is the default. Note that such a choice is sticky once you performed the `download` step, until you call `clean_all` again.**
+All installations go to `~/lib/rtorrent-«version»/`, and disturb neither any host setup
+nor another version of rTorrent you've installed the same way.
 
 ```sh
 # Run this in your NORMAL user account!
@@ -135,14 +144,11 @@ git clone https://github.com/pyroscope/rtorrent-ps.git
 cd rtorrent-ps
 
 # check the VERSION SELECTION at the top of the script, and edit as needed, then...
-./build.sh all
+./build.sh all  # build 'rtorrent-vanilla'
+./build.sh extend  # apply patches and build 'rtorrent-ps'
 ```
 
-If you want an extended version with some stability fixes and extension patches applied, call this command **in addition**:
-
-```sh
-./build.sh extend # "in addition" means AFTER the commands further above
-```
+This is what you'll get:
 
 <table border='0'><tr valign='middle'>
 <td><img src='http://i.imgur.com/xCd8z.png' /></td>
@@ -157,11 +163,11 @@ See
 [RtorrentExtended ](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md)
 for more details on the changes applied.
 
-:bulb: | If you use the configuration as outlined below, do not forget to change the value of `pyro.extended` to 1 in case you built the extended version, to unlock the additional features!
+:bulb: | If you use the configuration as outlined below, do not forget to change the value of `pyro.extended` to 1 in case you want to unlock the additional features of the extended version!
 ---: | :---
 
 
-## PyroScope installation
+## PyroScope Installation
 
 The installation of `pyrocore` is done from source, see its
 [manual](https://pyrocore.readthedocs.org/en/latest/installation.html) for more details.
@@ -192,7 +198,7 @@ or create alternate instances with ease.
 ### rTorrent startup script
 
 First, create the instance directories and a simple
-[start script](http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/examples/start.sh):
+[start script](https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh):
 
 ```sh
 # Run this in your NORMAL user account!
@@ -205,11 +211,11 @@ chmod a+x ./start
 
 ### rTorrent configuration
 Next, a not-so-simple
-[rtorrent.rc](http://pyroscope.googlecode.com/svn/trunk/pyrocore/docs/examples/rtorrent.rc)
+[rtorrent.rc](https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rtorrent.rc)
 is created, it already contains everything needed to use all features of PyroScope
 — you should check at least the first section and adapt the values to your environment.
 Note that most of the settings specific to PyroScope are read from a
-[provided include file](http://pyroscope.googlecode.com/svn/trunk/pyrocore/src/pyrocore/data/config/rtorrent-0.8.6.rc).
+[provided include file](https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-0.8.6.rc).
 
 ```sh
 # Run this in your NORMAL user account!
@@ -236,7 +242,7 @@ pyroadmin --create-config
 cat >~/.pyroscope/config.ini <<EOF
 # PyroScope configuration file
 #
-# For details, see http://code.google.com/p/pyroscope/wiki/UserConfiguration
+# For details, see https://pyrocore.readthedocs.org/en/latest/setup.html
 #
 
 [GLOBAL]
