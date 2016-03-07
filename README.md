@@ -122,7 +122,7 @@ the resulting executable located at `/opt/rtorrent/bin/rtorrent`.
 Finally, `./build.sh pkg2deb` creates the Debian package in `/tmp`.
 The script expects the packager's name and email in the usual environment variables,
 namely `DEBFULLNAME` and `DEBEMAIL`.
-For a few platforms (recent Debian, Ubuntu, and Raspian), you can find pre-built ones
+For a few platforms (recent Debian, Ubuntu, and Raspbian), you can find pre-built ones
 at [Bintray](https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps).
 
 
