@@ -5,6 +5,12 @@
 The following shows installation instructions for a working rTorrent
 instance in combination with PyroScope **from scratch**,
 on Debian and most Debian-derived distros.
+Note that the [pimp-my-box](https://github.com/pyroscope/pimp-my-box) project
+does all this automatically for you, and is the tested and maintained way
+of installation — this page is a reference of the core installation steps
+and not really maintained any more (if you run into problems, join the
+freenode IRC channel for help).
+
 While the package names and the use of `apt-get` are somewhat dependant on
 Debian, the _Preparatory steps_ commands which are executed under `root`
 are similar for other distributions, and the compilation instructions should
