@@ -28,20 +28,21 @@ The main changes are these:
   * extended command set:
     * sort views by more than one value, and set the sort direction for each of these.
     * bind keys in the root display to any command, e.g. change the built-in views.
+    * record network traffic.
   * interface additions:
     * easily customizable colors.
-    * collapsed 1-line item display.
+    * collapsed 1-line item display with condensed information.
     * network bandwidth graph.
     * displaying the tracker domain for each item.
     * some more minor modifications to the download list view.
 
-To get those, you just need to either follow the build instructions, or download and install a package from Bintray — assuming one is available for your platform.
-
-
-For more details, see
+To get those, you just need to either follow the build instructions, or download and install a package from Bintray
+— assuming one is available for your platform.
+See below for installation instructions — more detailed reference information can be found on the
 [RtorrentExtended](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md)
 and
-[RtorrentExtendedCanvas](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md).
+[RtorrentExtendedCanvas](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md)
+pages.
 
 
 ## Installation
@@ -49,7 +50,7 @@ and
 ### General Installation Options
 
 See the
-[instructions here](https://github.com/pyroscope/pyroscope/blob/wiki/DebianInstallFromSource.md#build-rtorrent-and-core-dependencies-from-source)
+[instructions here](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md#build-rtorrent-and-core-dependencies-from-source)
 for building from source using the provided ``build.sh`` script,
 which will install *rTorrent-PS* into ``~/lib/rtorrent-‹version›``.
 
@@ -116,7 +117,7 @@ the resulting executable located at `/opt/rtorrent/bin/rtorrent`.
 Finally, `./build.sh pkg2deb` creates the Debian package in `/tmp`.
 The script expects the packager's name and email in the usual environment variables,
 namely `DEBFULLNAME` and `DEBEMAIL`.
-For a few platforms (recent Debian and Ubuntu), you can find pre-built ones
+For a few platforms (recent Debian, Ubuntu, and Raspian), you can find pre-built ones
 at [Bintray](https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps).
 
 
