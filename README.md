@@ -43,6 +43,11 @@ See below for installation instructions — more detailed reference information 
 and
 [RtorrentExtendedCanvas](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md)
 pages.
+[DebianInstallFromSource](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md)
+contains installation instructions for a working rTorrent instance in combination with `pyrocore`,
+on Debian and most Debian-derived distros — i.e. a manual way to do parts of what
+[pimp-my-box](https://github.com/pyroscope/pimp-my-box)
+does automatically for you.
 
 
 ## Installation
