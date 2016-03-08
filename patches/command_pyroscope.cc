@@ -331,6 +331,8 @@ torrent::Object cmd_ui_current_view() {
 }
 
 
+#if RT_HEX_VERSION <= 0x000906
+// see https://github.com/rakshasa/rtorrent/commit/1f5e4d37d5229b63963bb66e76c07ec3e359ecba
 torrent::Object cmd_system_env(const torrent::Object::string_type& arg) {
     if (arg.empty()) {
         throw torrent::input_error("system.env: Missing variable name.");
@@ -339,6 +341,7 @@ torrent::Object cmd_system_env(const torrent::Object::string_type& arg) {
     char* val = getenv(arg.c_str());
     return std::string(val ? val : "");
 }
+#endif
 
 
 torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
@@ -416,7 +419,10 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
+#if RT_HEX_VERSION <= 0x000906
+    // see https://github.com/rakshasa/rtorrent/commit/1f5e4d37d5229b63963bb66e76c07ec3e359ecba
     CMD2_ANY_STRING("system.env", _cxxstd_::bind(&cmd_system_env, _cxxstd_::placeholders::_2));
+#endif
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
     CMD2_ANY("ui.current_view", _cxxstd_::bind(&cmd_ui_current_view));
     CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
