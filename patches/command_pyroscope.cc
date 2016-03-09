@@ -186,7 +186,8 @@ static std::map<int, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_S
         Binds the given key on a specified display to execute the commands when pressed.
 
         "display" must be one of "download_list", ...
-        "key" can be either a single character for normal keys, or ^ plus a character for control keys.
+        "key" can be either a single character for normal keys,
+            ^ plus a character for control keys, or a 4 digit octal key code.
 
         Configuration example:
             # VIEW: Bind view #7 to the "rtcontrol" result

@@ -98,12 +98,15 @@ schedule = filter_active,12,20,"view_filter = active,\"or={d.get_up_rate=,d.get_
 
 ### ui.bind_key=display,key,"command1=[,...]"
 
-<b>⚠ WARNING: This currently can NOT be used immediately when ``rtorrent.rc`` is parsed, so it has to be scheduled once shortly after startup (see below example).</b>
+:warning: | This currently can NOT be used immediately when ``rtorrent.rc`` is parsed, so it has to be scheduled once shortly after startup (see below example).
+---: | :---
 
 Binds the given key on a specified display to execute the commands when pressed.
 
   * ``display`` must be equal to ``download_list`` (currently, no other displays are supported).
-  * ``key`` can be either a single character for normal keys, or ``^`` plus a character for control keys.
+  * ``key`` can be either a single character for normal keys,
+    ``^`` plus a character for control keys,
+    or a 4 digit octal key code.
 
 Configuration example:
 
@@ -214,13 +217,13 @@ The chosen tracker is the first HTTP one with active peers (seeders or leechers)
 or else the first one.
 
 
-### ui.current_view=
+### ui.current_view= (merged into 0.9.7+)
 
 Returns the currently selected view, the official release only has a setter.
-Needed if you want to use »``-``« as a view name in ``rtcontrol``.
+Needed if you want to use ``-`` as a view name in ``rtcontrol``.
 
 
-### log.messages=«path» (0.8.9+ only)
+### log.messages=«path»
 
 (Re-)opens a log file that contains the messages normally only visible on
 the main panel and via the ``l`` key. Each line is prefixed with the
@@ -228,7 +231,7 @@ current date and time in ISO8601 format.
 If an empty path is passed, the file is closed.
 
 
-### network.history.*= (0.8.9+ only)
+### network.history.*=
 
 Commands to add network traffic charts to the bottom of the collapsed download display.
 The commands added are ``network.history.depth[.set]=``,  ``network.history.sample=``,
@@ -238,7 +241,7 @@ See the
 page on how to use them.
 
 
-### system.env=«name»
+### system.env=«name» (merged into 0.9.7+)
 
 Returns the value of the given environment variable, or an empty string if it does not exist.
 
