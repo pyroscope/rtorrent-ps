@@ -125,8 +125,8 @@ std::string get_active_tracker_domain(torrent::Download* item) {
             # VIEW: Show active and incomplete torrents (in view #9) and update every 20 seconds
             #       Items are grouped into complete, incomplete, and queued, in that order.
             #       Within each group, they're sorted by upload and then download speed.
-            view_sort_current = active,"compare=----,d.is_open=,d.get_complete=,d.get_up_rate=,d.get_down_rate="
-            schedule = filter_active,12,20,"view_filter = active,\"or={d.get_up_rate=,d.get_down_rate=,not=$d.get_complete=}\" ;view_sort=active"
+            view_sort_current = active,"compare=----,d.is_open=,d.complete=,d.up.rate=,d.down.rate="
+            schedule = filter_active,12,20,"view.filter = active,\"or={d.up.rate=,d.down.rate=,not=$d.complete=}\" ;view.sort=active"
 */
 torrent::Object apply_compare(rpc::target_type target, const torrent::Object::list_type& args) {
     if (!rpc::is_target_pair(target))
