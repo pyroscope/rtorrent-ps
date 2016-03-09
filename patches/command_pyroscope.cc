@@ -284,11 +284,17 @@ torrent::Object cmd_ui_focus_end() {
 }
 
 
+static int ui_page_size() {
+    // TODO: map 0 to the current view size, for adaptive scrolling
+    return std::max(1, (int) rpc::call_command_value("ui.focus.page_size"));
+}
+
+
 torrent::Object cmd_ui_focus_pgup() {
     ui::DownloadList* dl_list = control->ui()->download_list();
     core::View* dl_view = dl_list->current_view();
 
-    int skip = rpc::call_command_value("ui.focus.page_size");
+    int skip = ui_page_size();
     if (!dl_view->empty_visible()) {
         if (dl_view->focus() == dl_view->end_visible())
             dl_view->set_focus(dl_view->end_visible() - 1);
@@ -307,7 +313,7 @@ torrent::Object cmd_ui_focus_pgdn() {
     ui::DownloadList* dl_list = control->ui()->download_list();
     core::View* dl_view = dl_list->current_view();
 
-    int skip = rpc::call_command_value("ui.focus.page_size");
+    int skip = ui_page_size();
     if (!dl_view->empty_visible()) {
         if (dl_view->focus() == dl_view->end_visible())
             dl_view->set_focus(dl_view->begin_visible());
