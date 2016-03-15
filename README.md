@@ -77,6 +77,15 @@ You can download and install such a package from
 assuming one is available for your platform.
 The packages install the *rTorrent-PS* binary including some libraries into ``/opt/rtorrent``.
 
+Example on Raspbian Jessie:
+
+```sh
+version="0.9.6-20160308-c7c8d31~jessie_armhf"
+cd /tmp
+curl -Lko rt-ps.deb "https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-ps_$version.deb"
+dpkg -i rt-ps.deb
+```
+
 After installation, you must provide a configuration file (``~/.rtorrent.rc``),
 and either use the absolute path to the binary to start it,
 or link it into ``/usr/local`` like this:
