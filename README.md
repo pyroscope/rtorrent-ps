@@ -15,6 +15,8 @@ Extended `rTorrent` distribution with UI enhancements, colorization, and some ad
     * [Homebrew Tap for Mac OSX](#homebrew-tap-for-mac-osx)
     * [Installation on Arch Linux](#installation-on-arch-linux)
   * [Building the Debian Package](#building-the-debian-package)
+  * [Trouble-Shooting](#trouble-shooting)
+    * [Startup Failure: ‘your terminal only supports 8 colors’](#startup-failure-your-terminal-only-supports-8-colors)
   * [References](#references)
 
 
@@ -152,6 +154,21 @@ The script expects the packager's name and email in the usual environment variab
 namely `DEBFULLNAME` and `DEBEMAIL`.
 For a few platforms (recent Debian, Ubuntu, and Raspbian), you can find pre-built ones
 at [Bintray](https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps).
+
+
+## Trouble-Shooting
+
+### Startup Failure: ‘your terminal only supports 8 colors’
+
+Read these instructions:
+
+ * [color configuration](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uicolortypesetcolor-def)
+ * [tmux and 256 colors](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#using-the-extended-canvas-with-tmux--screen-and-256-colors)
+ * [(Windows) Terminal Setup](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal), and [Font Linking on Windows](https://github.com/chros73/rtorrent-ps_setup/tree/master/windows-8.1#font-linking-on-windows)
+
+If all else fails, you can add a
+[configuration snippet](http://community.rutorrent.org/RtorrentColorThemes#rT-PS:_8_color_scheme_for_badly_configured_terminals)
+to `rtorrent.rc` so that only 8 colors are used.
 
 
 ## References
