@@ -41,7 +41,7 @@ else they indicate the order of magnitude using roman numerals
 (c = 10², m = 10³, X = 10⁴, C = 10⁵, M = 10⁶).
 
 For the completion time display to work, you need the following in your `.rtorrent.rc`,
-which you already do if you installed PyroScope correctly
+which you already do if you installed the [PyroScope CLI Tools](https://pyrocore.readthedocs.org/) correctly
 (i.e. using the standard `.rtorrent.rc` include):
 
 ```
