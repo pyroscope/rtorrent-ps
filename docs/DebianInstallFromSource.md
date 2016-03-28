@@ -1,5 +1,24 @@
 # Install rTorrent-PS and ‘pyrocore’ on Debian-type Systems
 
+**Contents**
+
+  * [Introduction](#introduction)
+  * [Preparatory Steps](#preparatory-steps)
+    * [Installing Build Dependencies](#installing-build-dependencies)
+    * [Optional root Setup Steps](#optional-root-setup-steps)
+  * [rTorrent Installation](#rtorrent-installation)
+    * [rtorrent-ps Debian Packages](#rtorrent-ps-debian-packages)
+    * [Build rtorrent and Core Dependencies From Source](#build-rtorrent-and-core-dependencies-from-source)
+  * [PyroScope Installation](#pyroscope-installation)
+  * [rTorrent Instance Setup](#rtorrent-instance-setup)
+    * [rTorrent Startup Script](#rtorrent-startup-script)
+    * [rTorrent Configuration](#rtorrent-configuration)
+  * [PyroScope CLI Tools Configuration](#pyroscope-cli-tools-configuration)
+  * [First Start and Testing](#first-start-and-testing)
+    * [tmux Configuration](#tmux-configuration)
+    * [Starting a tmux Session](#starting-a-tmux-session)
+
+
 ## Introduction
 
 The following shows installation instructions for a working rTorrent
@@ -187,7 +206,7 @@ exec $SHELL -l; pyroadmin --version
 ```
 
 
-## rTorrent instance setup
+## rTorrent Instance Setup
 
 To be able to use several different instances of rTorrent (e.g. a second one
 for experimental configuration changes), this setup doesn't use `~/.rtorrent.rc` at all,
@@ -195,7 +214,7 @@ but keeps everything in one place under the `~/rtorrent` directory.
 If you change the assignment to `RT_HOME`, you can place it anywhere you like,
 or create alternate instances with ease.
 
-### rTorrent startup script
+### rTorrent Startup Script
 
 First, create the instance directories and a simple
 [start script](https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh):
@@ -209,7 +228,7 @@ cp ~/lib/pyroscope/pyrocore/docs/examples/start.sh ./start
 chmod a+x ./start
 ```
 
-### rTorrent configuration
+### rTorrent Configuration
 Next, a not-so-simple
 [rtorrent.rc](https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rtorrent.rc)
 is created, it already contains everything needed to use all features of PyroScope

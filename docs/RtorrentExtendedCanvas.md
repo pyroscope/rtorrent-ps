@@ -1,5 +1,13 @@
 # Extended Canvas Explained
 
+**Contents**
+
+  * [Columns in the Collapsed Display](#columns-in-the-collapsed-display)
+  * [Adding Traffic Graphs](#adding-traffic-graphs)
+  * [Setting Up Your Terminal](#setting-up-your-terminal)
+  * [Using the extended canvas with tmux / screen and 256 colors](#using-the-extended-canvas-with-tmux--screen-and-256-colors)
+
+
 ## Columns in the Collapsed Display
 
 The following is an explanation of the collapsed display of [rTorrent-PS](RtorrentExtended.md)

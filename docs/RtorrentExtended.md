@@ -2,6 +2,23 @@
 
 # :bangbang: NOTE THIS PAGE STILL NEEDS TO BE UPDATED TO GITHUB LINKS ETC.
 
+**Contents**
+
+  * [Introduction](#introduction)
+  * [Additional features in the standard configuration](#additional-features-in-the-standard-configuration)
+  * [Command Extensions](#command-extensions)
+    * [compare=order,command1=[,...]](#compareordercommand1)
+    * [ui.bind_key=display,key,"command1=[,...]"](#uibind_keydisplaykeycommand1)
+    * [view.collapsed.toggle=«VIEW NAME»](#viewcollapsedtoggleview-name)
+    * [ui.color.«TYPE».set="«COLOR DEF»"](#uicolortypesetcolor-def)
+    * [d.tracker_domain=](#dtracker_domain)
+    * [ui.current_view= (merged into 0.9.7 )](#uicurrent_view-merged-into-097)
+    * [log.messages=«path»](#logmessagespath)
+    * [network.history.*=](#networkhistory)
+    * [system.env=«name» (merged into 0.9.7 )](#systemenvname-merged-into-097)
+  * [Backports of git master fixes and features to 0.9.2](#backports-of-git-master-fixes-and-features-to-092)
+
+
 <table border='0'><tr valign='middle'>
 <td><img src='https://pyroscope.googlecode.com/svn/trunk/pyrocore/src/pyrocore/data/img/rt-logo.png' /></td>
 <td width='30px'></td>
