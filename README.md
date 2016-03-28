@@ -5,6 +5,21 @@ Extended `rTorrent` distribution with UI enhancements, colorization, and some ad
 
 ![Extended Canvas Screenshot](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png)
 
+**Contents**
+
+  * [Introduction](#introduction)
+  * [Feature Overview](#feature-overview)
+  * [Installation](#installation)
+    * [General Installation Options](#general-installation-options)
+    * [Installation Using Debian Packages](#installation-using-debian-packages)
+    * [Homebrew Tap for Mac OSX](#homebrew-tap-for-mac-osx)
+    * [Installation on Arch Linux](#installation-on-arch-linux)
+  * [Building the Debian Package](#building-the-debian-package)
+  * [References](#references)
+
+
+## Introduction
+
 `rTorrent-PS` is *not* the same as the `PyroScope`
 [command line utilities](https://github.com/pyroscope/pyrocore#pyrocore),
 and doesn't depend on them; the same is true the other way 'round.
@@ -93,6 +108,10 @@ or link it into ``/usr/local`` like this:
 ```sh
 ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
 ```
+
+:information_source: | You can safely install the package and test it out in parallel to an existing installation, just use the absolute path `/opt/rtorrent/bin/rtorrent` to start rTorrent. Your data is in no way affected as long as you normally run a 0.9.x version.
+----: | :----
+
 
 ### Homebrew Tap for Mac OSX
 
