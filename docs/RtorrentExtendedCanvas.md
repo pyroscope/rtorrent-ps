@@ -23,6 +23,7 @@ else you won't ever see it.
 | ☍ | Tied item? [⚯] |
 | ⌘ | Command lock-out? (⚒ = heed commands, ◌ = ignore commands) |
 | ✰ | Priority (✖ = off, ⇣ = low, nothing for normal, ⇡ = high) |
+| Ø | Throttle (none = global throttle, ∞ = NULL throttle, otherwise the first letter of the throttle name) |
 | ⣿ | Completion status (✔ = done; else up to 8 dots [⣿], i.e. 9 levels of 11% each); change to bar style using `ui.style.progress.set=2`, `0` is a _mostly_ ASCII one |
 | ⚡ | Transfer direction indicator [⇅ ↡ ↟] |
 | ☯ | Ratio (☹  plus color indication for < 1, ➀  — ➉ : >= the number, ⊛ : >= 11); change to a different set of number glyphs using `ui.style.ratio.set=2` (or `3`), `0` is a _mostly_ ASCII one |
@@ -30,7 +31,9 @@ else you won't ever see it.
 | ↺ | Number of completions from last scrape info |
 | ⤴ | Number of seeds from last scrape info |
 | ⤵ | Number of leeches from last scrape info |
-| ∆ | Upload rate |
+| ↻ | Number of connected peers |
+| ⌚ ≀∆ | Approximate time since last active state (units are «”’hdwmy» from seconds to years) or upload rate |
+| ⊼ | Uploaded data size |
 | ⌚ ≀∇ | Approximate time since completion (units are «”’hdwmy» from seconds to years); for incomplete items the download rate or, if there's no traffic, the time since the item was loaded |
 | ✇ | Data size |
 | Name | Name of the download item |

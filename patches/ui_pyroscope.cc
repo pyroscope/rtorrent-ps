@@ -1,15 +1,15 @@
 /*
- ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ∆ ⌚ ≀∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺
+ ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ Ø ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ↻ ⌚ ≀∆ ⊼ ∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺ ∞
 
  ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳
 
 
-python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 " \
-    u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u2206 \u231a \u2240\u2207 \u2707 " \
-    u"\u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 \u21e1  \u2801 \u2809 " \
-    u"\u280b \u281b \u281f \u283f \u287f \u28ff \u2639 \u2780 \u2781 \u2782 \u2783 \u2784 " \
-    u"\u2785 \u2786 \u2787 \u2788 \u2789 \u25b9\xa0\u254d \u25aa \u26af \u2692 \u25cc " \
-    u"\u21c5 \u21a1 \u219f \u229b \u267a ".encode("utf8")'
+python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 \xd8 " \
+    u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u21bb \u231a \u2240\u2206 " \
+    u"\u22bc \u2207 \u2707 \u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 " \
+    u"\u21e1  \u2801 \u2809 \u280b \u281b \u281f \u283f \u287f \u28ff \u2639 \u2780 " \
+    u"\u2781 \u2782 \u2783 \u2784 \u2785 \u2786 \u2787 \u2788 \u2789 \u25b9\xa0\u254d " \
+    u"\u25aa \u26af \u2692 \u25cc \u21c5 \u21a1 \u219f \u229b \u267a \u221e ".encode("utf8")'
 */
 
 #include "ui_pyroscope.h"
@@ -476,7 +476,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	// show column headers
 	int pos = 1;
-	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇   Name");
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ Ø ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵  ↻  ⌚ ≀∆    ⊼    ⌚ ≀∇   ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -556,9 +556,17 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 		const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
 
-        std::string displayname = get_custom_string(d, "displayname");
+		char throttle_str[3] = "  ";
+		std::string throttlename = "";
+		if (!d->bencode()->get_key("rtorrent").get_key_string("throttle_name").empty()) {
+			throttlename = rpc::call_command_string("d.throttle_name", rpc::make_target(d)).c_str();
+			sprintf(throttle_str, "%c ", throttlename[0]);
+		}
+
+		std::string displayname = get_custom_string(d, "displayname");
 		int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
 		uint32_t down_rate = D_INFO(item)->down_rate()->rate();
+		uint32_t up_rate = D_INFO(item)->up_rate()->rate();
 		char buffer[canvas->width() + 1];
 		char* last = buffer + canvas->width() - 2 + 1;
 		print_download_title(buffer, last, d);
@@ -573,12 +581,13 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
 		}
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s%s",
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s%s %s%s %s%s%s",
 			range.first == view->focus() ? "»" : " ",
 			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
+			!throttlename.empty() ? throttlename == "NULL" ? "∞ " : throttle_str : "  ",
 			d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
 				item->file_list()->completed_chunks() * PROGRESS_STEPS
 				/ item->file_list()->size_chunks()],
@@ -591,7 +600,15 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
-			human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
+			num2(d->connection_list()->size()).c_str(),
+			!up_rate ?  "" : " ",
+			!up_rate ? elapsed_time(get_custom_long(d, "last_active")).c_str() :
+				   human_size(up_rate, 2 | 8).c_str(),
+			D_INFO(item)->up_rate()->total() ? "" : "  ",
+			D_INFO(item)->up_rate()->total() ?
+				human_size(D_INFO(item)->up_rate()->total(), 0).c_str() :
+				num2(D_INFO(item)->up_rate()->total()).c_str(),
+			D_INFO(item)->up_rate()->total() ? "" : "  ",
 			d->is_done() || !down_rate ? "" : " ",
 			d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
 			!down_rate   ? elapsed_time(get_custom_long(d, "tm_loaded")).c_str() :
@@ -601,9 +618,9 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			displayname.empty() ? buffer : displayname.c_str()
 		);
 
-		int x_scrape = 3 + 8*2 + 1; // lead, 8 status columns, gap
-		int x_rate = x_scrape + 3*3; // skip 3 scrape columns
-		int x_name = x_rate + 3*5 + 1; // skip 3 rate/size columns
+		int x_scrape = 3 + 9*2 + 1; // lead, 9 status columns, gap
+		int x_rate = x_scrape + 4*3; // skip 4 scrape columns
+		int x_name = x_rate + 2*5 + 4 + 6 + 4; // skip 4 rate/size columns, gaps
 		decorate_download_title(window, canvas, view, pos, range);
 		canvas->set_attr(2, pos, x_name-2, attr_map[col_active + offset], col_active + offset);
 		if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
@@ -616,16 +633,25 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		int rcol = ratio_color(ratio);
 		canvas->set_attr(x_scrape-5, pos, 2, attr_map[rcol + offset], rcol + offset);
 
-		// color up/down rates
-		canvas->set_attr(x_rate+0, pos, 4, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
+		// color up rates / time
+		if (!up_rate) {
+			// time display
+			canvas->set_attr(x_rate+0+1, pos, 1, attr_map[ps::COL_QUEUED + offset], ps::COL_QUEUED + offset);
+			canvas->set_attr(x_rate+0+4, pos, 1, attr_map[ps::COL_QUEUED + offset], ps::COL_QUEUED + offset);
+		} else {
+			// up rate
+			canvas->set_attr(x_rate+0, pos, 5, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
+		}
+
+		// color down rates / time
 		if (d->is_done() || !down_rate) {
 			// time display
 			int tm_color = (d->is_done() ? ps::COL_SEEDING : ps::COL_INCOMPLETE) + offset;
-			canvas->set_attr(x_rate+5+1, pos, 1, attr_map[tm_color], tm_color);
-			canvas->set_attr(x_rate+5+4, pos, 1, attr_map[tm_color], tm_color);
+			canvas->set_attr(x_rate+6+7+1, pos, 1, attr_map[tm_color], tm_color);
+			canvas->set_attr(x_rate+6+7+4, pos, 1, attr_map[tm_color], tm_color);
 		} else {
 			// down rate
-			canvas->set_attr(x_rate+5, pos, 5, attr_map[ps::COL_LEECHING + offset], ps::COL_LEECHING + offset);
+			canvas->set_attr(x_rate+6+7, pos, 5, attr_map[ps::COL_LEECHING + offset], ps::COL_LEECHING + offset);
 		}
 
 		// is this the item in focus?
