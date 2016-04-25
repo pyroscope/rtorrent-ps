@@ -1,10 +1,10 @@
 /*
- ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ Ø ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ↻ ⌚ ≀∆ ⊼ ∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺ ∞
+ ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ ⊘ ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ↻ ⌚ ≀∆ ⊼ ∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺ ∞
 
  ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳
 
 
-python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 \xd8 " \
+python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 \u2298 " \
     u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u21bb \u231a \u2240\u2206 " \
     u"\u22bc \u2207 \u2707 \u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 " \
     u"\u21e1  \u2801 \u2809 \u280b \u281b \u281f \u283f \u287f \u28ff \u2639 \u2780 " \
@@ -476,7 +476,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	// show column headers
 	int pos = 1;
-	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ Ø ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵  ↻  ⌚ ≀∆    ⊼    ⌚ ≀∇   ✇   Name");
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⊘ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵  ↻  ⌚ ≀∆    ⊼    ⌚ ≀∇   ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
