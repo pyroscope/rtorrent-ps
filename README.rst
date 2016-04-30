@@ -8,9 +8,7 @@ and some added features.
    :align: center
    :alt: Extended Canvas Screenshot
 
-   Extended Canvas Screenshot
-
-..contents:: **Contents**
+.. contents:: **Contents**
 
 
 Introduction
@@ -86,12 +84,11 @@ here <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFro
 for building from source using the provided ``build.sh`` script, which
 will install *rTorrent-PS* into ``~/lib/rtorrent-‹version›``.
 
-:exclamation: \| If you also install the `PyroScope command line
-utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to
-activate the extended features available together with *rTorrent-PS*, as
-mentioned in the `Configuration
-Guide <https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc>`_.
-----: \| :----
+.. note:: If you also install the `PyroScope command line
+    utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to
+    activate the extended features available together with *rTorrent-PS*, as
+    mentioned in the 
+    `Configuration Guide <https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc>`_.
 
 Also take note of the
 `pimp-my-box <https://github.com/pyroscope/pimp-my-box>`_ project that
@@ -115,7 +112,7 @@ assuming one is available for your platform. The packages install the
 
 Example on Raspbian Jessie:
 
-::
+.. code-block:: bash
 
     version="0.9.6-20160308-c7c8d31~jessie_armhf"
     cd /tmp
@@ -126,14 +123,14 @@ After installation, you must provide a configuration file
 (``~/.rtorrent.rc``), and either use the absolute path to the binary to
 start it, or link it into ``/usr/local`` like this:
 
-::
+.. code-block:: bash
 
     ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
 
-:information\_source: \| You can safely install the package and test it
-out in parallel to an existing installation, just use the absolute path
-``/opt/rtorrent/bin/rtorrent`` to start rTorrent. Your data is in no way
-affected as long as you normally run a 0.9.x version. ----: \| :----
+.. note:: You can safely install the package and test it
+    out in parallel to an existing installation, just use the absolute path
+    ``/opt/rtorrent/bin/rtorrent`` to start rTorrent. Your data is in no way
+    affected as long as you normally run a 0.9.x version.
 
 
 Homebrew Tap for Mac OSX
@@ -161,7 +158,7 @@ A Debian package for easy installation is built using
 `fpm <https://github.com/jordansissel/fpm>`_, so you have to install
 that first on the build machine, if you don't have it yet:
 
-::
+.. code-block:: bash
 
     apt-get install ruby ruby-dev
     gem install fpm
@@ -170,7 +167,7 @@ that first on the build machine, if you don't have it yet:
 Then you need to prepare the install target, as follows (we assume
 building under the ``rtorrent`` user here):
 
-::
+.. code-block:: bash
 
     mkdir -p /opt/rtorrent
     chmod 0755 /opt/rtorrent
