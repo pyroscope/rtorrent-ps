@@ -476,7 +476,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	// show column headers
 	int pos = 1;
-	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⊘ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵  ↻  ⌚ ≀∆    ⊼    ⌚ ≀∇   ✇   Name");
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⊘ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵  ↻  ⌚ ≀∆     ⊼   ⌚ ≀∇   ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
