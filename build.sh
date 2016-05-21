@@ -3,6 +3,8 @@
 # Build rTorrent including patches
 #
 
+RT_CH_VERSION=1.0
+
 export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export SVN=0 # no git support yet!
@@ -423,7 +425,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
     fi
 
-    $SED_I 's/rTorrent \" VERSION/rTorrent-PS-CH " VERSION/' src/ui/download_list.cc
+    $SED_I "s/rTorrent \\\" VERSION/rTorrent-PS-CH $RT_CH_VERSION \\\" VERSION/" src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
@@ -464,6 +466,7 @@ install() { # Install to $PKG_INST_DIR
     rm -rf "$INST_DIR"/* || :
     test "$(echo $INST_DIR/*)" = "$INST_DIR/*" || fail "Could not clean install dir '$INST_DIR'"
     cat >"$INST_DIR"/version-info.sh <<.
+RT_CH_VERSION=$RT_CH_VERSION
 RT_PS_VERSION=$RT_VERSION
 RT_PS_REVISION=$(date +'%Y%m%d')-$(git rev-parse --short HEAD)
 RT_PS_LT_VERSION=$LT_VERSION
@@ -495,11 +498,11 @@ pkg2deb() { # Package current $PKG_INST_DIR installation [needs fpm]
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
 
     ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps-ch \
-        -v $RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
+        -v $RT_CH_VERSION-$RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
-        --license "GPL v2" --vendor "https://github.com/rakshasa" \
+        --license "GPL v2" --vendor "https://github.com/rakshasa , https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
         --description "Patched and extended ncurses BitTorrent client" \
-        --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
+        --url "https://github.com/chros73/rtorrent-ps#rtorrent-ps" \
         $deps -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
     chmod a+rX "$DIST_DIR"
     chmod a+r "$DIST_DIR"/*.deb
