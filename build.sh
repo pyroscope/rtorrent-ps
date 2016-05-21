@@ -423,7 +423,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
     fi
 
-    $SED_I 's/rTorrent \" VERSION/rTorrent-PS " VERSION/' src/ui/download_list.cc
+    $SED_I 's/rTorrent \" VERSION/rTorrent-PS-CH " VERSION/' src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
@@ -496,7 +496,7 @@ pkg2deb() { # Package current $PKG_INST_DIR installation [needs fpm]
     deps=$(ldd "$PKG_INST_DIR"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
 
-    ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps \
+    ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps-ch \
         -v $RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
         --license "GPL v2" --vendor "https://github.com/rakshasa" \
