@@ -1,7 +1,7 @@
 rTorrent-PS
 ===========
 
-Extended ``rTorrent`` distribution with UI enhancements, colorization,
+Extended `rTorrent`_ distribution with UI enhancements, colorization,
 and some added features.
 
 .. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png
@@ -14,7 +14,7 @@ and some added features.
 Introduction
 ------------
 
-``rTorrent-PS`` is a ``rTorrent`` *distribution* (*not* a fork of it),
+``rTorrent-PS`` is a `rTorrent`_ *distribution* (*not* a fork of it),
 in form of a set of patches that improve the user experience and
 stability of official ``rTorrent`` releases.
 
@@ -34,7 +34,7 @@ mailing list or the inofficial ``##rtorrent`` channel on
 Feature Overview
 ----------------
 
-The main changes compared to vanilla *rTorrent* are these:
+The main changes compared to vanilla `rTorrent`_ are these:
 
 -  self-contained install into any location of your choosing, including
    your home directory, offering the ability to run several versions at
@@ -87,7 +87,7 @@ will install *rTorrent-PS* into ``~/lib/rtorrent-‹version›``.
 .. note:: If you also install the `PyroScope command line
     utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to
     activate the extended features available together with *rTorrent-PS*, as
-    mentioned in the 
+    mentioned in the
     `Configuration Guide <https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc>`_.
 
 Also take note of the
@@ -213,3 +213,5 @@ References
 
 -  https://github.com/rakshasa/rtorrent
 -  `rTorrent Community Wiki <http://community.rutorrent.org/>`_
+
+.. _`rTorrent`: https://github.com/rakshasa/rtorrent
