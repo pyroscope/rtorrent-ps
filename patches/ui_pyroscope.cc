@@ -1,15 +1,15 @@
 /*
- ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ ⊘ ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ↻ ⌚ ≀∆ ⊼ ∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺ ∞
+ ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ ⊘ ◎ ⊕ ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ↻ ⌚ ≀∆ ⊼ ∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺ ∞ ⊗
 
  ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳
 
 
 python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 \u2298 " \
-    u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u21bb \u231a \u2240\u2206 " \
+    u"\u25ce \u2295 \u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u21bb \u231a \u2240\u2206 " \
     u"\u22bc \u2207 \u2707 \u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 " \
     u"\u21e1  \u2801 \u2809 \u280b \u281b \u281f \u283f \u287f \u28ff \u2639 \u2780 " \
     u"\u2781 \u2782 \u2783 \u2784 \u2785 \u2786 \u2787 \u2788 \u2789 \u25b9\xa0\u254d " \
-    u"\u25aa \u26af \u2692 \u25cc \u21c5 \u21a1 \u219f \u229b \u267a \u221e ".encode("utf8")'
+    u"\u25aa \u26af \u2692 \u25cc \u21c5 \u21a1 \u219f \u229b \u267a \u221e \u2297 ".encode("utf8")'
 */
 
 #include "ui_pyroscope.h"
@@ -476,7 +476,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	// show column headers
 	int pos = 1;
-	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⊘ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵  ↻  ⌚ ≀∆     ⊼   ⌚ ≀∇   ✇   Name");
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⊘ ◎ ⊕ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵  ↻  ⌚ ≀∆     ⊼   ⌚ ≀∇   ✇   Name");
 	if (canvas->width() > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
@@ -563,6 +563,14 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(throttle_str, "%c ", throttlename[0]);
 		}
 
+		char dir_str[3] = "  ";
+		std::string fullpath = rpc::call_command_string("d.base_path", rpc::make_target(d)).c_str();
+		std::string dirpath = fullpath.substr(0, fullpath.find_last_of("\\/"));
+		std::string dirletter = dirpath.substr(dirpath.find_last_of("\\/") + 1,1);
+		if (!dirletter.empty()) {
+			sprintf(dir_str, "%c ", dirletter[0]);
+		}
+
 		std::string displayname = get_custom_string(d, "displayname");
 		int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
 		uint32_t down_rate = D_INFO(item)->down_rate()->rate();
@@ -581,13 +589,15 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
 		}
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s%s %s%s %s%s%s",
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s%s %s%s %s%s%s",
 			range.first == view->focus() ? "»" : " ",
 			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.get_tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
 			!throttlename.empty() ? throttlename == "NULL" ? "∞ " : throttle_str : "  ",
+			get_custom_string(d, "unsafe_data") == "" ? "  " : get_custom_string(d, "delqueue") == "" ? "⊘ " : "⊗ ",
+			dir_str,
 			d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
 				item->file_list()->completed_chunks() * PROGRESS_STEPS
 				/ item->file_list()->size_chunks()],
@@ -618,7 +628,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			displayname.empty() ? buffer : displayname.c_str()
 		);
 
-		int x_scrape = 3 + 9*2 + 1; // lead, 9 status columns, gap
+		int x_scrape = 3 + 11*2 + 1; // lead, 11 status columns, gap
 		int x_rate = x_scrape + 4*3; // skip 4 scrape columns
 		int x_name = x_rate + 2*5 + 4 + 6 + 4; // skip 4 rate/size columns, gaps
 		decorate_download_title(window, canvas, view, pos, range);

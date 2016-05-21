@@ -24,6 +24,8 @@ else you won't ever see it.
 | ⌘ | Command lock-out? (⚒ = heed commands, ◌ = ignore commands) |
 | ✰ | Priority (✖ = off, ⇣ = low, nothing for normal, ⇡ = high) |
 | ⊘ | Throttle (none = global throttle, ∞ = NULL throttle, otherwise the first letter of the throttle name) |
+| ◎ | Unsafe-data (none = safe data, ⊘ = unsafe data, ⊗ = unsafe data with delqueue) |
+| ⊕ | Data directory (none = base path entry is missing, otherwise the first letter of the name of data directory) |
 | ⣿ | Completion status (✔ = done; else up to 8 dots [⣿], i.e. 9 levels of 11% each); change to bar style using `ui.style.progress.set=2`, `0` is a _mostly_ ASCII one |
 | ⚡ | Transfer direction indicator [⇅ ↡ ↟] |
 | ☯ | Ratio (☹  plus color indication for < 1, ➀  — ➉ : >= the number, ⊛ : >= 11); change to a different set of number glyphs using `ui.style.ratio.set=2` (or `3`), `0` is a _mostly_ ASCII one |
@@ -105,11 +107,11 @@ The following command lets you easily check whether your font supports all the n
 
 ```sh
 python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 \u2298 " \
-    u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u21bb \u231a \u2240\u2206 " \
+    u"\u25ce \u2295 \u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u21bb \u231a \u2240\u2206 " \
     u"\u22bc \u2207 \u2707 \u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 " \
     u"\u21e1  \u2801 \u2809 \u280b \u281b \u281f \u283f \u287f \u28ff \u2639 \u2780 " \
     u"\u2781 \u2782 \u2783 \u2784 \u2785 \u2786 \u2787 \u2788 \u2789 \u25b9\xa0\u254d " \
-    u"\u25aa \u26af \u2692 \u25cc \u21c5 \u21a1 \u219f \u229b \u267a \u221e ".encode("utf8")'
+    u"\u25aa \u26af \u2692 \u25cc \u21c5 \u21a1 \u219f \u229b \u267a \u221e \u2297 ".encode("utf8")'
 ```
 
 
