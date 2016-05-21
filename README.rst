@@ -215,3 +215,29 @@ References
 -  `rTorrent Community Wiki <http://community.rutorrent.org/>`_
 
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
+
+
+
+Fork notes
+===========
+
+This fork is another set of UI patches on top of the original. It's created to use with `rtorrent-ps_setup project <https://github.com/chros73/rtorrent-ps_setup/>`_
+
+It includes the following changes on `extended canvas <https://github.com/chros73/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#columns-in-the-collapsed-display>`_:
+
+.. code-block::
+
+    | ⊘ | Throttle (none = global throttle, ∞ = NULL throttle, otherwise the first letter of the throttle name) |
+    | ◎ | Unsafe-data (none = safe data, ⊘ = unsafe data, ⊗ = unsafe data with delqueue) |
+    | ⊕ | Data directory (none = base path entry is missing, otherwise the first letter of the name of data directory) |
+    | ↻ | Number of connected peers |
+    | ⌚ ≀∆ | Approximate time since last active state (units are «”’hdwmy» from seconds to years) or upload rate |
+    | ⊼ | Uploaded data size |
+
+It can include values of one throttle.up group in the status bar of rtorrent by setting `ui.status.throttle_up_name <https://github.com/chros73/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uistatusthrottle_up_namesetname>`_ command.
+
+.. code-block::
+
+    [Throttle 500 (200)/1500 KB] [Rate: 441.6 (190.0|51.6)/981.3 KB]
+
+
