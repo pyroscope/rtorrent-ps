@@ -241,3 +241,16 @@ It can include values of one throttle.up group in the status bar of rtorrent by 
     [Throttle 500 (200)/1500 KB] [Rate: 441.6 (190.0|51.6)/981.3 KB]
 
 
+Change log
+----------
+
+-  v1.1-0.9.6 (2016.06.24.)
+
+   -  Fix displaying last_active time in upload rate column when peers are connected (#14)
+   -  Modify Unsafe-data column under the hood (#15) : this change requires version 0.5-0.9.6 or above of `rtorrent-ps_setup project <https://github.com/chros73/rtorrent-ps_setup/>`_
+
+-  v1.0-0.9.6 (2016.05.21.)
+
+   -  Initial version.
+
+
