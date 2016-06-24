@@ -571,6 +571,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(dir_str, "%c ", dirletter[0]);
 		}
 
+		int connected_peers = d->connection_list()->size();
+
 		std::string displayname = get_custom_string(d, "displayname");
 		int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
 		uint32_t down_rate = D_INFO(item)->down_rate()->rate();
@@ -610,9 +612,9 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
 			tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
-			num2(d->connection_list()->size()).c_str(),
+			num2(connected_peers).c_str(),
 			!up_rate ?  "" : " ",
-			!up_rate ? elapsed_time(get_custom_long(d, "last_active")).c_str() :
+			!up_rate ? (connected_peers ? "   0”" : elapsed_time(get_custom_long(d, "last_active")).c_str()) :
 				   human_size(up_rate, 2 | 8).c_str(),
 			D_INFO(item)->up_rate()->total() ? "" : "  ",
 			D_INFO(item)->up_rate()->total() ?
