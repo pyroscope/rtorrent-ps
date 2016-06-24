@@ -563,6 +563,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(throttle_str, "%c ", throttlename[0]);
 		}
 
+		const char* unsafe_data[] = {"  ", "⊘ ", "⊗ "};
+
 		char dir_str[3] = "  ";
 		std::string fullpath = rpc::call_command_string("d.base_path", rpc::make_target(d)).c_str();
 		std::string dirpath = fullpath.substr(0, fullpath.find_last_of("\\/"));
@@ -598,7 +600,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			rpc::call_command_value("d.get_ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
 			prios[d->priority() % 4],
 			!throttlename.empty() ? throttlename == "NULL" ? "∞ " : throttle_str : "  ",
-			get_custom_string(d, "unsafe_data") == "" ? "  " : get_custom_string(d, "delqueue") == "" ? "⊘ " : "⊗ ",
+			unsafe_data[get_custom_long(d, "unsafe_data") % 3],
 			dir_str,
 			d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
 				item->file_list()->completed_chunks() * PROGRESS_STEPS
