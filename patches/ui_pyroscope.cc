@@ -563,14 +563,6 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(throttle_str, "%c ", throttlename[0]);
 		}
 
-		char dir_str[3] = "  ";
-		std::string fullpath = rpc::call_command_string("d.base_path", rpc::make_target(d)).c_str();
-		std::string dirpath = fullpath.substr(0, fullpath.find_last_of("\\/"));
-		std::string dirletter = dirpath.substr(dirpath.find_last_of("\\/") + 1,1);
-		if (!dirletter.empty()) {
-			sprintf(dir_str, "%c ", dirletter[0]);
-		}
-
 		int connected_peers = d->connection_list()->size();
 
 		std::string displayname = get_custom_string(d, "displayname");
