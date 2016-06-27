@@ -3,7 +3,7 @@
 # Build rTorrent including patches
 #
 
-RT_CH_VERSION=1.1
+RT_CH_VERSION=1.2
 
 export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;

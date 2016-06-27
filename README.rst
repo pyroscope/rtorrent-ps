@@ -244,6 +244,10 @@ It can include values of one throttle.up group in the status bar of rtorrent by 
 Change log
 ----------
 
+-  v1.2-0.9.6 (2016.06.27.)
+
+   -  Modify Data-directory column under the hood (#17)
+
 -  v1.1-0.9.6 (2016.06.24.)
 
    -  Fix displaying last_active time in upload rate column when peers are connected (#14)
