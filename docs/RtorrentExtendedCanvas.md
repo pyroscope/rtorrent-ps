@@ -15,7 +15,7 @@ The following is an explanation of the collapsed display of [rTorrent-PS](Rtorre
 or set the default of a view by calling that command in the configuration,
 else you won't ever see it.
 
-![http://i.imgur.com/B9qll.png](http://i.imgur.com/B9qll.png)
+![https://raw.githubusercontent.com/chros73/rtorrent-ps/master/docs/_static/img/rTorrent-PS-CH-0.9.6-solarized-yellow-kitty-s.png](https://raw.githubusercontent.com/chros73/rtorrent-ps/master/docs/_static/img/rTorrent-PS-CH-0.9.6-solarized-yellow-kitty-s.png)
 
 | **Column** | **Description** |
 |:-----------|:----------------|

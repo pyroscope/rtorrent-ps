@@ -221,6 +221,10 @@ References
 Fork notes
 ===========
 
+.. figure:: https://raw.githubusercontent.com/chros73/rtorrent-ps/master/docs/_static/img/rTorrent-PS-CH-0.9.6-happy-pastel-kitty-s.png
+   :align: center
+   :alt: Extended Canvas Screenshot
+
 This fork is another set of UI patches on top of the original. It's created to use with `rtorrent-ps_setup project <https://github.com/chros73/rtorrent-ps_setup/>`_
 
 It includes the following changes on `extended canvas <https://github.com/chros73/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#columns-in-the-collapsed-display>`_:
