@@ -3,6 +3,8 @@
 # Build rTorrent including patches
 #
 
+RT_CH_VERSION=1.2
+
 export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export SVN=0 # no git support yet!
@@ -19,7 +21,7 @@ BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libsigc++-2.0-dev libssl-dev l
 #export XMLRPC_REV=2626 # Release 1.38.04 2014-07
 
 export CARES_VERSION=1.10.0
-export CURL_VERSION=7.47.1 # 2016-02
+export CURL_VERSION=7.49.0 # 2016-05
 export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 
 case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
@@ -423,12 +425,15 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
     fi
 
-    $SED_I 's/rTorrent \" VERSION/rTorrent-PS " VERSION/' src/ui/download_list.cc
+    $SED_I "s/rTorrent \\\" VERSION/rTorrent-PS-CH $RT_CH_VERSION \\\" VERSION/" src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
     build
+
+    # Remove unnecessary files
+    rm -rf "$INST_DIR/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include,bin/curl,bin/*-config}
 }
 
 clean() { # Clean up generated files
@@ -459,8 +464,9 @@ install() { # Install to $PKG_INST_DIR
     export INST_DIR="$PKG_INST_DIR"
     test -d "$INST_DIR"/. || mkdir -p "$INST_DIR"/
     rm -rf "$INST_DIR"/* || :
-    test "$(echo /opt/rtorrent/*)" = "/opt/rtorrent/*" || fail "Could not clean install dir '$INST_DIR'"
+    test "$(echo $INST_DIR/*)" = "$INST_DIR/*" || fail "Could not clean install dir '$INST_DIR'"
     cat >"$INST_DIR"/version-info.sh <<.
+RT_CH_VERSION=$RT_CH_VERSION
 RT_PS_VERSION=$RT_VERSION
 RT_PS_REVISION=$(date +'%Y%m%d')-$(git rev-parse --short HEAD)
 RT_PS_LT_VERSION=$LT_VERSION
@@ -485,20 +491,18 @@ pkg2deb() { # Package current $PKG_INST_DIR installation [needs fpm]
     rm -rf "$DIST_DIR" || :
     mkdir -p "$DIST_DIR"
 
-    rm -rf "$PKG_INST_DIR/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include} || :
-    rm "$PKG_INST_DIR/bin/"{curl,*-config} || :
     chmod -R a+rX "$PKG_INST_DIR/"
 
     . "$PKG_INST_DIR"/version-info.sh
     deps=$(ldd "$PKG_INST_DIR"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
 
-    ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps \
-        -v $RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
+    ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps-ch \
+        -v $RT_CH_VERSION-$RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
-        --license "GPL v2" --vendor "https://github.com/rakshasa" \
+        --license "GPL v2" --vendor "https://github.com/rakshasa , https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
         --description "Patched and extended ncurses BitTorrent client" \
-        --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
+        --url "https://github.com/chros73/rtorrent-ps#rtorrent-ps" \
         $deps -C "$PKG_INST_DIR/." --prefix "$PKG_INST_DIR" '.')
     chmod a+rX "$DIST_DIR"
     chmod a+r "$DIST_DIR"/*.deb

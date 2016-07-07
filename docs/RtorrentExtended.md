@@ -16,6 +16,7 @@
     * [log.messages=«path»](#logmessagespath)
     * [network.history.*=](#networkhistory)
     * [system.env=«name» (merged into 0.9.7 )](#systemenvname-merged-into-097)
+    * [ui.status.throttle_up_name.set="«name»"](#uistatusthrottle_up_namesetname)
   * [Backports of git master fixes and features to 0.9.2](#backports-of-git-master-fixes-and-features-to-092)
 
 
@@ -266,6 +267,28 @@ Configuration example:
 
 ```ini
 session.path.set="$cat=\"$system.env=RTORRENT_HOME\",\"/.session\""
+```
+
+
+### ui.status.throttle_up_name.set="«name»"
+
+Displays values of the given throttle.up in the first part of status bar.
+Include the max limit of the throttle, the main upload rate and the upload rate of the throttle (in this order).
+
+Original: ``[Throttle 500/1500 KB] [Rate: 441.6/981.3 KB]``
+
+Modified: ``[Throttle 500 (200)/1500 KB] [Rate: 441.6 (190.0|51.6)/981.3 KB]``
+
+This extra info isn't displayed in the following cases:
+
+  * there isn't any throttle.up name as the config variable suggest or the given name is "NULL"
+  * the throttle.up is not throttled (=0)
+  * the global upload is not throttled (=0) (throttle.up won't be taken into account in this case)
+
+Configuration example:
+
+```ini
+ui.status.throttle_up_name.set="slowup"
 ```
 
 </dd>
