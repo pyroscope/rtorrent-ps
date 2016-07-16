@@ -224,7 +224,7 @@ First, create the instance directories and a simple
 export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
 mkdir -p $RT_HOME/{.session,work,done,log,watch/start,watch/load}
 cd $RT_HOME
-cp ~/lib/pyroscope/pyrocore/docs/examples/start.sh ./start
+cp ~/lib/pyroscope/docs/examples/start.sh ./start
 chmod a+x ./start
 ```
 
@@ -239,10 +239,10 @@ Note that most of the settings specific to PyroScope are read from a
 ```sh
 # Run this in your NORMAL user account!
 export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
-sed -e "s:RT_HOME:$RT_HOME:" <~/lib/pyroscope/pyrocore/docs/examples/rtorrent.rc >$RT_HOME/rtorrent.rc
+sed -e "s:RT_HOME:$RT_HOME:" <~/lib/pyroscope/docs/examples/rtorrent.rc >$RT_HOME/rtorrent.rc
 
 # Migrate config to new syntax
-bash ~/lib/pyroscope/pyrocore/src/scripts/migrate_rtorrent_rc.sh $RT_HOME/rtorrent.rc
+bash ~/lib/pyroscope/src/scripts/migrate_rtorrent_rc.sh $RT_HOME/rtorrent.rc
 ```
 
 :bulb: | Change the value of `pyro.extended` to 1 so the extended `rTorrent-PS` features are actually activated!
@@ -285,7 +285,7 @@ before we start it the first time. This makes it more homey for long-time `scree
 
 ```sh
 # Run this in your NORMAL user account!
-cp --no-clobber ~/lib/pyroscope/pyrocore/docs/examples/tmux.conf ~/.tmux.conf
+cp --no-clobber ~/lib/pyroscope/docs/examples/tmux.conf ~/.tmux.conf
 ```
 
 ### Starting a tmux Session
