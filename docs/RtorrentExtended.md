@@ -16,6 +16,7 @@
     * [log.messages=«path»](#logmessagespath)
     * [network.history.*=](#networkhistory)
     * [system.env=«name» (merged into 0.9.7 )](#systemenvname-merged-into-097)
+    * [d.is_meta=](#dis_meta)
   * [Backports of git master fixes and features to 0.9.2](#backports-of-git-master-fixes-and-features-to-092)
 
 
@@ -267,6 +268,11 @@ Configuration example:
 ```ini
 session.path.set="$cat=\"$system.env=RTORRENT_HOME\",\"/.session\""
 ```
+
+
+### d.is_meta=
+
+Returns boolean, determines whether a download is meta download of magnet URI.
 
 </dd>
 
