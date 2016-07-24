@@ -19,7 +19,7 @@ BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libsigc++-2.0-dev libssl-dev l
 #export XMLRPC_REV=2626 # Release 1.38.04 2014-07
 
 export CARES_VERSION=1.10.0
-export CURL_VERSION=7.47.1 # 2016-02
+export CURL_VERSION=7.49.0 # 2016-05
 export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 
 case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
@@ -429,6 +429,9 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
 
     # Build it (note that libtorrent patches ALSO influence the "vanilla" version)
     build
+
+    # Remove unnecessary files
+    rm -rf "$INST_DIR/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include,bin/curl,bin/*-config}
 }
 
 clean() { # Clean up generated files
@@ -485,8 +488,6 @@ pkg2deb() { # Package current $PKG_INST_DIR installation [needs fpm]
     rm -rf "$DIST_DIR" || :
     mkdir -p "$DIST_DIR"
 
-    rm -rf "$PKG_INST_DIR/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include} || :
-    rm "$PKG_INST_DIR/bin/"{curl,*-config} || :
     chmod -R a+rX "$PKG_INST_DIR/"
 
     . "$PKG_INST_DIR"/version-info.sh
