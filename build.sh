@@ -23,9 +23,9 @@ export CURL_VERSION=7.47.1 # 2016-02
 export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 
 case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
-    precise|trusty|utopic|wily|wheezy)
+    precise|trusty|utopic|wheezy)
         ;;
-    vivid|xenial|jessie)
+    vivid|wily|xenial|jessie)
         export CARES_VERSION=1.11.0 # 2016-02
         ;;
     NonLinux)
