@@ -186,6 +186,31 @@ pre-built ones at
 `Bintray <https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps>`_.
 
 
+Building git HEAD of rTorrent
+-----------------------------
+
+You can also build the latest source of the main rTorrent project (including its ``libtorrent``),
+with all the settings and rpath linking of the ``rtorrent-ps`` builds.
+
+Start by checking out the two projects as siblings of the ``rtorrent-ps`` workdir.
+Then use these commands to build them:
+
+.. code-block:: bash
+
+    ./build.sh clean_all
+    ./build.sh all
+    ./build.sh git
+
+Just like with the vanilla and extended version, you'll get a ‘branded’ binary
+called ``rtorrent-git``, and a symlink at ``~/bin/rtorrent`` will point to it.
+
+Note however that the new ``libtorrent.so`` is unlikely to work with the
+vanilla and extended code, so they'll be rendered unusable until you rebuild them.
+Doing that will in turn render the git version broken.
+This could be easily avoided if the (ABI) versions were bumped in git
+directly after a release, but alas…
+
+
 Trouble-Shooting
 ----------------
 

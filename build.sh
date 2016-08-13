@@ -377,6 +377,15 @@ build() { # Build and install all components
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INST_DIR install )
 }
 
+build_git() { # Build and install libtorrent and rtorrent from git checkouts
+    ( set +x ; cd ../libtorrent && automagic && \
+        ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INST_DIR install )
+    $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
+    ( set +x ; cd ../rtorrent && automagic && \
+        ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && \
+        $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INST_DIR install )
+}
+
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
 
@@ -529,6 +538,13 @@ case "$1" in
     download)   prep; download ;;
     env)        prep; set +x; set_build_env echo '"';;
     build)      prep; build_everything ;;
+    git|build_git)
+                prep
+                set_build_env
+                build_git
+                symlink_binary -git
+                check
+                ;;
     rtorrent)   prep; core_unpack; NODEPS=true; build_everything ;;
     extend)     prep
                 set_build_env
