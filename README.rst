@@ -228,8 +228,8 @@ Read these instructions:
    and `Font Linking on
    Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
 
-If all else fails, you can add a `configuration
-snippet <http://community.rutorrent.org/RtorrentColorThemes#rT-PS:_8_color_scheme_for_badly_configured_terminals>`_
+If all else fails, you can add a 
+`configuration snippet <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/examples/color_scheme8.rc>`_
 to ``rtorrent.rc`` so that only 8 colors are used.
 
 
