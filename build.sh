@@ -19,8 +19,10 @@ BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libsigc++-2.0-dev libssl-dev l
 #export XMLRPC_REV=2626 # Release 1.38.04 2014-07
 
 export CARES_VERSION=1.10.0
-export CURL_VERSION=7.47.1 # 2016-02
+##export CURL_VERSION=7.47.1 # 2016-02
+export CURL_VERSION=7.51.0 # 2016-11
 export XMLRPC_REV=2775 # Release 1.43.01 2015-10
+# WARNING: see rT issue #457 regarding curl configure options
 
 case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
     precise|trusty|utopic|wheezy)
