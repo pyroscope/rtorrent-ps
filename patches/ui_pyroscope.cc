@@ -563,8 +563,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		char* last = buffer + canvas->width() - 2 + 1;
 		print_download_title(buffer, last, d);
 
-		char progress_str[3] = "##";
-		char ying_yang_str[3] = "##";
+		char progress_str[6] = "##";
+		char ying_yang_str[6] = "##";
 		if (progress_style == 0) {
 			sprintf(progress_str, item->file_list()->completed_chunks() ? "%2.2d" : "--",
 				item->file_list()->completed_chunks() * 100 / item->file_list()->size_chunks());
