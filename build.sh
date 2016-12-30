@@ -120,8 +120,11 @@ test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSI
 # Incompatible patches
 _trackerinfo=0
 
+if [ -z "$PREFIX" ]; then
+    export PREFIX="$HOME"
+fi
 export PKG_INST_DIR="/opt/rtorrent"
-export INST_DIR="$HOME/lib/rtorrent-$RT_VERSION"
+export INST_DIR="$PREFIX/lib/rtorrent-$RT_VERSION"
 
 set_build_env() {
     local dump="$1"
