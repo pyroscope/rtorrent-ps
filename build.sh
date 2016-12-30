@@ -280,9 +280,9 @@ symlink_binary() {
     flavour="$1"
     test -z "$flavour" || ln -f "$binary" "$binary$flavour"
 
-    mkdir -p ~/bin
-    ln -nfs "$binary$flavour" ~/bin/rtorrent-$RT_VERSION
-    test -e ~/bin/rtorrent || ln -s rtorrent-$RT_VERSION ~/bin/rtorrent
+    mkdir -p ${BIN_DIR:-~/bin}
+    ln -nfs "$binary$flavour" ${BIN_DIR:-~/bin}/rtorrent-$RT_VERSION
+    test -e ${BIN_DIR:-~/bin}/rtorrent || ln -s rtorrent-$RT_VERSION ${BIN_DIR:-~/bin}/rtorrent
 }
 
 
@@ -456,12 +456,12 @@ clean_all() { # Remove all downloads and created files
 }
 
 check() { # Print some diagnostic success indicators
-    for i in ~/bin/rtorrent{,-$RT_VERSION}; do
+    for i in ${BIN_DIR:-~/bin}/rtorrent{,-$RT_VERSION}; do
         echo $i "->" $(readlink $i) | sed -e "s:$HOME:~:g"
     done
     echo
     echo -n "Check that static linking worked: "
-    libs=$(ldd ~/bin/rtorrent-$RT_VERSION | egrep "lib(cares|curl|xmlrpc|torrent)")
+    libs=$(ldd ${BIN_DIR:-~/bin}/rtorrent-$RT_VERSION | egrep "lib(cares|curl|xmlrpc|torrent)")
     test -n $(echo "$libs" | grep -v "$INST_DIR") && echo OK || echo FAIL
     echo "$libs" | sed -e "s:$HOME:~:g"
 }
