@@ -109,7 +109,7 @@ if test -z "$1"; then
 fi
 DOMAINNAME=$(sed -re 's%^(https://)?([^/]+)(.*)$%\2%' <<<$1)
 set -x
-openssl s_client -connect ${DOMAINNAME}:443 </dev/null | tee /tmp/${DOMAINNAME}.crt
+openssl s_client -servername ${DOMAINNAME} -connect ${DOMAINNAME}:443 </dev/null | tee /tmp/${DOMAINNAME}.crt
 openssl x509 -inform PEM -in /tmp/${DOMAINNAME}.crt -text -out /usr/share/ca-certificates/${DOMAINNAME}.crt
 grep ${DOMAINNAME}.crt /etc/ca-certificates.conf >/dev/null || echo ${DOMAINNAME}.crt >>/etc/ca-certificates.conf
 update-ca-certificates
