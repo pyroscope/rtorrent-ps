@@ -380,10 +380,13 @@ build() { # Build and install all components
 }
 
 build_git() { # Build and install libtorrent and rtorrent from git checkouts
-    ( set +x ; cd ../libtorrent && automagic && \
+    local lt_src="../rakshasa-libtorrent"; test -d "$lt_src" || lt_src="../libtorrent"
+    local rt_src="../rakshasa-rtorrent"; test -d "$rt_src" || rt_src="../rtorrent"
+
+    ( set +x ; cd "$lt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INST_DIR install )
     $SED_I s:/usr/local:$INST_DIR: $INST_DIR/lib/pkgconfig/*.pc $INST_DIR/lib/*.la
-    ( set +x ; cd ../rtorrent && automagic && \
+    ( set +x ; cd "$rt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INST_DIR/bin/xmlrpc-c-config && \
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INST_DIR install )
 }
