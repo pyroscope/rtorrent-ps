@@ -140,6 +140,7 @@ See the
 `homebrew-rtorrent-ps <https://github.com/pyroscope/homebrew-rtorrent-ps>`_
 repository for instructions to build *rTorrent-PS* and related
 dependencies on Mac OSX.
+*Right now, it is not maintained by anyone.*
 
 
 Installation on Arch Linux
@@ -147,8 +148,10 @@ Installation on Arch Linux
 
 There is an AUR package
 `rtorrent-pyro-git <https://aur.archlinux.org/packages/rtorrent-pyro-git/>`_
-for Arch Linux. If you have problems installing it, contact *the
-maintainer* of the package.
+for Arch Linux. If you have problems installing it,
+contact *the maintainer* of that package.
+It is *not* the same as you get from using ``build.sh``,
+and entirely unsupported by *this* project.
 
 
 Building the Debian Package
@@ -191,6 +194,9 @@ Building git HEAD of rTorrent
 
 You can also build the latest source of the main rTorrent project (including its ``libtorrent``),
 with all the settings and rpath linking of the ``rtorrent-ps`` builds.
+This is intended to be used for checking compatibility of patches with the head of the core project,
+and preparing PRs for it.
+You will *not get a stable system* and these builds are in no way recommended for production use.
 
 Start by checking out the two projects as siblings of the ``rtorrent-ps`` workdir.
 Then use these commands to build them:
@@ -228,7 +234,7 @@ Read these instructions:
    and `Font Linking on
    Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
 
-If all else fails, you can add a 
+If all else fails, you can add a
 `configuration snippet <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/examples/color_scheme8.rc>`_
 to ``rtorrent.rc`` so that only 8 colors are used.
 
