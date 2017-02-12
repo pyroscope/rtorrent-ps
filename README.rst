@@ -216,6 +216,9 @@ Doing that will in turn render the git version broken.
 This could be easily avoided if the (ABI) versions were bumped in git
 directly after a release, but alas…
 
+So if you want to run git HEAD concurrently to release versions,
+use a dedicated user account to build, install, and run it.
+
 
 Trouble-Shooting
 ----------------
