@@ -94,7 +94,7 @@ std::string get_active_tracker_domain(torrent::Download* item) {
         // remove some common cruft
         const char* domain_cruft[] = {
             "tracker", "1.", "2.", "001.", ".",
-            "www.",
+            "www.", "cfdata.",
             0
         };
         for (const char** cruft = domain_cruft; *cruft; cruft++) {
