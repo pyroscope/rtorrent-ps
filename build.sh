@@ -142,7 +142,7 @@ http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
 
 XMLRPC_SVN=true
 case $XMLRPC_REV in
-    2366|2626)
+    2775|2366|2626)
         TARBALLS="$TARBALLS https://bintray.com/artifact/download/pyroscope/rtorrent-ps/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz"
         XMLRPC_SVN=false
         ;;
