@@ -1,0 +1,18 @@
+--- command_pyroscope.cc	2015-07-01 16:45:07.159542127 +0200
++++ command_pyroscope.cc.1	2015-07-01 16:47:02.922527462 +0200
+@@ -45,11 +45,11 @@
+ #include "control.h"
+ #include "command_helpers.h"
+ 
+-#if (RT_HEX_VERSION >= 0x000901)
+-    #define _cxxstd_ tr1
+-#else
++//#if (RT_HEX_VERSION >= 0x000901)
++//    #define _cxxstd_ tr1
++//#else
+     #define _cxxstd_ std
+-#endif
++//#endif
+ 
+ 
+ // handle for message log file
