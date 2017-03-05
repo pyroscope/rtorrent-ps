@@ -235,15 +235,35 @@ Next, a not-so-simple
 is created, it already contains everything needed to use all features of PyroScope
 — you should check at least the first section and adapt the values to your environment.
 Note that most of the settings specific to PyroScope are read from a
-[provided include file](https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-0.8.6.rc).
+[provided include file](https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-pyro.rc).
 
 ```sh
 # Run this in your NORMAL user account!
 export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
 sed -e "s:RT_HOME:$RT_HOME:" <~/lib/pyroscope/docs/examples/rtorrent.rc >$RT_HOME/rtorrent.rc
+touch _rtlocal.rc
 
-# Migrate config to new syntax
-bash ~/lib/pyroscope/src/scripts/migrate_rtorrent_rc.sh $RT_HOME/rtorrent.rc
+curl -L -o /tmp/$USER-pimp-my-box.tgz \
+    "https://github.com/pyroscope/pimp-my-box/archive/master.tar.gz"
+tar -xz --strip-components=5 -f /tmp/$USER-pimp-my-box.tgz \
+    "pimp-my-box-master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d"
+
+( cd rtorrent.d && for i in *.rc; do \
+    sed -i -re 's/\{\{ item }}/'"$i/" -e '/^# !.+!$/d' "$i" \
+            -e 's:~/rtorrent/:'"$RT_HOME/:" -e "s:'rtorrent' user:'$USER' user:"; \
+  done )
+sed -i -re 's/\{\{ inventory_hostname }}/'"$(hostname)/" rtorrent.d/20-session-name.rc
+sed -i -r \
+    -e 's/\{\{ rt_pieces_memory }}/1200M/' \
+    -e 's/\{\{ rt_xmlrpc_size_limit }}/16M/' \
+    -e 's/\{\{ rt_global_up_rate_kb }}/115000/' \
+    -e 's/\{\{ rt_global_down_rate_kb }}/115000/' \
+    -e 's/\{\{ .+rt_system_umask.+ }}/0027/' \
+    -e 's/\{\{ rt_keys_layout }}/qwerty/' \
+    rtorrent.d/20-host-var-settings.rc
+
+# Check that there are no overlooked settings, if yes, edit manually…
+egrep -nH '\{\{.+?}}' rtorrent.d/*.rc
 ```
 
 :bulb: | Change the value of `pyro.extended` to 1 so the extended `rTorrent-PS` features are actually activated!
