@@ -15,7 +15,7 @@ The following is an explanation of the collapsed display of [rTorrent-PS](Rtorre
 or set the default of a view by calling that command in the configuration,
 else you won't ever see it.
 
-![http://i.imgur.com/B9qll.png](http://i.imgur.com/B9qll.png)
+![rt-ps-trackers-view](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-trackers-view.png)
 
 | **Column** | **Description** |
 |:-----------|:----------------|
@@ -64,7 +64,7 @@ branch=pyro.extended=,"schedule = bind_auto_scale,0,0,\"ui.bind_key=download_lis
 
 And you'll get this in your terminal:
 
-![http://i.imgur.com/RUj91.png](http://i.imgur.com/RUj91.png)
+![rt-ps-network-history](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-network-history.png)
 
 As you can see, you get the upper and lower bounds of traffic
 within your configured time window, and each bar of the graph
@@ -157,5 +157,5 @@ ui.color.progress100.set=41
 ui.color.progress120.set="bold bright green"
 ```
 
-| ![http://i.imgur.com/CZ71l.png](http://i.imgur.com/CZ71l.png) |
-|:--------------------------------------------------------------|
+| ![rt-ps-glyphs](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-glyphs.png) |
+|:----|
