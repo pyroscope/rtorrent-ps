@@ -241,7 +241,6 @@ Note that most of the settings specific to PyroScope are read from a
 # Run this in your NORMAL user account!
 export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
 sed -e "s:RT_HOME:$RT_HOME:" <~/lib/pyroscope/docs/examples/rtorrent.rc >$RT_HOME/rtorrent.rc
-touch _rtlocal.rc
 
 curl -L -o /tmp/$USER-pimp-my-box.tgz \
     "https://github.com/pyroscope/pimp-my-box/archive/master.tar.gz"
