@@ -170,9 +170,9 @@ cd rtorrent-ps
 This is what you'll get:
 
 <table border='0'><tr valign='middle'>
-<td><img src='http://i.imgur.com/xCd8z.png' /></td>
+<td><img src='https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-view-thumb.png' /></td>
 <td width='50'></td>
-<td align='center'><a href='http://youtu.be/Bv-oajBgsSU'><img src='http://i.imgur.com/5FPx5.png' /></a><br />rT-PS Demo Video</td>
+<td align='center'><a href='http://youtu.be/Bv-oajBgsSU'><img src='https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/youtube-logo.png' /></a><br />rT-PS Demo Video</td>
 </tr></table>
 
 Note that the unpatched version is still available as `rtorrent-vanilla`,
