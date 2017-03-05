@@ -1,7 +1,5 @@
 # rTorrent-PS Reference
 
-# :bangbang: NOTE THIS PAGE STILL NEEDS TO BE UPDATED TO GITHUB LINKS ETC.
-
 **Contents**
 
   * [Introduction](#introduction)
@@ -17,16 +15,6 @@
     * [network.history.*=](#networkhistory)
     * [system.env=«name» (merged into 0.9.7 )](#systemenvname-merged-into-097)
   * [Backports of git master fixes and features to 0.9.2](#backports-of-git-master-fixes-and-features-to-092)
-
-
-<table border='0'><tr valign='middle'>
-<td><img src='https://pyroscope.googlecode.com/svn/trunk/pyrocore/src/pyrocore/data/img/rt-logo.png' /></td>
-<td width='30px'></td>
-<td><br /><img src='http://i.imgur.com/hAdjM.gif' /></td>
-<td width='10px'></td>
-<td><wiki:gadget url="http://www.ohloh.net/p/346666/widgets/project_users.xml?style=red" height="100"  border="0" /></td>
-<td align='center'><a href='http://youtu.be/Bv-oajBgsSU'><img src='http://i.imgur.com/5FPx5.png' /></a><br />  Demo Video</td>
-</tr></table>
 
 
 ## Introduction
@@ -48,17 +36,28 @@ you'll get an alternative rTorrent executable with the following changes:
  1. show number of registered downloads on the tracker info panel.
 
 You just need to either follow the
-[build instructions](https://github.com/pyroscope/pyroscope/blob/wiki/DebianInstallFromSource.md#build-rtorrent-and-core-dependencies-from-source),
+[build instructions](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md#build-rtorrent-and-core-dependencies-from-source),
 or download and install a package from
 [Bintray](https://bintray.com/pkg/show/general/pyroscope/rtorrent-ps/rtorrent-ps)
 — assuming one is available for your platform.
 
-![http://i.imgur.com/xVSmh.png](http://i.imgur.com/xVSmh.png)
+![rt-ps-screen-3d](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-screen-3d.png)
 
-The new stable rTorrent version **0.9.6** is built by default, but 0.8.9 and 0.8.6 are also supported (but not tested anymore) — also, not all patches are applied equally (depending on whether they're needed, or applicable at all).
-Note that some of these patches are taken from the [AUR package](https://aur.archlinux.org/packages/rtorrent-extended/) provided for [Arch Linux](http://www.archlinux.org/). Also, there is now a [rtorrent-pyro](https://aur.archlinux.org/packages.php?ID=54763) AUR package (which is said to not really work, contact its maintainers with any problems, _not_ me).
+The new stable rTorrent version **0.9.6** is built by default,
+but 0.9.2 and 0.9.4 are also supported (but not tested anymore)
+— also, not all patches are applied equally
+(depending on whether they're needed, or applicable at all).
 
-➽ _Note that you need to read **all** of the following explanations of the user-interface related new commands to get the visual changes set up correctly, since this requires some special setup of your terminal on many machines!_
+Note that some of these patches are taken from
+the [AUR package](https://aur.archlinux.org/packages/rtorrent-extended/)
+provided for [Arch Linux](http://www.archlinux.org/).
+Also, there is now a [rtorrent-pyro](https://aur.archlinux.org/packages.php?ID=54763)
+AUR package (which might break any time due to using rTorrent's HEAD,
+contact its maintainers with any problems, _not_ me).
+
+> ➽ _Note that you need to read **all** of the following explanations of the_
+> _user-interface related new commands to get the visual changes set up correctly,_
+> _since this requires some special setup of your terminal on many machines!_
 
 
 ## Additional features in the standard configuration
@@ -71,14 +70,15 @@ you will get the following additional features in your `rTorrent-PS` installatio
   1. the `t` key is bound to a `trackers` view that shows all items sorted by tracker and then by name.
   1. the `!` key is bound to a `messages` view, listing all items that currently have a non-empty message, sorted in order of the message text.
   1. the `^` key is bound to the `rtcontrol` search result view, so you can easily return to your last search.
+  1. the `u` key shows the uptime and some other essential data of your rTorrent instance.
   1. `*` toggles between the collapsed (as described on [Extended Canvas Explained](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#extended-canvas-explained)) and the expanded display of the current view. <br /><br /> ![http://i.imgur.com/zbAT9.png](http://i.imgur.com/zbAT9.png)
   1. The `active` view is changed to include all incomplete items regardless of whether they have any traffic, and then groups the list into complete, incomplete, and queued items, in that order. Within each group, they're sorted by download and then upload speed.
   1. The commands `s=«keyword»`, `t=«tracker_alias»`, and `f=«filter_condition»` are pre-defined for searching using a Ctrl-X prompt.
   1. The `.` key toggles the membership in the `tagged` view for the item in focus,
      `:` shows the `tagged` view, and `T` clears that view (i.e. removes the tagged state on all items).
      This can be very useful to manually select a few items and then run `rtcontrol` on them,
-     or alternatively use »`--to-view tagged`« to populate the `tagged` view,
-     then deselect some items interactively with the »`.`« key, and finally mass-control the rest.
+     or alternatively use `--to-view tagged` to populate the `tagged` view,
+     then deselect some items interactively with the `.` key, and finally mass-control the rest.
   1. You can use the `purge=` and `cull=` commands (on a Ctrl-X prompt) for deleting the current item and its (incomplete) data.
 
 > ✪ _Do not forget to set the value of `pyro.extended` to 1!_
@@ -236,8 +236,15 @@ or else the first one.
 
 ### ui.current_view= (merged into 0.9.7+)
 
-Returns the currently selected view, the official release only has a setter.
-Needed if you want to use ``-`` as a view name in ``rtcontrol``.
+Returns the currently selected view, the vanilla 0.9.6 release only has a setter.
+
+Needed if you want to use a hyphen ``-`` as a view name in ``rtcontrol``
+to refer to the currently shown view.
+An example for that is passing ``-M-`` as an option, which performs in-place
+filtering of the current view via ``rtcontrol``.
+
+Another use-case for this command is if you want to rotate through a set of views
+via XMLRPC.
 
 
 ### log.messages=«path»
