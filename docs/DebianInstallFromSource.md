@@ -223,7 +223,7 @@ First, create the instance directories and a simple
 ```sh
 # Run this in your NORMAL user account!
 export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
-mkdir -p $RT_HOME/{.session,work,done,log,watch/start,watch/load}
+mkdir -p $RT_HOME/{.session,work,done,log,watch/start,watch/load,watch/hdtv}
 cd $RT_HOME
 cp ~/lib/pyroscope/docs/examples/start.sh ./start
 chmod a+x ./start
