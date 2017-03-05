@@ -232,10 +232,16 @@ chmod a+x ./start
 ### rTorrent Configuration
 Next, a not-so-simple
 [rtorrent.rc](https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rtorrent.rc)
-is created, it already contains everything needed to use all features of PyroScope
-— you should check at least the first section and adapt the values to your environment.
-Note that most of the settings specific to PyroScope are read from a
-[provided include file](https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-pyro.rc).
+is created.
+It already provides everything needed to use all features of PyroScope
+— you should check at least the ``rtorrent.d/20-host-var-settings.rc`` file
+and adapt the values to your environment.
+
+Note that built-in ``pyrocore`` settings are read from a
+[provided include file](https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-pyro.rc)
+that in turn loads snippets from the ``~/.pyroscope/rtorrent.d`` directory.
+The same mechanism is used in the main ``rtorrent.rc`` file,
+so you can easily add your own customizations in new ``rtorrent.d/*.rc`` files.
 
 ```sh
 # Run this in your NORMAL user account!
