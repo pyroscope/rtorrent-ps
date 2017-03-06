@@ -72,6 +72,7 @@ you will get the following additional features in your `rTorrent-PS` installatio
   1. the `^` key is bound to the `rtcontrol` search result view, so you can easily return to your last search.
   1. the `?` key is bound to the `indemand` view, which sorts all open items by their activity, with the most recently active on top.
   1. the `~` key rotates through all available color themes, or a user-selected subset.
+  1. the `<` and `>` keys rotate through all added category views (`pyro.category.add=‹name›`), with filtering based on the ruTorrent label (`custom_1=‹name›`).
   1. the `u` key shows the uptime and some other essential data of your rTorrent instance.
   1. `*` toggles between the collapsed (as described on [Extended Canvas Explained](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#extended-canvas-explained)) and the expanded display of the current view. <br /><br /> ![rt-ps-name-view](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-name-view.png)
   1. The `active` view is changed to include all incomplete items regardless of whether they have any traffic, and then groups the list into complete, incomplete, and queued items, in that order. Within each group, they're sorted by download and then upload speed.
