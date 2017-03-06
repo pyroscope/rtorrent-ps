@@ -164,8 +164,8 @@ cd rtorrent-ps
 
 # check the VERSION SELECTION at the top of the script, and edit as needed,
 # then call BOTH these commands…
-./build.sh all  # build 'rtorrent-vanilla', and then ALSO…
-./build.sh extend  # apply patches and build 'rtorrent-ps' ON TOP of that
+nice time ./build.sh all  # build 'rtorrent-vanilla', and then ALSO…
+nice time ./build.sh extend  # apply patches and build 'rtorrent-ps' ON TOP of that
 ```
 
 This is what you'll get:
