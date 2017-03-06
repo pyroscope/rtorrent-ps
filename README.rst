@@ -240,7 +240,7 @@ Read these instructions:
    Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
 
 If all else fails, you can add a
-`configuration snippet <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/examples/color_scheme8.rc>`_
+`configuration snippet <https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/color-schemes/default-8.rc>`_
 to ``rtorrent.rc`` so that only 8 colors are used.
 
 
