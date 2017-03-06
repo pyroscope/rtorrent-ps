@@ -473,7 +473,7 @@ install() { # Install to $PKG_INST_DIR
     export INST_DIR="$PKG_INST_DIR"
     test -d "$INST_DIR"/. || mkdir -p "$INST_DIR"/
     rm -rf "$INST_DIR"/* || :
-    test "$(echo /opt/rtorrent/*)" = "/opt/rtorrent/*" || fail "Could not clean install dir '$INST_DIR'"
+    test "$(echo $INST_DIR/*)" = "$INST_DIR/*" || fail "Could not clean install dir '$INST_DIR'"
     cat >"$INST_DIR"/version-info.sh <<.
 RT_PS_VERSION=$RT_VERSION
 RT_PS_REVISION=$(date +'%Y%m%d')-$(git rev-parse --short HEAD)
