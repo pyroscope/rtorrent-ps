@@ -71,6 +71,8 @@ combination with ``pyrocore``, on Debian and most Debian-derived distros
 — i.e. a manual way to do parts of what
 `pimp-my-box <https://github.com/pyroscope/pimp-my-box>`_ does
 automatically for you.
+Another option for automatic setup of a similar system is the one by
+`chros73 <https://github.com/chros73/rtorrent-ps_setup/wiki>`_.
 
 
 Installation
