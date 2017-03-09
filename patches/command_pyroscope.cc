@@ -19,10 +19,11 @@
 #include "globals.h"
 
 #include <cstdio>
+#include <climits>
+#include <ctime>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <ctime>
 #include <rak/path.h>
 #include <rak/functional.h>
 #include <rak/functional_fun.h>
@@ -56,6 +57,10 @@
 namespace core {
 int log_messages_fd = -1;
 };
+
+#define RANDOM_STATESIZE 128
+static char system_random_state[RANDOM_STATESIZE];
+static struct random_data system_random_data;
 
 
 // return the "main" tracker for this download item
@@ -176,6 +181,61 @@ torrent::Object apply_compare(rpc::target_type target, const torrent::Object::li
 
     // if all else is equal, ensure stable sort order based on memory location
     return (int64_t) (target.second < target.third);
+}
+
+
+/*  @DOC
+    `system.random = [[<lower>,] <upper>]`
+
+    Generate *uniformly* distributed random numbers in the range
+    defined by `lower`..`upper`.
+
+    The default range is `0`..`RAND_MAX`, providing just one
+    argument sets the upper bound. The range is inclusive.
+
+    An example use-case is adding jitter to time values that you
+    later check with `elapsed.greater`, to avoid load spikes and
+    similar effects of clustered time triggers.
+*/
+torrent::Object apply_random(rpc::target_type target, const torrent::Object::list_type& args) {
+    int64_t lo = 0, hi = RAND_MAX;
+
+    torrent::Object::list_const_iterator itr = args.begin();
+    if (args.size() > 0) {
+        hi = (itr++)->as_value();
+    }
+    if (args.size() > 1) {
+        lo = hi;
+        hi = (itr++)->as_value();
+    }
+    if (args.size() > 2) {
+        throw torrent::input_error("system.random accepts at most two arguments!");
+    }
+    if (lo > hi) {
+        throw torrent::input_error("Empty interval passed to system.random (low > high)!");
+    }
+    if (lo < 0 || RAND_MAX < lo) {
+        throw torrent::input_error("Lower bound of system.random range outside 0..RAND_MAX!");
+    }
+    if (hi < 0 || RAND_MAX < hi) {
+        throw torrent::input_error("Upper bound of system.random range outside 0..RAND_MAX!");
+    }
+
+    int32_t rval;
+    const int64_t range   = 1 + hi - lo;
+    const int64_t buckets = RAND_MAX / range;
+    const int64_t limit   = buckets * range;
+
+    /* Create equal size buckets all in a row, then fire randomly towards
+     * the buckets until you land in one of them. All buckets are equally
+     * likely. If you land off the end of the line of buckets, try again. */
+    do {
+        if (random_r(&system_random_data, &rval) == -1) {
+            throw torrent::input_error("system.random: random_r() failure!");
+        }
+    } while (rval >= limit);
+
+    return (int64_t) lo + (rval / buckets);
 }
 
 
@@ -409,6 +469,9 @@ torrent::Object cmd_ui_current_view() {
 
 
 void initialize_command_pyroscope() {
+    unsigned int seed = cachedTime.usec() ^ (getpid() << 16) ^ getppid();
+    initstate_r(seed, system_random_state, RANDOM_STATESIZE, &system_random_data);
+
 // Backports from 0.9.2
 #if (API_VERSION < 3)
     // https://github.com/rakshasa/rtorrent/commit/b28f2ea8070
@@ -427,6 +490,7 @@ void initialize_command_pyroscope() {
 #endif
 
     CMD2_ANY_LIST("compare", &apply_compare);
+    CMD2_ANY_LIST("system.random", &apply_random);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
