@@ -495,14 +495,8 @@ RT_PS_XMLRPC_REV=$XMLRPC_REV
     #check
 }
 
-pkg2deb() { # Package current $PACKAGE_ROOT installation [needs fpm]
-    # You need to:
-    #   aptitude install ruby ruby-dev
-    #   gem install fpm
-    #   which fpm || ln -s $(ls -1 /var/lib/gems/*/bin/fpm | tail -1) /usr/local/bin
-    test -n "$DEBFULLNAME" || fail "You MUST set DEBFULLNAME in your environment"
-    test -n "$DEBEMAIL" || fail "You MUST set DEBEMAIL in your environment"
-
+package_prep() # make $PACKAGE_ROOT lean and mean
+{
     DIST_DIR=/tmp/rt-ps-dist
     rm -rf "$DIST_DIR" || :
     mkdir -p "$DIST_DIR"
@@ -512,6 +506,18 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation [needs fpm]
     chmod -R a+rX "$PACKAGE_ROOT/"
 
     . "$PACKAGE_ROOT"/version-info.sh
+}
+
+pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
+    # You need to:
+    #   aptitude install ruby ruby-dev
+    #   gem install fpm
+    #   which fpm || ln -s $(ls -1 /var/lib/gems/*/bin/fpm | tail -1) /usr/local/bin
+    test -n "$DEBFULLNAME" || fail "You MUST set DEBFULLNAME in your environment"
+    test -n "$DEBEMAIL" || fail "You MUST set DEBEMAIL in your environment"
+
+    package_prep
+
     deps=$(ldd "$PACKAGE_ROOT"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
 
