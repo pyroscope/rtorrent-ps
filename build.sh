@@ -25,13 +25,13 @@ export CURL_VERSION=7.51.0 # 2016-11
 export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 # WARNING: see rT issue #457 regarding curl configure options
 
-case "$(lsb_release -cs 2>/dev/null || echo NonLinux)" in
+case "$(lsb_release -cs 2>/dev/null || echo NonLSB)" in
     precise|trusty|utopic|wheezy)
         ;;
     vivid|wily|xenial|jessie)
         export CARES_VERSION=1.11.0 # 2016-02
         ;;
-    NonLinux)
+    NonLSB)
         # Place tests for MacOSX etc. here
         BUILD_PKG_DEPS=( )
         echo
