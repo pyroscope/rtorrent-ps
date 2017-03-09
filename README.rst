@@ -148,12 +148,31 @@ dependencies on Mac OSX.
 Installation on Arch Linux
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is an AUR package
+There are now two options contributed by `xsmile <https://github.com/xsmile>`_
+for installing on *Arch* via ``pacman``.
+
+#. The ``pkg2pacman`` command of ``build.sh`` creates a package similar to the
+   Debian one, embedding a tested version combination of dependencies.
+   See *“Building the Debian Package”* for general instructions on building that
+   variant, and use ``pkg2pacman`` instead of ``pkg2deb``.
+#. The *“Arch User Repository”* (AUR) PKG_BUILDs maintained by @xsmile.
+   These use a standard *Arch* build process, but include the usual *rTorrent-PS*
+   patches.
+
+   There is one package for ``libtorrent-ps``, and one for ``rtorrent-ps``,
+   and both take their dependencies from the normal OS packages:
+
+   - https://aur.archlinux.org/packages/libtorrent-ps/
+   - https://aur.archlinux.org/packages/rtorrent-ps/
+
+There is also the
 `rtorrent-pyro-git <https://aur.archlinux.org/packages/rtorrent-pyro-git/>`_
-for Arch Linux. If you have problems installing it,
-contact *the maintainer* of that package.
+AUR package.
 It is *not* the same as you get from using ``build.sh``,
-and entirely unsupported by *this* project.
+and not recommended anymore by *this* project, given the new options above.
+
+If you have problems with building or installing any of these packages,
+contact *their maintainer*.
 
 
 Building the Debian Package
