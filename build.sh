@@ -39,7 +39,7 @@ export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPTS CFG_OPTS_LT CFG_OPTS_RT
 
 # Distro specifics
-case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr \\n '-') in
+case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
         ;;
     *-vivid|*-wily|*-xenial|*-jessie)
