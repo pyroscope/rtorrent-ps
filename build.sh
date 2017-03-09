@@ -7,6 +7,7 @@ export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export SVN=0 # no git support yet!
 
+# Debian-like deps, see below for other distros
 BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev libcppunit-dev locales )
 test "$RT_VERSION" != "0.9.2" || BUILD_PKG_DEPS+=( libsigc++-2.0-dev )
 
@@ -25,6 +26,19 @@ export CURL_VERSION=7.51.0 # 2016-11
 export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 # WARNING: see rT issue #457 regarding curl configure options
 
+# Extra options handling (set overridable defaults)
+: ${PACKAGE_ROOT:=/opt/rtorrent}
+: ${INSTALL_ROOT:=$HOME}
+: ${INSTALL_DIR:=$INSTALL_ROOT/lib/rtorrent-$RT_VERSION}
+: ${BIN_DIR:=$INSTALL_ROOT/bin}
+: ${CURL_OPTS:=-sLS}
+: ${MAKE_OPTS:=}
+: ${CFG_OPTS:=}
+: ${CFG_OPTS_LT:=}
+: ${CFG_OPTS_RT:=}
+export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPTS CFG_OPTS_LT CFG_OPTS_RT
+
+# Distro specifics
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr \\n '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
         ;;
@@ -44,18 +58,6 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr \\n '-') in
         echo
         ;;
 esac
-
-# Extra options handling
-: ${PACKAGE_ROOT:=/opt/rtorrent}
-: ${INSTALL_ROOT:=$HOME}
-: ${INSTALL_DIR:=$INSTALL_ROOT/lib/rtorrent-$RT_VERSION}
-: ${BIN_DIR:=$INSTALL_ROOT/bin}
-: ${CURL_OPTS:=-sLS}
-: ${MAKE_OPTS:=}
-: ${CFG_OPTS:=}
-: ${CFG_OPTS_LT:=}
-: ${CFG_OPTS_RT:=}
-export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPTS CFG_OPTS_LT CFG_OPTS_RT
 
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
