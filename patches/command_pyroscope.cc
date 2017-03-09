@@ -108,25 +108,26 @@ std::string get_active_tracker_domain(torrent::Download* item) {
 
 
 /*  @DOC
-    compare=order,command1=[,...]
+    `compare = <order>, <sort_key>=[, ...]`
 
-        Compares two items like `less=` or `greater=`, but allows to compare
-        by several different sort criteria, and ascending or descending
-        order per given field. The first parameter is a string of order
-        indicators, either `aA+` for ascending or `dD-` for descending.
-        The default, i.e. when there's more fields than indicators, is
-        ascending. Field types other than value or string are treated
-        as equal (or in other words, they're ignored).
+    Compares two items like `less=` or `greater=`, but allows to compare
+    by several different sort criteria, and ascending or descending
+    order per given field. The first parameter is a string of order
+    indicators, either `aA+` for ascending or `dD-` for descending.
+    The default, i.e. when there's more fields than indicators, is
+    ascending. Field types other than value or string are treated
+    as equal (or in other words, they're ignored).
 
-        If all fields are equal, then items are ordered in a random, but
-        stable fashion.
+    If all fields are equal, then items are ordered in a random, but
+    stable fashion.
 
-        Configuration example:
-            # VIEW: Show active and incomplete torrents (in view #9) and update every 20 seconds
-            #       Items are grouped into complete, incomplete, and queued, in that order.
-            #       Within each group, they're sorted by upload and then download speed.
-            view_sort_current = active,"compare=----,d.is_open=,d.complete=,d.up.rate=,d.down.rate="
-            schedule = filter_active,12,20,"view.filter = active,\"or={d.up.rate=,d.down.rate=,not=$d.complete=}\" ;view.sort=active"
+    Configuration example:
+
+        # VIEW: Show active and incomplete torrents (in view #9) and update every 20 seconds
+        #       Items are grouped into complete, incomplete, and queued, in that order.
+        #       Within each group, they're sorted by upload and then download speed.
+        view_sort_current = active,"compare=----,d.is_open=,d.complete=,d.up.rate=,d.down.rate="
+        schedule = filter_active,12,20,"view.filter = active,\"or={d.up.rate=,d.down.rate=,not=$d.complete=}\" ;view.sort=active"
 */
 torrent::Object apply_compare(rpc::target_type target, const torrent::Object::list_type& args) {
     if (!rpc::is_target_pair(target))
