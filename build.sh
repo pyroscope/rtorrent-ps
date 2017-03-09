@@ -530,6 +530,19 @@ package_prep() # make $PACKAGE_ROOT lean and mean
     . "$PACKAGE_ROOT"/version-info.sh
 }
 
+call_fpm() {
+    fpm -s dir -n "${fpm_pkg_name:-rtorrent-ps}" \
+        -v "$RT_PS_VERSION" --iteration "$fpm_iteration" \
+        -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
+        --license "$fpm_license" --vendor "https://github.com/rakshasa" \
+        --description "Patched and extended ncurses BitTorrent client" \
+        --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
+        "$@" -C "$PACKAGE_ROOT/." --prefix "$PACKAGE_ROOT" '.'
+
+    chmod a+rX .
+    chmod a+r  *".$fpm_pkg_ext"
+}
+
 pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
     # You need to:
     #   aptitude install ruby ruby-dev
@@ -538,43 +551,33 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
 
     package_prep
 
+    fpm_pkg_ext="deb"
+    fpm_iteration=$RT_PS_REVISION"~"$(lsb_release -cs)
+    fpm_license="GPL v2"
     deps=$(ldd "$PACKAGE_ROOT"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
 
-    ( cd "$DIST_DIR" && fpm -s dir -t deb -n rtorrent-ps \
-        -v $RT_PS_VERSION --iteration $RT_PS_REVISION"~"$(lsb_release -cs) \
-        -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
-        --license "GPL v2" --vendor "https://github.com/rakshasa" \
-        --description "Patched and extended ncurses BitTorrent client" \
-        --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
-        $deps -C "$PACKAGE_ROOT/." --prefix "$PACKAGE_ROOT" '.')
-    chmod a+rX "$DIST_DIR"
-    chmod a+r  "$DIST_DIR"/*.deb
+    ( cd "$DIST_DIR" && call_fpm -t deb $deps )
 
-    dpkg-deb -c "$DIST_DIR"/*.deb
-    echo "~~~" $(find "$DIST_DIR"/*.deb)
-    dpkg-deb -I "$DIST_DIR"/*.deb
+    dpkg-deb -c       "$DIST_DIR"/*".$fpm_pkg_ext"
+    echo "~~~" $(find "$DIST_DIR"/*".$fpm_pkg_ext")
+    dpkg-deb -I       "$DIST_DIR"/*".$fpm_pkg_ext"
 }
 
 pkg2pacman() { # Package current $PACKAGE_ROOT installation for PACMAN [needs fpm]
     # You need to install fpm from the AUR
 
-    local pkg_ext="tar.xz"
     package_prep
 
-    ( cd "$DIST_DIR" && fpm -s dir -t pacman -n rtorrent-ps \
-       -v $RT_PS_VERSION --iteration ${RT_PS_REVISION//-/.} \
-       -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
-       --license "GPL2" --vendor "https://github.com/rakshasa" \
-       --description "Patched and extended ncurses BitTorrent client" \
-       --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
-       -C "$PACKAGE_ROOT/." --prefix "$PACKAGE_ROOT" '.')
-    chmod a+rX "$DIST_DIR"
-    chmod a+r  "$DIST_DIR"/*."$pkg_ext"
+    fpm_pkg_ext="tar.xz"
+    fpm_iteration="${RT_PS_REVISION//-/.}"
+    fpm_license="GPL2"
 
-    pacman -Qp --info "$DIST_DIR"/*."$pkg_ext"
-    echo "~~~" $(find "$DIST_DIR"/*."$pkg_ext")
-    pacman -Qp --list "$DIST_DIR"/*."$pkg_ext"
+    ( cd "$DIST_DIR" && call_fpm -t pacman )
+
+    pacman -Qp --info "$DIST_DIR"/*".$fpm_pkg_ext"
+    echo "~~~" $(find "$DIST_DIR"/*".$fpm_pkg_ext")
+    pacman -Qp --list "$DIST_DIR"/*".$fpm_pkg_ext"
 }
 
 build_everything() {
