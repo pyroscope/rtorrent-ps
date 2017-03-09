@@ -58,9 +58,65 @@ namespace core {
 int log_messages_fd = -1;
 };
 
+
 #define RANDOM_STATESIZE 128
-static char system_random_state[RANDOM_STATESIZE];
-static struct random_data system_random_data;
+
+class uniform_rng { // Uniform distribution random number generator
+public:
+    uniform_rng() {
+        unsigned int seed = cachedTime.usec() ^ (getpid() << 16) ^ getppid();
+        ::initstate_r(seed, m_state, RANDOM_STATESIZE, &m_data);
+    }
+
+    int rand();
+    int rand_range(int lo, int hi);
+    int rand_below(int limit) { return this->rand_range(0, limit); }
+
+private:
+    char m_state[RANDOM_STATESIZE];
+    struct random_data m_data;
+};
+
+// return random number in interval [0, RAND_MAX]
+int uniform_rng::rand()
+{
+    int rval;
+    if (::random_r(&m_data, &rval) == -1) {
+        throw torrent::input_error("system.random: random_r() failure!");
+    }
+    return rval;
+}
+
+// return random number in interval [lo, hi]
+int uniform_rng::rand_range(int lo, int hi)
+{
+    if (lo > hi) {
+        throw torrent::input_error("Empty interval passed to rand_range (low > high)");
+    }
+    if (lo < 0 || RAND_MAX < lo) {
+        throw torrent::input_error("Lower bound of rand_range outside 0..RAND_MAX");
+    }
+    if (hi < 0 || RAND_MAX < hi) {
+        throw torrent::input_error("Upper bound of rand_range outside 0..RAND_MAX");
+    }
+
+    int rval;
+    const int64_t range   = 1 + hi - lo;
+    const int64_t buckets = RAND_MAX / range;
+    const int64_t limit   = buckets * range;
+
+    /* Create equal size buckets all in a row, then fire randomly towards
+     * the buckets until you land in one of them. All buckets are equally
+     * likely. If you land off the end of the line of buckets, try again. */
+    do {
+        rval = this->rand();
+    } while (rval >= limit);
+
+    return (int) (lo + (rval / buckets));
+}
+
+
+static uniform_rng* system_random_gen = 0;
 
 
 // return the "main" tracker for this download item
@@ -211,31 +267,8 @@ torrent::Object apply_random(rpc::target_type target, const torrent::Object::lis
     if (args.size() > 2) {
         throw torrent::input_error("system.random accepts at most two arguments!");
     }
-    if (lo > hi) {
-        throw torrent::input_error("Empty interval passed to system.random (low > high)!");
-    }
-    if (lo < 0 || RAND_MAX < lo) {
-        throw torrent::input_error("Lower bound of system.random range outside 0..RAND_MAX!");
-    }
-    if (hi < 0 || RAND_MAX < hi) {
-        throw torrent::input_error("Upper bound of system.random range outside 0..RAND_MAX!");
-    }
 
-    int32_t rval;
-    const int64_t range   = 1 + hi - lo;
-    const int64_t buckets = RAND_MAX / range;
-    const int64_t limit   = buckets * range;
-
-    /* Create equal size buckets all in a row, then fire randomly towards
-     * the buckets until you land in one of them. All buckets are equally
-     * likely. If you land off the end of the line of buckets, try again. */
-    do {
-        if (random_r(&system_random_data, &rval) == -1) {
-            throw torrent::input_error("system.random: random_r() failure!");
-        }
-    } while (rval >= limit);
-
-    return (int64_t) lo + (rval / buckets);
+    return (int64_t) system_random_gen->rand_range(lo, hi);
 }
 
 
@@ -469,8 +502,7 @@ torrent::Object cmd_ui_current_view() {
 
 
 void initialize_command_pyroscope() {
-    unsigned int seed = cachedTime.usec() ^ (getpid() << 16) ^ getppid();
-    initstate_r(seed, system_random_state, RANDOM_STATESIZE, &system_random_data);
+    system_random_gen = new uniform_rng();
 
 // Backports from 0.9.2
 #if (API_VERSION < 3)
