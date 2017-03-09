@@ -162,6 +162,10 @@ mkdir -p ~/src/; cd ~/src/
 git clone https://github.com/pyroscope/rtorrent-ps.git
 cd rtorrent-ps
 
+# Use this if you have the resources, adapt for the number of cores
+# and the amount of free memory you have available.
+export MAKE_OPTS="-j4"
+
 # check the VERSION SELECTION at the top of the script, and edit as needed,
 # then call BOTH these commands…
 nice time ./build.sh all  # build 'rtorrent-vanilla', and then ALSO…
