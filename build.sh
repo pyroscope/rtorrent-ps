@@ -533,7 +533,7 @@ package_prep() # make $PACKAGE_ROOT lean and mean
 call_fpm() {
     fpm -s dir -n "${fpm_pkg_name:-rtorrent-ps}" \
         -v "$RT_PS_VERSION" --iteration "$fpm_iteration" \
-        -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
+        -m "\"$DEBFULLNAME\" <$DEBEMAIL>" \
         --license "$fpm_license" --vendor "https://github.com/rakshasa" \
         --description "Patched and extended ncurses BitTorrent client" \
         --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
@@ -557,7 +557,7 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
     deps=$(ldd "$PACKAGE_ROOT"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
 
-    ( cd "$DIST_DIR" && call_fpm -t deb $deps )
+    ( cd "$DIST_DIR" && call_fpm -t deb --category "net" $deps )
 
     dpkg-deb -c       "$DIST_DIR"/*".$fpm_pkg_ext"
     echo "~~~" $(find "$DIST_DIR"/*".$fpm_pkg_ext")
