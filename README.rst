@@ -108,7 +108,7 @@ Installation Using Debian Packages
 For a limited set of Debian-derived platforms, there are packages
 available that contain pre-compiled binaries (and only those, no
 configuration or init scripts). You can download and install such a
-package from `Bintray <https://bintray.com/pyroscope/rtorrent-ps>`_ —
+package from `Bintray`_ —
 assuming one is available for your platform. The packages install the
 *rTorrent-PS* binary including some libraries into ``/opt/rtorrent``.
 
@@ -187,8 +187,7 @@ Finally, ``./build.sh pkg2deb`` creates the Debian package in ``/tmp``.
 The script expects the packager's name and email in the usual
 environment variables, namely ``DEBFULLNAME`` and ``DEBEMAIL``. For a
 few platforms (recent Debian, Ubuntu, and Raspbian), you can find
-pre-built ones at
-`Bintray <https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps>`_.
+pre-built ones at `Bintray`_.
 
 
 Building git HEAD of rTorrent
@@ -251,3 +250,4 @@ References
 -  `rTorrent Community Wiki <http://community.rutorrent.org/>`_
 
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
+.. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
