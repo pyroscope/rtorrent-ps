@@ -25,11 +25,16 @@ export CURL_VERSION=7.51.0 # 2016-11
 export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 # WARNING: see rT issue #457 regarding curl configure options
 
-case "$(lsb_release -cs 2>/dev/null || echo NonLSB)" in
-    precise|trusty|utopic|wheezy)
+case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr \\n '-') in
+    *-precise|*-trusty|*-utopic|*-wheezy)
         ;;
-    vivid|wily|xenial|jessie)
+    *-vivid|*-wily|*-xenial|*-jessie)
         export CARES_VERSION=1.11.0 # 2016-02
+        ;;
+    Arch-*) # 0.9.[46] only!
+        BUILD_PKG_DEPS=( ncurses openssl cppunit )
+        source /etc/makepkg.conf 2>/dev/null
+        MAKE_OPTS="${MAKEFLAGS}${MAKE_OPTS:+ }${MAKE_OPTS}"
         ;;
     NonLSB)
         # Place tests for MacOSX etc. here
@@ -221,11 +226,23 @@ check_deps() {
             exit 1
         fi
     done
+
+    local have_dep=''
+    local installer=''
+
     if which dpkg >/dev/null; then
-        for dep in ${BUILD_PKG_DEPS[@]}; do
-            if ! dpkg -l "$dep" >/dev/null; then
+        have_dep='dpkg -l'
+        installer='apt-get install'
+    elif which pacman >/dev/null; then
+        have_dep='pacman -Q'
+        installer='pacman -S'
+    fi
+
+    if test -n "$installer"; then
+        for dep in "${BUILD_PKG_DEPS[@]}"; do
+            if ! $have_dep "$dep" >/dev/null; then
                 echo "You don't have the '$dep' package installed, you likely need to:"
-                bold "    sudo apt-get install $dep"
+                bold "    sudo $installer $dep"
                 exit 1
             fi
         done
@@ -497,6 +514,9 @@ RT_PS_XMLRPC_REV=$XMLRPC_REV
 
 package_prep() # make $PACKAGE_ROOT lean and mean
 {
+    test -n "$DEBFULLNAME" || fail "You MUST set DEBFULLNAME in your environment"
+    test -n "$DEBEMAIL" || fail "You MUST set DEBEMAIL in your environment"
+
     DIST_DIR=/tmp/rt-ps-dist
     rm -rf "$DIST_DIR" || :
     mkdir -p "$DIST_DIR"
@@ -513,8 +533,6 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
     #   aptitude install ruby ruby-dev
     #   gem install fpm
     #   which fpm || ln -s $(ls -1 /var/lib/gems/*/bin/fpm | tail -1) /usr/local/bin
-    test -n "$DEBFULLNAME" || fail "You MUST set DEBFULLNAME in your environment"
-    test -n "$DEBEMAIL" || fail "You MUST set DEBEMAIL in your environment"
 
     package_prep
 
@@ -529,11 +547,32 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
         --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
         $deps -C "$PACKAGE_ROOT/." --prefix "$PACKAGE_ROOT" '.')
     chmod a+rX "$DIST_DIR"
-    chmod a+r "$DIST_DIR"/*.deb
+    chmod a+r  "$DIST_DIR"/*.deb
 
     dpkg-deb -c "$DIST_DIR"/*.deb
     echo "~~~" $(find "$DIST_DIR"/*.deb)
     dpkg-deb -I "$DIST_DIR"/*.deb
+}
+
+pkg2pacman() { # Package current $PACKAGE_ROOT installation for PACMAN [needs fpm]
+    # You need to install fpm from the AUR
+
+    local pkg_ext="tar.xz"
+    package_prep
+
+    ( cd "$DIST_DIR" && fpm -s dir -t pacman -n rtorrent-ps \
+       -v $RT_PS_VERSION --iteration ${RT_PS_REVISION//-/.} \
+       -m "\"$DEBFULLNAME\" <$DEBEMAIL>" --category "net" \
+       --license "GPL2" --vendor "https://github.com/rakshasa" \
+       --description "Patched and extended ncurses BitTorrent client" \
+       --url "https://github.com/pyroscope/rtorrent-ps#rtorrent-ps" \
+       -C "$PACKAGE_ROOT/." --prefix "$PACKAGE_ROOT" '.')
+    chmod a+rX "$DIST_DIR"
+    chmod a+r  "$DIST_DIR"/*."$pkg_ext"
+
+    pacman -Qp --info "$DIST_DIR"/*."$pkg_ext"
+    echo "~~~" $(find "$DIST_DIR"/*."$pkg_ext")
+    pacman -Qp --list "$DIST_DIR"/*."$pkg_ext"
 }
 
 build_everything() {
@@ -575,6 +614,7 @@ case "$1" in
     check)      check ;;
     install)    install;;
     pkg2deb)    pkg2deb;;
+    pkg2pacman) pkg2pacman;;
     *)
         echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
         echo >&2 "Build rTorrent $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"
