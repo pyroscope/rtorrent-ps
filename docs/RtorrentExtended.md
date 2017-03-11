@@ -268,6 +268,38 @@ See the
 page on how to use them.
 
 
+### trackers.alias.set_key=«domain»,«alias»
+
+Sets an alias that replaces the given domain, when displayed on the right of the collapsed canvas.
+
+Configuration example:
+
+```ini
+trackers.alias.set_key = bttracker.debian.org, Debian
+```
+
+
+### trackers.alias.items=
+
+Returns all the mappings in the form ``«domain»=«alias»`` as a list.
+Note that domains that were not explicitly defined so far, but shown previously,
+are also contained in the list, with an empty alias.
+
+Example that prints all the domains and their aliases as commands that define them:
+
+```sh
+rtxmlrpc trackers.alias.items | tr = , | sed -re s/^/trackers.alias.set_key=/ \
+    | tee >~/rtorrent/rtorrent.d/tracker-aliases.rc
+```
+
+This also dumps them into the ``tracker-aliases.rc`` file to persist your mappings,
+and also make them easily editable. To reload edited alias definitions, use this:
+
+```sh
+rtxmlrpc "try_import=,~/rtorrent/rtorrent.d/tracker-aliases.rc"
+```
+
+
 ### system.env=«name» (merged into 0.9.7+)
 
 Returns the value of the given environment variable, or an empty string if it does not exist.
@@ -277,10 +309,6 @@ Configuration example:
 ```ini
 session.path.set="$cat=\"$system.env=RTORRENT_HOME\",\"/.session\""
 ```
-
-</dd>
-
-</dl>
 
 
 ## Backports of git `master` fixes and features to 0.9.2
