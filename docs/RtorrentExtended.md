@@ -284,8 +284,11 @@ trackers.alias.set_key = bttracker.debian.org, Debian
 ### trackers.alias.items=
 
 Returns all the mappings in the form ``«domain»=«alias»`` as a list.
+
 Note that domains that were not explicitly defined so far, but shown previously,
 are also contained in the list, with an empty alias.
+So to create a list for you to fill in the aliases, scroll through all your items
+on ``main`` or ``trackers``, so you can dump the domains of all loaded items.
 
 Example that prints all the domains and their aliases as commands that define them:
 
