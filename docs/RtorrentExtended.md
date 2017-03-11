@@ -9,10 +9,12 @@
     * [ui.bind_key=display,key,"command1=[,...]"](#uibind_keydisplaykeycommand1)
     * [view.collapsed.toggle=«VIEW NAME»](#viewcollapsedtoggleview-name)
     * [ui.color.«TYPE».set="«COLOR DEF»"](#uicolortypesetcolor-def)
-    * [d.tracker_domain=](#dtracker_domain)
     * [ui.current_view= (merged into 0.9.7 )](#uicurrent_view-merged-into-097)
     * [log.messages=«path»](#logmessagespath)
     * [network.history.*=](#networkhistory)
+    * [d.tracker_domain=](#dtracker_domain)
+    * [trackers.alias.set_key=«domain»,«alias»](#trackersaliasset_keydomainalias)
+    * [trackers.alias.items=](#trackersaliasitems)
     * [system.env=«name» (merged into 0.9.7 )](#systemenvname-merged-into-097)
   * [Backports of git master fixes and features to 0.9.2](#backports-of-git-master-fixes-and-features-to-092)
 
@@ -230,13 +232,6 @@ an example output using Gnome's terminal looks like the following...
 ![xterm-256-color](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/xterm-256-color.png)
 
 
-### d.tracker_domain=
-
-Returns the (shortened) <i>tracker domain</i> of the given download item.
-The chosen tracker is the first HTTP one with active peers (seeders or leechers),
-or else the first one.
-
-
 ### ui.current_view= (merged into 0.9.7+)
 
 Returns the currently selected view, the vanilla 0.9.6 release only has a setter.
@@ -266,6 +261,13 @@ The commands added are ``network.history.depth[.set]=``,  ``network.history.samp
 See the
 [Extended Canvas Explained](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#extended-canvas-explained)
 page on how to use them.
+
+
+### d.tracker_domain=
+
+Returns the (shortened) <i>tracker domain</i> of the given download item.
+The chosen tracker is the first HTTP one with active peers (seeders or leechers),
+or else the first one.
 
 
 ### trackers.alias.set_key=«domain»,«alias»
