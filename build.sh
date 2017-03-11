@@ -479,7 +479,7 @@ clean() { # Clean up generated files
 }
 
 clean_all() { # Remove all downloads and created files
-    rm tarballs/*.tar.gz tarballs/DONE >/dev/null || :
+    rm tarballs/*.tar.gz tarballs/DONE >/dev/null 2>&1 || :
     for i in $SUBDIRS; do
         test ! -d $i || rm -rf $i >/dev/null
     done
