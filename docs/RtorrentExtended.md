@@ -293,8 +293,9 @@ on ``main`` or ``trackers``, so you can dump the domains of all loaded items.
 Example that prints all the domains and their aliases as commands that define them:
 
 ```sh
-rtxmlrpc trackers.alias.items | tr = , | sed -re s/^/trackers.alias.set_key=/ \
-    | tee >~/rtorrent/rtorrent.d/tracker-aliases.rc
+rtxmlrpc trackers.alias.items \
+    | sed -r -e 's/=/, "/' -e 's/^/trackers.alias.set_key = /' -e 's/$/"/' \
+    | tee ~/rtorrent/rtorrent.d/tracker-aliases.rc
 ```
 
 This also dumps them into the ``tracker-aliases.rc`` file to persist your mappings,
