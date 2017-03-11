@@ -5,11 +5,11 @@
 |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ## rTorrent-PS colorized canvas
-| ![http://i.imgur.com/C5j8Z.png](http://i.imgur.com/C5j8Z.png) |
+| ![rt-ps-expanded-view.png](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-expanded-view.png) |
 |:--------------------------------------------------------------|
 
 ## rTorrent-PS collapsed download list
-| ![http://i.imgur.com/5QMjL.png](http://i.imgur.com/5QMjL.png) |
+| ![rt-ps-name-view.png](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-name-view.png) |
 |:--------------------------------------------------------------|
 
 ## HTML status display
@@ -29,7 +29,7 @@
 |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ## Item selection, and file listings
-| ![rtcontrol-files.png](http://freshmeat.net/screenshots/6d/13/6d139b5f84a3deb1c05355f3ad3f7534_medium.png) |
+| ![rtcontrol-files.png](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rtcontrol-files.png) |
 |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ## Statistical plots using GNU Octave
