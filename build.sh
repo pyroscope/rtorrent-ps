@@ -433,7 +433,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Patch libtorrent
     pushd libtorrent-$LT_VERSION
 
-    for backport in $SRC_DIR/patches/{backport,trac,misc}_${LT_VERSION%-svn}_*.patch; do
+    for backport in $SRC_DIR/patches/{backport,trac,misc}_{${LT_VERSION%-svn},all}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -479,7 +479,7 @@ clean() { # Clean up generated files
 }
 
 clean_all() { # Remove all downloads and created files
-    rm tarballs/*.tar.gz tarballs/DONE >/dev/null || :
+    test ! -d tarballs || rm tarballs/*.tar.gz tarballs/DONE >/dev/null || :
     for i in $SUBDIRS; do
         test ! -d $i || rm -rf $i >/dev/null
     done
