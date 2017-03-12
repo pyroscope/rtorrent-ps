@@ -66,10 +66,9 @@ These are the only steps that must be performed by the `root` user
 (i.e. in a root shell, or by writing `sudo` before the actual command):
 
 ```sh
-apt-get install tmux curl wget build-essential git \
+apt-get install tmux curl wget build-essential git locales \
     python-setuptools python-virtualenv python-dev \
-    libsigc++-2.0-dev libssl-dev \
-    libncurses-dev libncursesw5-dev locales libcppunit-dev \
+    libssl-dev libncurses-dev libncursesw5-dev libcppunit-dev \
     autoconf automake libtool \
     libxml2-dev libxslt1-dev
 ```
