@@ -12,7 +12,8 @@
 
 The following is an explanation of the collapsed display of [rTorrent-PS](RtorrentExtended.md)
 — remember that you need to bind a key to the `view.collapsed.toggle` command,
-or set the default of a view by calling that command in the configuration,
+or set the default of a view by
+[calling that command in the configuration](https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/collapse-built-in-views.rc),
 else you won't ever see it.
 
 ![rt-ps-trackers-view](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-trackers-view.png)
