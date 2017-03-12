@@ -252,7 +252,7 @@ export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
 ~/lib/pyroscope/src/scripts/make-rtorrent-config.sh
 ```
 
-:bulb: | Change the value of `pyro.extended` to 1 so the extended `rTorrent-PS` features are actually activated!
+:bulb: | In ``rtorrent.rc``, change the value of `pyro.extended` to 1 so the extended `rTorrent-PS` features are actually activated!
 ---: | :---
 
 
