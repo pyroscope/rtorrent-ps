@@ -503,10 +503,13 @@ check() { # Print some diagnostic success indicators
     for i in "$BIN_DIR"/rtorrent{,-$RT_VERSION}; do
         echo $i "->" $(readlink $i) | sed -e "s:$HOME:~:g"
     done
+
+    # This first selects the rpath dependencies, and then filters out libs found in the install dirs.
+    # If anything is left, we have an external dependency that sneaked in.
     echo
     echo -n "Check that static linking worked: "
     libs=$(ldd "$BIN_DIR"/rtorrent-$RT_VERSION | egrep "lib(cares|curl|xmlrpc|torrent)")
-    test -n $(echo "$libs" | grep -v "$INSTALL_DIR") && echo OK || echo FAIL
+    test -n "$(echo "$libs" | grep -v "$INSTALL_DIR" | grep -v "$INSTALL_RELEASE_DIR")" && echo OK || echo FAIL
     echo "$libs" | sed -e "s:$HOME:~:g"
 }
 
