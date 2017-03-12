@@ -266,7 +266,9 @@ References
 ----------
 
 -  https://github.com/rakshasa/rtorrent
--  `rTorrent Community Wiki <http://community.rutorrent.org/>`_
+-  `rTorrent Documentation Wiki`_
 
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
+.. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
+.. _`rTorrent Community Wiki`: http://community.rutorrent.org/
