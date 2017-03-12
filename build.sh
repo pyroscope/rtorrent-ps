@@ -414,6 +414,11 @@ build() { # Build and install all components
 }
 
 build_git() { # Build and install libtorrent and rtorrent from git checkouts
+    # Start script should contain:
+    #
+    #   BIN="$HOME/src/rakshasa-rtorrent/src/"; LD_PRELOAD=$HOME/lib/rtorrent-0.9.7/lib/libtorrent.so.19 \
+    #   ${BIN}rtorrent -n -o import=$PWD/rtorrent.rc
+
     local lt_src="../rakshasa-libtorrent"; test -d "$lt_src" || lt_src="../libtorrent"
     local rt_src="../rakshasa-rtorrent"; test -d "$rt_src" || rt_src="../rtorrent"
 
