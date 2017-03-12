@@ -46,7 +46,7 @@ which means you can easily delete any installed software, and also run several v
 
 For shared multi-user setups, this works fine also — compile and install to `/opt/rtorrent`
 using `./build.sh install`, then provide access to all users by calling `chmod -R go+rX /opt/rtorrent`.
-Perform the steps from *rTorrent Configuration* onwards for each user repeatedly,
+Perform the steps from *PyroScope Installation* onwards for each user repeatedly,
 so they get their own instance.
 
 :computer: | Most of the command blocks further below can be cut & pasted wholesale into a terminal. Note that `bash` _here documents_ (`... <<'EOF'`) **MUST** be pasted at once, up to and including the line having a single `EOF` on it.
