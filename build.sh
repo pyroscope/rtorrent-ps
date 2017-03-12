@@ -428,7 +428,7 @@ build_git() { # Build and install libtorrent and rtorrent from git checkouts
 
     echo; echo "*** Entering $rt_src"
     ( set +x ; cd "$rt_src" && automagic && \
-        ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INSTALL_DIR/bin/xmlrpc-c-config && \
+        ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INSTALL_RELEASE_DIR/bin/xmlrpc-c-config && \
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
 }
 
