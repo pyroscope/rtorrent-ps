@@ -16,6 +16,7 @@
     * [trackers.alias.set_key=«domain»,«alias»](#trackersaliasset_keydomainalias)
     * [trackers.alias.items=](#trackersaliasitems)
     * [system.env=«name» (merged into 0.9.7 )](#systemenvname-merged-into-097)
+    * [system.random=[[«lower»,]«upper»]](#systemrandomlowerupper)
   * [Backports of git master fixes and features to 0.9.2](#backports-of-git-master-fixes-and-features-to-092)
 
 
@@ -315,6 +316,20 @@ Configuration example:
 ```ini
 session.path.set="$cat=\"$system.env=RTORRENT_HOME\",\"/.session\""
 ```
+
+
+### system.random=[[«lower»,]«upper»]
+
+Generate *uniformly* distributed random numbers in the range
+defined by `lower`..`upper`.
+
+The default range with no args is `0`..`RAND_MAX`. Providing
+just one argument sets an *exclusive* upper bound, and two
+arguments define an *inclusive*  range.
+
+An example use-case is adding jitter to time values that you
+later check with `elapsed.greater`, to avoid load spikes and
+similar effects of clustered time triggers.
 
 
 ## Backports of git `master` fixes and features to 0.9.2
