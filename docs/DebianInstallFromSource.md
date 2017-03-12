@@ -34,7 +34,7 @@ While the package names and the use of `apt-get` are somewhat dependant on
 Debian, the _Preparatory Steps_ commands which are executed under `root`
 are similar for other distributions, and the compilation instructions should
 work as-is on practically any Linux and (F)BSD. These instructions are explicitly
-known to work on *Debian Jessie*, and *Ubuntu Lucid + Precise*.
+known to work on *Debian Jessie*, and *Ubuntu Trusty + Xenial*.
 
 :book: | If you don't understand a word of what follows, hit [The Debian Administrator's Handbook](http://static.debian-handbook.info/browse/stable/short-remedial-course.html) so then you do.
 ---: | :---
