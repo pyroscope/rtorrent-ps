@@ -3,9 +3,13 @@
 # Build rTorrent including patches
 #
 
+now_iso="$(date +'%Y%m%d-%H%M')"
+git_id="$(git describe --long --tags --dirty="-$now_iso")"
+
 export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
-export SVN=0 # no git support yet!
+export GIT_MINOR=$(( $RT_MINOR + 1 ))  # ensure git version has a bumped version number
+export VERSION_EXTRAS=" $git_id"
 
 # Debian-like deps, see below for other distros
 BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev libcppunit-dev locales )
@@ -127,20 +131,34 @@ test -d rtorrent-0.9.2 && { export LT_VERSION=0.13.2; export RT_VERSION=0.9.2; }
 test -d rtorrent-0.9.4 && { export LT_VERSION=0.13.4; export RT_VERSION=0.9.4; }
 test -d rtorrent-0.9.5 && { export LT_VERSION=0.13.5; export RT_VERSION=0.9.5; }
 test -d rtorrent-0.9.6 && { export LT_VERSION=0.13.6; export RT_VERSION=0.9.6; }
-test -d SVN-HEAD -o ${SVN:-0} = 1 && { export LT_VERSION=0.12.9; export RT_VERSION=0.8.9-svn; export SVN=1; }
+BUILD_GIT=false
 
 # Incompatible patches
 _trackerinfo=0
 
 set_build_env() {
-    local dump="$1"
-    local quot="$2"
+    export CPPFLAGS="-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
+    export CXXFLAGS="$CFLAGS"
+    export LDFLAGS="-L$INSTALL_RELEASE_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
+    export LIBS="${LIBS}"
+    export PKG_CONFIG_PATH="$INSTALL_RELEASE_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
 
-    $dump export CPPFLAGS="$quot-I $INSTALL_DIR/include${CPPFLAGS:+ }${CPPFLAGS}$quot"
-    $dump export CXXFLAGS="$quot$CFLAGS$quot"
-    $dump export LDFLAGS="$quot-L$INSTALL_DIR/lib${LDFLAGS:+ }${LDFLAGS}$quot"
-    $dump export LIBS="$quot${LIBS}$quot"
-    $dump export PKG_CONFIG_PATH="$quot$INSTALL_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}$quot"
+    local git_tag=''
+    if $BUILD_GIT; then
+        git_tag=' [GIT]'
+
+        CPPFLAGS="-I $INSTALL_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
+        LDFLAGS="-L$INSTALL_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
+        PKG_CONFIG_PATH="$INSTALL_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+ }${PKG_CONFIG_PATH}"
+    fi
+
+    echo "!!! Installing rTorrent$VERSION_EXTRAS v$RT_VERSION$git_tag into $INSTALL_DIR !!!"; echo
+
+    printf "export CPPFLAGS=%q\n"           "${CPPFLAGS}"
+    printf "export CXXFLAGS=%q\n"           "$CFLAGS"
+    printf "export LDFLAGS=%q\n"            "${LDFLAGS}"
+    printf "export LIBS=%q\n"               "${LIBS}"
+    printf "export PKG_CONFIG_PATH=%q\n"    "${PKG_CONFIG_PATH}"
 }
 
 SELF_URL=https://github.com/pyroscope/rtorrent-ps.git
@@ -163,7 +181,7 @@ esac
 #   http://rtorrent.net/downloads/
 #   http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/
 #   http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/
-test ${SVN:-0} = 0 && TARBALLS=$(cat <<.
+TARBALLS=$(cat <<.
 $TARBALLS
 https://bintray.com/artifact/download/pyroscope/rtorrent-ps/libtorrent-$LT_VERSION.tar.gz
 https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION.tar.gz
@@ -192,12 +210,11 @@ ESC=$(echo -en \\0033)
 BOLD="$ESC[1m"
 OFF="$ESC[0m"
 
-echo "${BOLD}Environment for building rTorrent $RT_VERSION/$LT_VERSION$OFF"
+echo "${BOLD}Environment for building rTorrent$VERSION_EXTRAS $RT_VERSION/$LT_VERSION$OFF"
 printf 'export PACKAGE_ROOT=%q\n'   "$PACKAGE_ROOT"
 printf 'export INSTALL_ROOT=%q\n'   "$INSTALL_ROOT"
 printf 'export INSTALL_DIR=%q\n'    "$INSTALL_DIR"
 printf 'export BIN_DIR=%q\n'        "$BIN_DIR"
-set_build_env echo '"'
 printf 'export CURL_OPTS=%q\n'      "$CURL_OPTS"
 printf 'export MAKE_OPTS=%q\n'      "$MAKE_OPTS"
 printf 'export CFG_OPTS=%q\n'       "$CFG_OPTS"
@@ -319,7 +336,18 @@ symlink_binary() {
 prep() {
     # Create directories
     check_deps
-    mkdir -p $INSTALL_DIR/{bin,include,lib,man,share}
+
+    # Properly bump version, even if upstream doesn't
+    INSTALL_RELEASE_DIR="${INSTALL_DIR}"
+    if $BUILD_GIT; then
+        RT_RELEASE_VERSION="$RT_VERSION"
+        RT_VERSION="${RT_RELEASE_VERSION/%.$RT_MINOR/.$GIT_MINOR}"
+        INSTALL_DIR="${INSTALL_RELEASE_DIR//$RT_RELEASE_VERSION/$RT_VERSION}"
+
+        mkdir -p $INSTALL_DIR/{bin,include,lib,man,share}
+    fi
+
+    mkdir -p $INSTALL_RELEASE_DIR/{bin,include,lib,man,share}
     mkdir -p tarballs
 }
 
@@ -339,12 +367,6 @@ download() { # Download and unpack sources
         test -d $tarball_dir || fail "Tarball ${url_base} could not be unpacked"
     done
 
-    if test ${SVN:-0} = 1 -a ! -d SVN-HEAD; then
-        svn co svn://rakshasa.no/libtorrent/trunk SVN-HEAD
-        ln -nfs SVN-HEAD/libtorrent libtorrent-$LT_VERSION
-        ln -nfs SVN-HEAD/rtorrent rtorrent-$RT_VERSION
-    fi
-
     tar xfz patches/rtorrent-extended.tar.gz
 
     touch tarballs/DONE
@@ -360,18 +382,9 @@ automagic() {
     ./autogen.sh
 }
 
-tag_svn_rev() {
-    if test ${SVN:-0} = 1; then
-        svnrev=$(export LANG=en_US.UTF8 && svn info SVN-HEAD/ | grep ^Revision | cut -f2 -d":" | tr -d " ")
-        $SED_I "s% VERSION \"/\"% VERSION \" r$svnrev/\"%" rtorrent-$RT_VERSION/src/ui/download_list.cc
-    fi
-}
-
 build_deps() {
     # Build direct dependencies
     test -e $SRC_DIR/tarballs/DONE || fail "You need to '$0 download' first!"
-
-    tag_svn_rev
 
     ( cd c-ares-$CARES_VERSION && ./configure && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
@@ -387,14 +400,8 @@ build_deps() {
 core_unpack() { # Unpack original LT/RT source
     test -e $INSTALL_DIR/lib/libxmlrpc.a || fail "You need to '$0 build' first!"
 
-    if test ${SVN:-0} = 0; then
-        tar xfz tarballs/libtorrent-$LT_VERSION.tar.gz
-        tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
-    else
-        # TODO: libtorrent
-        ( cd rtorrent-$RT_VERSION && svn revert -R . && svn update )
-        tag_svn_rev
-    fi
+    tar xfz tarballs/libtorrent-$LT_VERSION.tar.gz
+    tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
 }
 
 build() { # Build and install all components
@@ -410,9 +417,16 @@ build_git() { # Build and install libtorrent and rtorrent from git checkouts
     local lt_src="../rakshasa-libtorrent"; test -d "$lt_src" || lt_src="../libtorrent"
     local rt_src="../rakshasa-rtorrent"; test -d "$rt_src" || rt_src="../rtorrent"
 
+    # TODO: ++ LIBTORRENT_CURRENT=19
+    $SED_I 's/^AC_INIT(libtorrent, '${LT_VERSION}'/AC_INIT(libtorrent, '${LT_VERSION%.*}.$GIT_MINOR'/' "$lt_src/configure.ac"
+    $SED_I 's/^AC_INIT(rtorrent, '$RT_RELEASE_VERSION'/AC_INIT(rtorrent, '$RT_VERSION'/' "$rt_src/configure.ac"
+
+    echo; echo "*** Entering $lt_src"
     ( set +x ; cd "$lt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
+
+    echo; echo "*** Entering $rt_src"
     ( set +x ; cd "$rt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INSTALL_DIR/bin/xmlrpc-c-config && \
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
@@ -433,7 +447,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Patch libtorrent
     pushd libtorrent-$LT_VERSION
 
-    for backport in $SRC_DIR/patches/{backport,trac,misc}_${LT_VERSION%-svn}_*.patch; do
+    for backport in $SRC_DIR/patches/{backport,trac,misc}_${LT_VERSION%-git}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -445,11 +459,11 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     srcdir=$SRC_DIR/rtorrent-extended
     aur_patches
 
-    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION%-svn},all}.patch; do
+    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION%-git},all}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
-    for backport in $SRC_DIR/patches/{backport,misc}_${RT_VERSION%-svn}_*.patch; do
+    for backport in $SRC_DIR/patches/{backport,misc}_${RT_VERSION%-git}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -464,7 +478,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
     fi
 
-    $SED_I 's/rTorrent \" VERSION/rTorrent-PS " VERSION/' src/ui/download_list.cc
+    $SED_I 's/rTorrent \" VERSION/rTorrent'"$VERSION_EXTRAS"' " VERSION/' src/ui/download_list.cc
     popd
     bold "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
@@ -602,8 +616,10 @@ case "$1" in
     env)        prep; set +x; set_build_env echo '"';;
     build)      prep; build_everything ;;
     git|build_git)
+                BUILD_GIT=true
                 prep
                 set_build_env
+                test -e $SRC_DIR/rtorrent-$RT_RELEASE_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
                 build_git
                 symlink_binary -git
                 check
