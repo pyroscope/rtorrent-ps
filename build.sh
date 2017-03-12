@@ -42,7 +42,7 @@ export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPT
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
         ;;
-    *-vivid|*-wily|*-xenial|*-jessie)
+    *-vivid|*-wily|*-xenial|*-yakkety|*-jessie|*-stretch)
         export CARES_VERSION=1.11.0 # 2016-02
         ;;
     Arch-*) # 0.9.[46] only!
