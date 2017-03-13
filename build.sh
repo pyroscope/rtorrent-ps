@@ -163,16 +163,15 @@ set_build_env() {
 
 SELF_URL=https://github.com/pyroscope/rtorrent-ps.git
 XMLRPC_URL="http://svn.code.sf.net/p/xmlrpc-c/code/advanced@$XMLRPC_REV"
-TARBALLS=$(cat <<.
-http://c-ares.haxx.se/download/c-ares-$CARES_VERSION.tar.gz
-http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
-.
+TARBALLS=(
+"http://c-ares.haxx.se/download/c-ares-$CARES_VERSION.tar.gz"
+"http://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz"
 )
 
 XMLRPC_SVN=true
 case $XMLRPC_REV in
     2775|2366|2626)
-        TARBALLS="$TARBALLS https://bintray.com/artifact/download/pyroscope/rtorrent-ps/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz"
+        TARBALLS+=( "https://bintray.com/artifact/download/pyroscope/rtorrent-ps/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz" )
         XMLRPC_SVN=false
         ;;
 esac
@@ -181,11 +180,9 @@ esac
 #   http://rtorrent.net/downloads/
 #   http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/
 #   http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/
-TARBALLS=$(cat <<.
-$TARBALLS
-https://bintray.com/artifact/download/pyroscope/rtorrent-ps/libtorrent-$LT_VERSION.tar.gz
-https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION.tar.gz
-.
+TARBALLS+=(
+"https://bintray.com/artifact/download/pyroscope/rtorrent-ps/libtorrent-$LT_VERSION.tar.gz"
+"https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION.tar.gz"
 )
 
 BUILD_CMD_DEPS=$(cat <<.
@@ -358,7 +355,7 @@ download() { # Download and unpack sources
         test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
             svn -q checkout "$XMLRPC_URL" xmlrpc-c-advanced-$XMLRPC_REV )
     fi
-    for url in $TARBALLS; do
+    for url in "${TARBALLS[@]}"; do
         url_base=${url##*/}
         tarball_dir=${url_base%.tar.gz}
         tarball_dir=${tarball_dir%-src.tgz}
@@ -498,7 +495,7 @@ clean() { # Clean up generated files
 }
 
 clean_all() { # Remove all downloads and created files
-    rm tarballs/*.tar.gz tarballs/DONE >/dev/null 2>&1 || :
+    rm tarballs/*{.tar.gz,.tgz} tarballs/DONE >/dev/null 2>&1 || :
     for i in $SUBDIRS; do
         test ! -d $i || rm -rf $i >/dev/null
     done
