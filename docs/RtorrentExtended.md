@@ -47,16 +47,13 @@ or download and install a package from
 ![rt-ps-screen-3d](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-screen-3d.png)
 
 The new stable rTorrent version **0.9.6** is built by default,
-but 0.9.2 and 0.9.4 are also supported (but not tested anymore)
-— also, not all patches are applied equally
+but 0.9.4 is also supported (but not tested anymore)
+And not all patches are applied equally
 (depending on whether they're needed, or applicable at all).
 
-Note that some of these patches are taken from
-the [AUR package](https://aur.archlinux.org/packages/rtorrent-extended/)
-provided for [Arch Linux](http://www.archlinux.org/).
-Also, there is now a [rtorrent-pyro](https://aur.archlinux.org/packages.php?ID=54763)
-AUR package (which might break any time due to using rTorrent's HEAD,
-contact its maintainers with any problems, _not_ me).
+See the [installation options](https://github.com/pyroscope/rtorrent-ps#installation)
+regarding building rTorrent-PS from source, using one of the provided
+Debian packages, or PKGBUILDs for [Arch Linux](http://www.archlinux.org/).
 
 > ➽ _Note that you need to read **all** of the following explanations of the_
 > _user-interface related new commands to get the visual changes set up correctly,_

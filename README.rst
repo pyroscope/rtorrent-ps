@@ -135,16 +135,6 @@ start it, or link it into ``/usr/local`` like this:
     affected as long as you normally run a 0.9.x version.
 
 
-Homebrew Tap for Mac OSX
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-See the
-`homebrew-rtorrent-ps <https://github.com/pyroscope/homebrew-rtorrent-ps>`_
-repository for instructions to build *rTorrent-PS* and related
-dependencies on Mac OSX.
-*Right now, it is not maintained by anyone.*
-
-
 Installation on Arch Linux
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -155,7 +145,7 @@ for installing on *Arch* via ``pacman``.
    Debian one, embedding a tested version combination of dependencies.
    See *“Building the Debian Package”* for general instructions on building that
    variant, and use ``pkg2pacman`` instead of ``pkg2deb``.
-#. The *“Arch User Repository”* (AUR) PKG_BUILDs maintained by @xsmile.
+#. The *“Arch User Repository”* (AUR) PKGBUILDs maintained by @xsmile.
    These use a standard *Arch* build process, but include the usual *rTorrent-PS*
    patches.
 
@@ -173,6 +163,16 @@ and not recommended anymore by *this* project, given the new options above.
 
 If you have problems with building or installing any of these packages,
 contact *their maintainer*.
+
+
+Homebrew Tap for Mac OSX
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+See the
+`homebrew-rtorrent-ps <https://github.com/pyroscope/homebrew-rtorrent-ps>`_
+repository for instructions to build *rTorrent-PS* and related
+dependencies on Mac OSX.
+*Right now, it is not maintained by anyone.*
 
 
 Building the Debian Package
