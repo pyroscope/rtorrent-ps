@@ -6,7 +6,7 @@
 
 ## 2017-xx-xx PS-1.1
 
-* Fix filtering started and stopped views [@chros73]
+* Fix: Prevent filtering of ``started`` and ``stopped`` views [@chros73]
 * Improved git build process
 * Allow installation of several concurrent patch versions
 
