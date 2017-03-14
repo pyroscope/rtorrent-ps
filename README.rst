@@ -17,6 +17,8 @@ Introduction
 ``rTorrent-PS`` is a `rTorrent`_ *distribution* (*not* a fork of it),
 in form of a set of patches that improve the user experience and
 stability of official ``rTorrent`` releases.
+See the `changelog`_ for a timeline of applied changes,
+especially those since the last `official release`_.
 
 ``rTorrent-PS`` is *not* the same as the ``PyroScope`` `command line
 utilities <https://github.com/pyroscope/pyrocore#pyrocore>`_, and
@@ -268,6 +270,8 @@ References
 -  https://github.com/rakshasa/rtorrent
 -  `rTorrent Documentation Wiki`_
 
+.. _`official release`: https://github.com/pyroscope/rtorrent-ps/releases
+.. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/CHANGES.md
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
 .. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
