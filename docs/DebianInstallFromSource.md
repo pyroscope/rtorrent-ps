@@ -41,7 +41,7 @@ known to work on *Debian Jessie*, and *Ubuntu Trusty + Xenial*.
 
 Non-packaged software is installed exclusively into your normal user account,
 i.e. this description works OK for non-root users as long as the required packages
-are installed before-hand. The default install location is `~/lib/rtorrent-«version»`,
+are installed before-hand. The default install location is `~/.local/rtorrent/«version»`,
 which means you can easily delete any installed software, and also run several versions concurrently.
 
 For shared multi-user setups, this works fine also — compile and install to `/opt/rtorrent`
@@ -152,7 +152,7 @@ after everything works. Make sure you followed the *Preparatory Steps* in the se
 :bangbang: | Be sure to select the version of rTorrent you want to compile, as determined by the settings at the start of the script. If you have no preference otherwise, stick to the default set in the script. Note that such a choice is sticky once you performed the `download` step, until you call `clean_all` again.
 ---: | :---
 
-All installations go to `~/lib/rtorrent-«version»/`, and disturb neither any host setup
+All installations go to `~/.local/rtorrent/«version»/`, and disturb neither any host setup
 nor another version of rTorrent you've installed the same way.
 
 ```sh

@@ -84,7 +84,7 @@ General Installation Options
 See the `instructions
 here <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md#build-rtorrent-and-core-dependencies-from-source>`_
 for building from source using the provided ``build.sh`` script, which
-will install *rTorrent-PS* into ``~/lib/rtorrent-‹version›``.
+will install *rTorrent-PS* into ``~/.local/rtorrent/‹version›``.
 
 .. note:: If you also install the `PyroScope command line
     utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to

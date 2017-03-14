@@ -3,9 +3,15 @@
 # Build rTorrent including patches
 #
 
+# Get git metadata
 now_iso="$(date +'%Y%m%d-%H%M')"
 git_id="$(git describe --long --tags --dirty="-$now_iso")"
+commits_since_release=$(sed -re 's/.+-([0-9]+)-g[0-9a-fA-F]{7}.*/\1/' <<<"$git_id")
+export RT_PS_REVISION="${git_id%%-$commits_since_release-g*}"
+test "$commits_since_release" -eq 0 || \
+    RT_PS_REVISION="${RT_PS_REVISION%.*}.$(( ${RT_PS_REVISION##*.} + 1 ))-dev"
 
+# Version selection
 export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export GIT_MINOR=$(( $RT_MINOR + 1 ))  # ensure git version has a bumped version number
@@ -33,7 +39,7 @@ export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 # Extra options handling (set overridable defaults)
 : ${PACKAGE_ROOT:=/opt/rtorrent}
 : ${INSTALL_ROOT:=$HOME}
-: ${INSTALL_DIR:=$INSTALL_ROOT/lib/rtorrent-$RT_VERSION}
+: ${INSTALL_DIR:=$INSTALL_ROOT/.local/rtorrent/$RT_VERSION-$RT_PS_REVISION}
 : ${BIN_DIR:=$INSTALL_ROOT/bin}
 : ${CURL_OPTS:=-sLS}
 : ${MAKE_OPTS:=}
@@ -322,8 +328,8 @@ symlink_binary() {
     test -z "$flavour" || ln -f "$binary" "$binary$flavour"
 
     mkdir -p "$BIN_DIR"
-    ln -nfs "$binary$flavour" "$BIN_DIR"/rtorrent-$RT_VERSION
-    test -e "$BIN_DIR"/rtorrent || ln -s rtorrent-$RT_VERSION "$BIN_DIR"/rtorrent
+    ln -nfs "$binary$flavour" "$BIN_DIR"/rtorrent-$RT_VERSION-$RT_PS_REVISION
+    test -e "$BIN_DIR"/rtorrent || ln -s rtorrent-$RT_VERSION-$RT_PS_REVISION "$BIN_DIR"/rtorrent
 }
 
 
@@ -335,9 +341,9 @@ prep() {
     check_deps
 
     # Properly bump version, even if upstream doesn't
+    RT_RELEASE_VERSION="$RT_VERSION"
     INSTALL_RELEASE_DIR="${INSTALL_DIR}"
     if $BUILD_GIT; then
-        RT_RELEASE_VERSION="$RT_VERSION"
         RT_VERSION="${RT_RELEASE_VERSION/%.$RT_MINOR/.$GIT_MINOR}"
         INSTALL_DIR="${INSTALL_RELEASE_DIR//$RT_RELEASE_VERSION/$RT_VERSION}"
 
@@ -413,7 +419,7 @@ build() { # Build and install all components
 build_git() { # Build and install libtorrent and rtorrent from git checkouts
     # Start script should contain:
     #
-    #   BIN="$HOME/src/rakshasa-rtorrent/src/"; LD_PRELOAD=$HOME/lib/rtorrent-0.9.7/lib/libtorrent.so.19 \
+    #   BIN="$HOME/src/rakshasa-rtorrent/src/"; LD_PRELOAD=$HOME/lib/rtorrent/0.9.7-PS-1.0-dev/lib/libtorrent.so.19 \
     #   ${BIN}rtorrent -n -o import=$PWD/rtorrent.rc
 
     local lt_src="../rakshasa-libtorrent"; test -d "$lt_src" || lt_src="../libtorrent"
@@ -502,7 +508,7 @@ clean_all() { # Remove all downloads and created files
 }
 
 check() { # Print some diagnostic success indicators
-    for i in "$BIN_DIR"/rtorrent{,-$RT_VERSION}; do
+    for i in "$BIN_DIR"/rtorrent{,-*}; do
         echo $i "->" $(readlink $i) | sed -e "s:$HOME:~:g"
     done
 
@@ -510,8 +516,15 @@ check() { # Print some diagnostic success indicators
     # If anything is left, we have an external dependency that sneaked in.
     echo
     echo -n "Check that static linking worked: "
-    libs=$(ldd "$BIN_DIR"/rtorrent-$RT_VERSION | egrep "lib(cares|curl|xmlrpc|torrent)")
-    test -n "$(echo "$libs" | grep -v "$INSTALL_DIR" | grep -v "$INSTALL_RELEASE_DIR")" && echo OK || echo FAIL
+    libs=$(ldd "$BIN_DIR"/rtorrent-$RT_VERSION-$RT_PS_REVISION | egrep "lib(cares|curl|xmlrpc|torrent)")
+    if test "$(echo "$libs" | egrep -v "($INSTALL_DIR|$INSTALL_RELEASE_DIR)" | wc -l)" -eq 0; then
+        echo OK; echo
+    else
+        echo FAIL; echo; echo "Suspicious library paths are:"
+        echo "$libs" | egrep -v "($INSTALL_DIR|$INSTALL_RELEASE_DIR)" || :
+        echo
+    fi
+    echo "Dependency library paths:"
     echo "$libs" | sed -e "s:$HOME:~:g"
 }
 
@@ -521,8 +534,9 @@ install() { # Install to $PACKAGE_ROOT
     rm -rf "$INSTALL_DIR"/* || :
     test "$(echo /opt/rtorrent/*)" = "/opt/rtorrent/*" || fail "Could not clean install dir '$INSTALL_DIR'"
     cat >"$INSTALL_DIR"/version-info.sh <<.
-RT_PS_VERSION=$RT_VERSION
-RT_PS_REVISION=$(date +'%Y%m%d')-$(git rev-parse --short HEAD)
+RT_PS_VERSION=$RT_VERSION-$RT_PS_REVISION
+RT_PS_REVISION=$RT_PS_REVISION
+RT_PS_RT_VERSION=$RT_VERSION
 RT_PS_LT_VERSION=$LT_VERSION
 RT_PS_CARES_VERSION=$CARES_VERSION
 RT_PS_CURL_VERSION=$CURL_VERSION
@@ -551,7 +565,7 @@ package_prep() # make $PACKAGE_ROOT lean and mean
 
 call_fpm() {
     fpm -s dir -n "${fpm_pkg_name:-rtorrent-ps}" \
-        -v "$RT_PS_VERSION" --iteration "$fpm_iteration" \
+        -v "$RT_PS_RT_VERSION" --iteration "$fpm_iteration" \
         -m "\"$DEBFULLNAME\" <$DEBEMAIL>" \
         --license "$fpm_license" --vendor "https://github.com/rakshasa" \
         --description "Patched and extended ncurses BitTorrent client" \
@@ -571,7 +585,7 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
     package_prep
 
     fpm_pkg_ext="deb"
-    fpm_iteration=$RT_PS_REVISION"~"$(lsb_release -cs)
+    fpm_iteration="$RT_PS_REVISION~"$(lsb_release -cs)
     fpm_license="GPL v2"
     deps=$(ldd "$PACKAGE_ROOT"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | xargs -i+ dpkg -S "+" | cut -f1 -d: | sort -u | xargs -i+ echo -d "+")
@@ -624,7 +638,8 @@ case "$1" in
                 BUILD_GIT=true
                 prep
                 set_build_env
-                test -e $SRC_DIR/rtorrent-$RT_RELEASE_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
+                rt_binary="$SRC_DIR/rtorrent-$RT_RELEASE_VERSION/src/rtorrent"
+                test -e "$rt_binary" || fail "You need to '$0 all' first! ($rt_binary not found)"
                 build_git
                 symlink_binary -git
                 check
@@ -632,7 +647,8 @@ case "$1" in
     rtorrent)   prep; core_unpack; NODEPS=true; build_everything ;;
     extend)     prep
                 set_build_env
-                test -e $SRC_DIR/rtorrent-$RT_VERSION/src/rtorrent || fail "You need to '$0 all' first!"
+                rt_binary="$SRC_DIR/rtorrent-$RT_RELEASE_VERSION/src/rtorrent"
+                test -e "$rt_binary" || fail "You need to '$0 all' first! ($rt_binary not found)"
                 extend
                 symlink_binary -extended
                 check
@@ -643,7 +659,7 @@ case "$1" in
     pkg2pacman) pkg2pacman;;
     *)
         echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
-        echo >&2 "Build rTorrent $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"
+        echo >&2 "Build rTorrent$VERSION_EXTRAS $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"
         echo >&2
         echo >&2 "Custom environment variables:"
         echo >&2 "    CURL_OPTS=\"${CURL_OPTS}\" (e.g. --insecure)"
