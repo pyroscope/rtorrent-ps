@@ -197,13 +197,13 @@ The installation of `pyrocore` is done from source, see its
 
 ```sh
 # Run this in your NORMAL user account!
-mkdir -p ~/bin ~/lib
-git clone "https://github.com/pyroscope/pyrocore.git" ~/lib/pyroscope
+mkdir -p ~/bin ~/.local
+git clone "https://github.com/pyroscope/pyrocore.git" ~/.local/pyroscope
 
 # Pass "/usr/bin/python2", or whatever else fits, to the script as its
 # 1st argument, if the default of "/usr/bin/python" is not a suitable
 # version.
-~/lib/pyroscope/update-to-head.sh
+~/.local/pyroscope/update-to-head.sh
 
 # Check success
 exec $SHELL -l; pyroadmin --version
@@ -228,7 +228,7 @@ First, create the instance directories and a simple
 export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
 mkdir -p $RT_HOME; cd $RT_HOME
 mkdir -p .session log work done watch/{start,load,hdtv}
-cp ~/lib/pyroscope/docs/examples/start.sh ./start
+cp ~/.local/pyroscope/docs/examples/start.sh ./start
 chmod a+x ./start
 ```
 
@@ -249,7 +249,7 @@ so you can easily add your own customizations in new ``rtorrent.d/*.rc`` files.
 ```sh
 # Run this in your NORMAL user account!
 export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
-~/lib/pyroscope/src/scripts/make-rtorrent-config.sh
+~/.local/pyroscope/src/scripts/make-rtorrent-config.sh
 ```
 
 :bulb: | In ``rtorrent.rc``, change the value of `pyro.extended` to 1 so the extended `rTorrent-PS` features are actually activated!
@@ -292,7 +292,7 @@ before we start it the first time. This makes it more homey for long-time `scree
 
 ```sh
 # Run this in your NORMAL user account!
-cp --no-clobber ~/lib/pyroscope/docs/examples/tmux.conf ~/.tmux.conf
+cp --no-clobber ~/.local/pyroscope/docs/examples/tmux.conf ~/.tmux.conf
 ```
 
 ### Starting a tmux Session
