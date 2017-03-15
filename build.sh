@@ -91,19 +91,6 @@ case "$GCC_TYPE" in
         ;;
 esac
 
-# AUR Patches (do NOT touch these)
-_magnet_uri=0
-_ipv6=0
-_ip_filter=0
-_friend=0
-_bad_peer_handling=0
-# 1 = canvas color patch / 2 = karabja mod patch / 3 = PyroScope UI
-_interface=3
-_show_idle_times=0
-_trackerinfo=1
-# 1 = tjwoosta vi keybindings / 2 = akston vi keybindings
-_keybindings=0
-
 
 #
 # HERE BE DRAGONS!
@@ -139,8 +126,6 @@ test -d rtorrent-0.9.5 && { export LT_VERSION=0.13.5; export RT_VERSION=0.9.5; }
 test -d rtorrent-0.9.6 && { export LT_VERSION=0.13.6; export RT_VERSION=0.9.6; }
 BUILD_GIT=false
 
-# Incompatible patches
-_trackerinfo=0
 
 set_build_env() {
     export CPPFLAGS="-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
@@ -208,7 +193,7 @@ pkg-config:pkg-config
 set -e
 set +x
 export SRC_DIR=$(cd $(dirname $0) && pwd)
-SUBDIRS="c-ares-*[0-9] curl-*[0-9] xmlrpc-c-advanced-$XMLRPC_REV libtorrent-*[0-9] rtorrent-*[0-9] rtorrent-extended"
+SUBDIRS="c-ares-*[0-9] curl-*[0-9] xmlrpc-c-advanced-$XMLRPC_REV libtorrent-*[0-9] rtorrent-*[0-9]"
 ESC=$(echo -en \\0033)
 BOLD="$ESC[1m"
 OFF="$ESC[0m"
@@ -271,57 +256,6 @@ check_deps() {
     fi
 }
 
-aur_patches() {
-    #ex
-    if [[ "${_magnet_uri}" = "1" || "${_ipv6}" = "1" ]]; then
-        bold "ex_magnet_uri.patch"
-        patch -uNp1 -i "${srcdir}/ex_magnet_uri.patch"
-    fi
-    if [[ "${_ipv6}" = "1" ]]; then
-        bold "ex_ip6.patch"
-        patch -uNp1 -i "${srcdir}/ex_ipv6.patch"
-        _cfg_opts="--enable-ipv6"
-    fi
-    if [[ "${_ip_filter}" = "1" || "${_friend}" = "1" ]]; then
-        bold "ex_ip_filter.patch"
-        patch -uNp1 -i "${srcdir}/ex_ip_filter.patch"
-    fi
-    if [[ "${_friend}" = "1" ]]; then
-        bold "ex_friend.patch"
-        patch -uNp1 -i "${srcdir}/ex_friend.patch"
-    fi
-    if [[ "${_bad_peer_handling}" = "1" ]]; then
-        bold "ex_bad_peer_handling.patch"
-        patch -uNp1 -i "${srcdir}/ex_bad_peer_handling.patch"
-    fi
-
-    #ui
-    if [[ "${_interface}" = "1" ]]; then
-        bold "ui_canvas_color.patch"
-        patch -uNp1 -i "${srcdir}/ui_canvas_color.patch"
-    elif [[ "${_interface}" = "2" ]]; then
-        bold "ui_karabaja_mod.patch"
-        patch -uNp1 -i "${srcdir}/ui_karabaja_mod.patch"
-    fi
-    if [[ "${_show_idle_times}" = "1" ]]; then
-        bold "ui_show_idle_times.patch"
-        patch -uNp1 -i "${srcdir}/ui_show_idle_times.patch"
-    fi
-    if [[ "${_trackerinfo}" = "1" ]]; then
-        bold "ui_trackerinfo.patch"
-        patch -uNp1 -i "${srcdir}/ui_trackerinfo.patch"
-    fi
-
-    #kb
-    if [[ "${_keybindings}" = "1" ]]; then
-        bold "kb_vi_tjwoosta.patch"
-        patch -uNp1 -i "${srcdir}/kb_vi_tjwoosta.patch"
-    elif [[ "${_keybindings}" = "2" ]]; then
-        bold "kb_vi_akston.patch"
-        patch -uNp1 -i "${srcdir}/kb_vi_akston.patch"
-    fi
-}
-
 symlink_binary() {
     binary="$INSTALL_DIR/bin/rtorrent"
     flavour="$1"
@@ -369,8 +303,6 @@ download() { # Download and unpack sources
         test -d $tarball_dir || ( echo "Unpacking ${url_base}" && tar xfz tarballs/${url_base} )
         test -d $tarball_dir || fail "Tarball ${url_base} could not be unpacked"
     done
-
-    tar xfz patches/rtorrent-extended.tar.gz
 
     touch tarballs/DONE
 }
@@ -441,12 +373,9 @@ build_git() { # Build and install libtorrent and rtorrent from git checkouts
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
-    # Based partly on https://aur.archlinux.org/packages/rtorrent-extended/
-
     core_unpack
 
     # Version handling
-    [ "$_interface" == 3 ] || { _interface=0; bold "Interface patches disabled"; }
     RT_HEX_VERSION=$(printf "0x%02X%02X%02X" ${RT_VERSION//./ })
     $SED_I "s:\\(AC_DEFINE(HAVE_CONFIG_H.*\\):\1  AC_DEFINE(RT_HEX_VERSION, $RT_HEX_VERSION, for CPP if checks):" rtorrent-$RT_VERSION/configure.ac
     grep "AC_DEFINE.*API_VERSION" rtorrent-$RT_VERSION/configure.ac >/dev/null || \
@@ -455,7 +384,11 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Patch libtorrent
     pushd libtorrent-$LT_VERSION
 
-    for backport in $SRC_DIR/patches/{backport,trac,misc}_${LT_VERSION%-git}_*.patch; do
+    for corepatch in $SRC_DIR/patches/lt-ps-*_{${LT_VERSION},all}.patch; do
+        test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
+    done
+
+    for backport in $SRC_DIR/patches/{backport,misc}_${LT_VERSION}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -464,14 +397,12 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
 
     # Patch rTorrent
     pushd rtorrent-$RT_VERSION
-    srcdir=$SRC_DIR/rtorrent-extended
-    aur_patches
 
-    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION%-git},all}.patch; do
+    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION},all}.patch; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
-    for backport in $SRC_DIR/patches/{backport,misc}_${RT_VERSION%-git}_*.patch; do
+    for backport in $SRC_DIR/patches/{backport,misc}_${RT_VERSION}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -481,10 +412,8 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         ln -nfs $i src
     done
 
-    if [[ "${_interface}" = "3" ]]; then
-        bold "ui_pyroscope.patch"
-        patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
-    fi
+    bold "ui_pyroscope.patch"
+    patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
 
     $SED_I 's/rTorrent \" VERSION/rTorrent'"$VERSION_EXTRAS"' " VERSION/' src/ui/download_list.cc
     popd
