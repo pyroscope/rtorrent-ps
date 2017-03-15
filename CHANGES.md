@@ -10,6 +10,7 @@
 * Fix: `system.file.allocate.set=[0|1]` semantics [@chros73] (issue #41)
 * Build: Improved git build process
 * Build: Allow installation of several concurrent patch versions
+* Command: Added `ui.bind_key.verbose` flag (issue #55)
 
 
 ## 2017-03-12 PS-1.0 “First version-tagged release”
