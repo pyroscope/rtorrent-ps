@@ -6,9 +6,10 @@
 
 ## 2017-xx-xx PS-1.1
 
-* Fix: Prevent filtering of ``started`` and ``stopped`` views [@chros73]
-* Improved git build process
-* Allow installation of several concurrent patch versions
+* Fix: Prevent filtering of ``started`` and ``stopped`` views [@chros73] (#36)
+* Fix: `system.file.allocate.set=[0|1]` semantics [@chros73] (#41)
+* Build: Improved git build process
+* Build: Allow installation of several concurrent patch versions
 
 
 ## 2017-03-12 PS-1.0 “First version-tagged release”
