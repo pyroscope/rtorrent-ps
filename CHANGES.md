@@ -6,8 +6,8 @@
 
 ## 2017-xx-xx PS-1.1
 
-* Fix: Prevent filtering of ``started`` and ``stopped`` views [@chros73] (#36)
-* Fix: `system.file.allocate.set=[0|1]` semantics [@chros73] (#41)
+* Fix: Prevent filtering of ``started`` and ``stopped`` views [@chros73] (issue #36)
+* Fix: `system.file.allocate.set=[0|1]` semantics [@chros73] (issue #41)
 * Build: Improved git build process
 * Build: Allow installation of several concurrent patch versions
 
