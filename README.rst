@@ -76,6 +76,10 @@ automatically for you.
 Another option for automatic setup of a similar system is the one by
 `chros73 <https://github.com/chros73/rtorrent-ps_setup/wiki>`_.
 
+You can also add your own content to the
+`project's wiki <https://github.com/pyroscope/rtorrent-ps/wiki#community-documentation>`_,
+to help out other users, and show to the world you're awesome.
+
 
 Installation
 ------------
