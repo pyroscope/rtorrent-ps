@@ -263,7 +263,7 @@ symlink_binary() {
 
     mkdir -p "$BIN_DIR"
     ln -nfs "$binary$flavour" "$BIN_DIR"/rtorrent-$RT_VERSION-$RT_PS_REVISION
-    test -e "$BIN_DIR"/rtorrent || ln -s rtorrent-$RT_VERSION-$RT_PS_REVISION "$BIN_DIR"/rtorrent
+    test -e "$BIN_DIR"/rtorrent || ln -nfs rtorrent-$RT_VERSION-$RT_PS_REVISION "$BIN_DIR"/rtorrent
 }
 
 
