@@ -222,6 +222,13 @@ and add the combinations you like to your ``~/.rtorrent.rc``.
 rtxmlrpc ui.color.title.set "bold magenta on bright cyan"
 ```
 
+You can use the following code in a terminal to dump a color scheme:
+
+```sh
+for i in $(rtxmlrpc system.listMethods | grep ui.color. | grep -v '\.set$'); do
+    echo $i = $(rtxmlrpc -r $i | tr "'" '"') ;
+done
+```
 
 The <a href='https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/term-256color.py'>term-256color</a>
 script can help you with showing the colors your terminal supports,
