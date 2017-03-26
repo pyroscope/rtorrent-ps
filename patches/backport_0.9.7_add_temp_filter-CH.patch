@@ -1,0 +1,283 @@
+--- src/command_ui.cc	2016-11-04 21:58:44.000000000 +0000
++++ src/command_ui.cc	2017-01-09 19:39:25.707339423 +0000
+@@ -39,6 +39,8 @@
+ #include <sys/types.h>
+ 
+ #include <ctime>
++#include <regex>
++
+ #include <rak/functional.h>
+ #include <rak/functional_fun.h>
+ 
+@@ -282,6 +284,53 @@ torrent::Object apply_equal(rpc::target_
+   return result.is_value() ? result.as_value() == 0 : (int64_t)false;
+ }
+ 
++// Regexp based 'match' function.
++// arg1: the text to match.
++// arg2: the regexp pattern.
++// eg: match{d.name=,.*linux.*iso}
++torrent::Object apply_match(rpc::target_type target, const torrent::Object::list_type& args) {
++  if (args.size() != 2)
++    throw torrent::input_error("Wrong argument count for 'match': 2 arguments needed.");
++
++  // This really should be converted to using args flagged as
++  // commands, so that we can compare commands and statics values.
++
++  torrent::Object result1;
++  torrent::Object result2;
++
++  rpc::target_type target1 = rpc::is_target_pair(target) ? rpc::get_target_left(target) : target;
++  rpc::target_type target2 = rpc::is_target_pair(target) ? rpc::get_target_right(target) : target;
++
++  if (args.front().is_dict_key())
++    result1 = rpc::commands.call_command(args.front().as_dict_key().c_str(), args.front().as_dict_obj(), target1);
++  else
++    result1 = rpc::parse_command_single(target1, args.front().as_string());
++
++  if (args.back().is_dict_key())
++    result2 = rpc::commands.call_command(args.back().as_dict_key().c_str(), args.back().as_dict_obj(), target2);
++  else
++    result2 = args.back().as_string();
++
++  if (result1.type() != result2.type())
++    throw torrent::input_error("Type mismatch for 'match' arguments.");
++
++  std::string text = result1.as_string();
++  std::string pattern = result2.as_string();
++
++  std::transform(text.begin(), text.end(), text.begin(), ::tolower);
++  std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
++
++  bool isAMatch = false;
++  try {
++    std::regex re(pattern);
++    isAMatch = std::regex_match(text, re);
++  } catch (const std::regex_error& exc) {
++    control->core()->push_log_std("regex_error: " + std::string(exc.what()));
++  }
++
++  return isAMatch ? (int64_t)true : (int64_t)false;
++}
++
+ torrent::Object
+ apply_to_time(const torrent::Object& rawArgs, int flags) {
+   std::tm *u;
+@@ -529,6 +578,7 @@ initialize_command_ui() {
+   CMD2_ANY_LIST("view.set",           std::bind(&apply_view_set, std::placeholders::_2));
+ 
+   CMD2_ANY_LIST("view.filter",        std::bind(&apply_view_event, &core::ViewManager::set_filter, std::placeholders::_2));
++  CMD2_ANY_LIST("view.temp_filter",   std::bind(&apply_view_event, &core::ViewManager::set_temp_filter, std::placeholders::_2));
+   CMD2_ANY_LIST("view.filter_on",     std::bind(&apply_view_filter_on, std::placeholders::_2));
+ 
+   CMD2_ANY_LIST("view.sort",          std::bind(&apply_view_sort, std::placeholders::_2));
+@@ -555,6 +605,8 @@ initialize_command_ui() {
+   CMD2_ANY       ("ui.current_view",       std::bind(&cmd_ui_current_view));
+   CMD2_ANY_STRING("ui.current_view.set",   std::bind(&cmd_ui_set_view, std::placeholders::_2));
+ 
++  CMD2_VAR_BOOL  ("ui.console.log.tempfilter", 0);
++
+   // TODO: Add 'option_string' for rtorrent-specific options.
+   CMD2_VAR_STRING("ui.torrent_list.layout", "full");
+ 
+@@ -574,6 +626,7 @@ initialize_command_ui() {
+   CMD2_ANY_LIST("less",    &apply_less);
+   CMD2_ANY_LIST("greater", &apply_greater);
+   CMD2_ANY_LIST("equal",   &apply_equal);
++  CMD2_ANY_LIST("match",   &apply_match);
+ 
+   CMD2_ANY_VALUE("convert.gm_time",      std::bind(&apply_to_time, std::placeholders::_2, 0));
+   CMD2_ANY_VALUE("convert.gm_date",      std::bind(&apply_to_time, std::placeholders::_2, 0x2));
+--- src/core/view.cc	2016-11-04 21:58:44.000000000 +0000
++++ src/core/view.cc	2017-01-09 19:07:20.024438409 +0000
+@@ -89,17 +89,21 @@ struct view_downloads_compare : std::bin
+ };
+ 
+ struct view_downloads_filter : std::unary_function<Download*, bool> {
+-  view_downloads_filter(const torrent::Object& cmd) : m_command(cmd) {}
++  view_downloads_filter(const torrent::Object& cmd, const torrent::Object& cmd2) : m_command(cmd), m_command2(cmd2) {}
+ 
+   bool operator () (Download* d1) const {
+-    if (m_command.is_empty())
++    return this->evalCmd(m_command, d1) && this->evalCmd(m_command2, d1);
++  }
++
++  bool evalCmd(const torrent::Object& cmd, Download* d1) const {
++    if (cmd.is_empty())
+       return true;
+ 
+     try {
+       torrent::Object result;
+ 
+-      if (m_command.is_dict_key()) {
+-        // torrent::Object tmp_command = m_command;
++      if (cmd.is_dict_key()) {
++        // torrent::Object tmp_command = cmd;
+ 
+         // uint32_t flags = tmp_command.flags() & torrent::Object::mask_function;
+         // tmp_command.unset_flags(torrent::Object::mask_function);
+@@ -109,10 +113,10 @@ struct view_downloads_filter : std::unar
+         // result = rpc::commands.call_command(tmp_command.as_dict_key().c_str(), tmp_command.as_dict_obj(),
+         //                                     rpc::make_target(d1));
+ 
+-        result = rpc::commands.call_command(m_command.as_dict_key().c_str(), m_command.as_dict_obj(), rpc::make_target(d1));
++        result = rpc::commands.call_command(cmd.as_dict_key().c_str(), cmd.as_dict_obj(), rpc::make_target(d1));
+ 
+       } else {
+-        result = rpc::parse_command_single(rpc::make_target(d1), m_command.as_string());
++        result = rpc::parse_command_single(rpc::make_target(d1), cmd.as_string());
+       }
+ 
+       switch (result.type()) {
+@@ -136,6 +140,7 @@ struct view_downloads_filter : std::unar
+   }
+ 
+   const torrent::Object&       m_command;
++  const torrent::Object&       m_command2;
+ };
+ 
+ void
+@@ -262,8 +267,8 @@ View::filter() {
+     return;
+ 
+   // Parition the list in two steps so we know which elements changed.
+-  iterator splitVisible  = std::stable_partition(begin_visible(),  end_visible(),  view_downloads_filter(m_filter));
+-  iterator splitFiltered = std::stable_partition(begin_filtered(), end_filtered(), view_downloads_filter(m_filter));
++  iterator splitVisible  = std::stable_partition(begin_visible(),  end_visible(),  view_downloads_filter(m_filter, m_tempFilter));
++  iterator splitFiltered = std::stable_partition(begin_filtered(), end_filtered(), view_downloads_filter(m_filter, m_tempFilter));
+ 
+   base_type changed(splitVisible, splitFiltered);
+   iterator splitChanged = changed.begin() + std::distance(splitVisible, end_visible());
+@@ -302,7 +307,7 @@ View::filter_download(core::Download* do
+   if (itr == base_type::end())
+     throw torrent::internal_error("View::filter_download(...) could not find download.");
+ 
+-  if (view_downloads_filter(m_filter)(download)) {
++  if (view_downloads_filter(m_filter, m_tempFilter)(download)) {
+       
+     if (itr >= end_visible()) {
+       erase_internal(itr);
+--- src/core/view.h	2016-11-04 21:58:44.000000000 +0000
++++ src/core/view.h	2017-01-09 19:07:20.024438409 +0000
+@@ -124,6 +124,8 @@ public:
+ 
+   const torrent::Object& get_filter() const { return m_filter; }
+   void                set_filter(const torrent::Object& s)        { m_filter = s; }
++  const torrent::Object& get_temp_filter() const { return m_tempFilter; }
++  void                set_temp_filter(const torrent::Object& s)        { m_tempFilter = s; }
+   void                set_filter_on_event(const std::string& event);
+ 
+   void                clear_filter_on();
+@@ -172,6 +174,7 @@ private:
+   torrent::Object     m_sortCurrent;
+ 
+   torrent::Object     m_filter;
++  torrent::Object     m_tempFilter; // Temporary view filter (eg: name based filter)
+ 
+   torrent::Object     m_event_added;
+   torrent::Object     m_event_removed;
+--- src/core/view_manager.cc	2016-11-04 21:58:44.000000000 +0000
++++ src/core/view_manager.cc	2017-01-09 19:07:20.024438409 +0000
+@@ -110,6 +110,14 @@ ViewManager::set_filter(const std::strin
+ }
+ 
+ void
++ViewManager::set_temp_filter(const std::string& name, const torrent::Object& cmd) {
++  iterator viewItr = find_throw(name);
++
++  (*viewItr)->set_temp_filter(cmd);
++  (*viewItr)->filter();
++}
++
++void
+ ViewManager::set_filter_on(const std::string& name, const filter_args& args) {
+   iterator viewItr = find_throw(name);
+ 
+--- src/core/view_manager.h	2016-11-04 21:58:44.000000000 +0000
++++ src/core/view_manager.h	2017-01-09 19:07:20.027771724 +0000
+@@ -93,6 +93,7 @@ public:
+   void                set_sort_current(const std::string& name, const torrent::Object& cmd) { (*find_throw(name))->set_sort_current(cmd); }
+ 
+   void                set_filter(const std::string& name, const torrent::Object& cmd);
++  void                set_temp_filter(const std::string& name, const torrent::Object& cmd);
+   void                set_filter_on(const std::string& name, const filter_args& args);
+ 
+   void                set_event_added(const std::string& name, const torrent::Object& cmd)   { (*find_throw(name))->set_event_added(cmd); }
+--- src/display/window_download_list.cc	2016-11-04 21:58:44.000000000 +0000
++++ src/display/window_download_list.cc	2017-01-09 19:07:20.027771724 +0000
+@@ -81,7 +81,7 @@ WindowDownloadList::redraw() {
+   if (m_view == NULL)
+     return;
+ 
+-  m_canvas->print(0, 0, "%s", ("[View: " + m_view->name() + "]").c_str());
++  m_canvas->print(0, 0, "%s", ("[View: " + m_view->name() + (m_view->get_temp_filter().is_empty() ? "" : " (filtered)") + "]").c_str());
+ 
+   if (m_view->empty_visible() || m_canvas->width() < 5 || m_canvas->height() < 2)
+     return;
+--- src/ui/download_list.cc	2016-11-04 21:58:44.000000000 +0000
++++ src/ui/download_list.cc	2017-01-09 19:47:27.361396745 +0000
+@@ -262,6 +262,15 @@ DownloadList::receive_view_input(Input t
+     title = "command";
+     break;
+ 
++  case INPUT_FILTER:
++    // STARTED and STOPPED views are not allowed to being filtered: they are special
++    if (current_view()->name() == "started" || current_view()->name() == "stopped") {
++      control->core()->push_log_std("View '" + current_view()->name() + "' can't be filtered.");
++      return;
++    }
++    title = "filter";
++    break;
++
+   default:
+     throw torrent::internal_error("DownloadList::receive_view_input(...) Invalid input type.");
+   }
+@@ -325,6 +334,28 @@ DownloadList::receive_exit_input(Input t
+                                 input->str());
+       break;
+ 
++    case INPUT_FILTER:
++      if (input->str().empty()) {
++        if (rpc::call_command_value("ui.console.log.tempfilter"))
++          control->core()->push_log_std("Clear temporary filter on '" + current_view()->name() + "' view.");
++        current_view()->set_temp_filter(torrent::Object());
++        current_view()->filter();
++        current_view()->sort();
++      } else {
++        std::string pattern = input->str();
++        if (pattern.back() != '$')
++          pattern = pattern + ".*";
++        if (pattern.front() != '^')
++          pattern = ".*" + pattern;
++        std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
++        std::string tempFilter = "match={d.name=," + pattern + "}";
++        if (rpc::call_command_value("ui.console.log.tempfilter"))
++          control->core()->push_log_std("Temporary filter on '" + current_view()->name() + "' view: " + pattern);
++        current_view()->set_temp_filter(tempFilter);
++        current_view()->filter();
++      }
++      break;
++
+     default:
+       throw torrent::internal_error("DownloadList::receive_exit_input(...) Invalid input type.");
+     }
+@@ -346,6 +377,7 @@ DownloadList::setup_keys() {
+   m_bindings[KEY_ENTER]     = std::bind(&DownloadList::receive_view_input, this, INPUT_LOAD_MODIFIED);
+   m_bindings['\x0F']        = std::bind(&DownloadList::receive_view_input, this, INPUT_CHANGE_DIRECTORY);
+   m_bindings['X' - '@']     = std::bind(&DownloadList::receive_view_input, this, INPUT_COMMAND);
++  m_bindings['F']           = std::bind(&DownloadList::receive_view_input, this, INPUT_FILTER);
+ 
+   m_uiArray[DISPLAY_LOG]->bindings()[KEY_LEFT] =
+     m_uiArray[DISPLAY_LOG]->bindings()['B' - '@'] =
+--- src/ui/download_list.h	2016-11-04 21:58:44.000000000 +0000
++++ src/ui/download_list.h	2017-01-09 19:07:20.027771724 +0000
+@@ -86,7 +86,8 @@ public:
+     INPUT_LOAD_DEFAULT,
+     INPUT_LOAD_MODIFIED,
+     INPUT_CHANGE_DIRECTORY,
+-    INPUT_COMMAND
++    INPUT_COMMAND,
++    INPUT_FILTER
+   } Input;
+ 
+   DownloadList();
