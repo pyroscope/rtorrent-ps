@@ -388,7 +388,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
-    for backport in $SRC_DIR/patches/{backport,misc}_${LT_VERSION}_*.patch; do
+    for backport in $SRC_DIR/patches/{backport,misc}*_${LT_VERSION}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
@@ -402,7 +402,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
-    for backport in $SRC_DIR/patches/{backport,misc}_${RT_VERSION}_*.patch; do
+    for backport in $SRC_DIR/patches/{backport,misc}*_${RT_VERSION}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp0 -i "$backport"; }
     done
 
