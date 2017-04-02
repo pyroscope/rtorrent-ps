@@ -336,6 +336,27 @@ later check with `elapsed.greater`, to avoid load spikes and
 similar effects of clustered time triggers.
 
 
+### string.contains[_i]=«haystack»,«needle»[,…]
+
+Checks if a given string contains any of the strings following it.
+The variant with ``_i`` is case-ignoring, but *only* works for pure ASCII needles.
+
+Example:
+
+```ini
+rtxmlrpc d.multicall.filtered '' '' 'string.contains_i=(d.name),x264.aac' d.hash= d.name=
+```
+
+
+### d.multicall.filtered=«viewname»,«condition»,«command»[,…]
+
+Iterates over all items of a view (or `default` if the view name is empty),
+just like ``d.multicall2``,
+but only calls the given commands if ``condition`` is true for an item.
+
+See directly above for an example.
+
+
 ## Backports of git `master` fixes and features to 0.9.2
 The following fixes and features of the development version are patched into the 0.9.2 version of rTorrent-PS:
   * [Wait for disowned HTTP requests to finish, to ensure stopped event gets sent to tracker on client shutdown](https://github.com/rakshasa/rtorrent/commit/b79dea94b2f537eda620ed48207369c076fcd11f).
