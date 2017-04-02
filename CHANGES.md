@@ -11,6 +11,8 @@
 * Build: Improved git build process
 * Build: Allow installation of several concurrent patch versions
 * Command: Added `ui.bind_key.verbose` flag (issue #55)
+* Command: Added `d.multicall.filtered`
+* Command: Added `string.contains` and `string.contains_i`
 
 
 ## 2017-03-12 PS-1.0 “First version-tagged release”
