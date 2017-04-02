@@ -513,6 +513,38 @@ d_multicall_filtered(const torrent::Object::list_type& args) {
 }
 
 
+torrent::Object::value_type apply_string_contains(bool ignore_case, const torrent::Object::list_type& args) {
+    if (args.size() < 2) {
+        throw torrent::input_error("string.contains[_i] takes at least two arguments!");
+    }
+
+    torrent::Object::list_const_iterator itr = args.begin();
+    std::string text = itr->as_string();
+    if (ignore_case)
+        std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+
+    for (++itr; itr != args.end(); ++itr) {
+        std::string substr = itr->as_string();
+        if (ignore_case)
+            std::transform(substr.begin(), substr.end(), substr.begin(), ::tolower);
+        if (substr.empty() || text.find(substr) != std::string::npos)
+            return 1;
+    }
+
+    return 0;
+}
+
+
+torrent::Object cmd_string_contains(rpc::target_type target, const torrent::Object::list_type& args) {
+    return apply_string_contains(false, args);
+}
+
+// XXX: Will NOT work correctly for non-ASCII strings!
+torrent::Object cmd_string_contains_i(rpc::target_type target, const torrent::Object::list_type& args) {
+    return apply_string_contains(true, args);
+}
+
+
 // Backports from 0.9.2
 #if (API_VERSION < 3)
 template <typename InputIterator, typename OutputIterator> OutputIterator
@@ -588,6 +620,8 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("d.multicall.filtered", _cxxstd_::bind(&d_multicall_filtered, _cxxstd_::placeholders::_2));
 #endif
 
+    CMD2_ANY_LIST("string.contains", &cmd_string_contains);
+    CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_VAR_VALUE("ui.bind_key.verbose", 1);
