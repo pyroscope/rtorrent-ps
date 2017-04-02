@@ -471,6 +471,48 @@ torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
 }
 
 
+torrent::Object
+d_multicall_filtered(const torrent::Object::list_type& args) {
+  if (args.size() < 2)
+    throw torrent::input_error("d.multicall.filtered requires at least 2 arguments.");
+  torrent::Object::list_const_iterator arg = args.begin();
+
+  // Find the given view
+  core::ViewManager* viewManager = control->view_manager();
+  core::ViewManager::iterator viewItr;
+
+  if (!arg->as_string().empty())
+    viewItr = viewManager->find(arg->as_string());
+  else
+    viewItr = viewManager->find("default");
+
+  if (viewItr == viewManager->end())
+    throw torrent::input_error("Could not find view.");
+
+  // Make a filtered copy of the current item list
+  core::View::base_type dlist;
+  (*viewItr)->filter_by(*++arg, dlist);
+
+  // Generate result by iterating over all items
+  torrent::Object             resultRaw = torrent::Object::create_list();
+  torrent::Object::list_type& result = resultRaw.as_list();
+  ++arg;  // skip to first command
+
+  for (core::View::iterator item = dlist.begin(); item != dlist.end(); ++item) {
+    // Add empty row to result
+    torrent::Object::list_type& row = result.insert(result.end(), torrent::Object::create_list())->as_list();
+
+    // Call the provided commands and assemble their results
+    for (torrent::Object::list_const_iterator command = arg; command != args.end(); command++) {
+      const std::string& cmdstr = command->as_string();
+      row.push_back(rpc::parse_command(rpc::make_target(*item), cmdstr.c_str(), cmdstr.c_str() + cmdstr.size()).first);
+    }
+  }
+
+  return resultRaw;
+}
+
+
 // Backports from 0.9.2
 #if (API_VERSION < 3)
 template <typename InputIterator, typename OutputIterator> OutputIterator
@@ -543,6 +585,7 @@ void initialize_command_pyroscope() {
     CMD2_ANY_STRING("system.env", _cxxstd_::bind(&cmd_system_env, _cxxstd_::placeholders::_2));
     CMD2_ANY("ui.current_view", _cxxstd_::bind(&cmd_ui_current_view));
     CMD2_ANY_LIST("system.random", &apply_random);
+    CMD2_ANY_LIST("d.multicall.filtered", _cxxstd_::bind(&d_multicall_filtered, _cxxstd_::placeholders::_2));
 #endif
 
     CMD2_ANY_LIST("compare", &apply_compare);
