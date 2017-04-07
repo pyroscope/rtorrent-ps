@@ -336,6 +336,20 @@ later check with `elapsed.greater`, to avoid load spikes and
 similar effects of clustered time triggers.
 
 
+### value=«number»[,«base»]
+
+Converts a given number with the given base (or 10 as the default) to an integer value.
+
+Examples:
+
+```sh
+$ rtxmlrpc --repr value '' 1b 16
+27
+$ rtxmlrpc --repr value '' 1b
+ERROR    While calling value('', '1b'): <Fault -503: 'Junk at end of number: 1b'>
+```
+
+
 ### string.contains[_i]=«haystack»,«needle»[,…]
 
 Checks if a given string contains any of the strings following it.
