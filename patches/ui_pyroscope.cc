@@ -18,6 +18,7 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
 #include "globals.h"
 
 #include <cstdio>
+#include <cwchar>
 #include <list>
 #include <stdlib.h>
 #include <unistd.h>
@@ -111,6 +112,21 @@ static uint32_t* network_history_up = 0;
 static uint32_t* network_history_down = 0;
 static std::string network_history_up_str;
 static std::string network_history_down_str;
+
+
+// Chop off an UTF-8 string
+std::string u8_chop(std::string& text, size_t glyphs) {
+    std::mbstate_t mbs = std::mbstate_t();
+    int bytes = 0, skip;
+    const char* pos = text.c_str();
+
+    while (*pos && glyphs-- > 0 && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
+        pos += skip;
+        bytes += skip;
+    }
+
+    return text.substr(0, bytes);
+}
 
 
 // get custom field contaioning a long (time_t)
@@ -486,7 +502,7 @@ int render_columns(bool headers, rpc::target_type target,
 		} else {
 			std::string text = rpc::call_object_nothrow(cols_itr->second, target).as_string();
 			//std::string text = rpc::call_command_string(cols_itr->second.as_string().c_str(), target);
-			canvas->print(column, pos, " %s", text.substr(0, header_len).c_str()); // XXX: needs UTF8 support
+			canvas->print(column, pos, " %s", u8_chop(text, header_len).c_str());
 		}
 
         // Advance posiiton
