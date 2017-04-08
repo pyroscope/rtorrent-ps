@@ -15,6 +15,8 @@
 * Command: Added `string.contains` and `string.contains_i`
 * Command: Added `value` conversion command
 
+NOTE: Support for rTorrent versions before 0.9.6 and non-C++11 compilers will end soon!
+
 
 ## 2017-03-12 PS-1.0 “First version-tagged release”
 
