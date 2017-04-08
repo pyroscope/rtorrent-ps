@@ -487,7 +487,7 @@ d_multicall_filtered(const torrent::Object::list_type& args) {
     viewItr = viewManager->find("default");
 
   if (viewItr == viewManager->end())
-    throw torrent::input_error("Could not find view.");
+    throw torrent::input_error("Could not find view '" + arg->as_string() + "'.");
 
   // Make a filtered copy of the current item list
   core::View::base_type dlist;
