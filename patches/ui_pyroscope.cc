@@ -462,6 +462,41 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 }
 
 
+// Render columns from `column_defs`, return total length
+int render_columns(bool headers, rpc::target_type target,
+                   display::Canvas* canvas, int column, int pos,
+                   const torrent::Object::map_type& column_defs) {
+	torrent::Object::map_const_iterator cols_itr, last_col = column_defs.end();
+	int total = 0;
+
+	for (cols_itr = column_defs.begin(); cols_itr != last_col; ++cols_itr) {
+		// Skip sort key (format is "sort:len:title")
+		size_t header_colon = cols_itr->first.find(':');
+		if (header_colon == std::string::npos) continue;
+
+		// Parse header length
+		const char* header_pos = cols_itr->first.c_str() + header_colon + 1;
+		char* header_text = 0;
+		int header_len = (int)strtol(header_pos, &header_text, 10);
+		if (*header_text++ != ':') continue;
+
+		// Render title text, or the result of the column command
+		if (headers) {
+			canvas->print(column, pos, " %s", header_text);
+		} else {
+			std::string text = rpc::call_object_nothrow(cols_itr->second, target).as_string();
+			//std::string text = rpc::call_command_string(cols_itr->second.as_string().c_str(), target);
+			canvas->print(column, pos, " %s", text.substr(0, header_len).c_str()); // XXX: needs UTF8 support
+		}
+
+        // Advance posiiton
+		column += header_len + 1;
+		total += header_len + 1;
+	}
+	return total;
+}
+
+
 // patch hook for download list canvas redraw; if this returns true, the calling
 // function is left immediately (i.e. true indicates we took over ALL redrawing)
 bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view) {
@@ -482,9 +517,13 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 		return true;
 
 	// show column headers
-	int pos = 1;
-	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇   Name");
-	if (canvas->width() > TRACKER_LABEL_WIDTH) {
+	const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
+	int pos = 1, base_offset = 45, column = base_offset; // 45 depends on the static headers below
+
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇   ");
+	column += render_columns(true, rpc::make_target(), canvas, column, pos, column_defs);
+	canvas->print(column, pos, " Name "); column += 6;
+	if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
 		canvas->print(canvas->width() - 14, 1, "Tracker Domain");
 	}
 	canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
@@ -580,7 +619,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
 		}
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s%s%s",
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s",
 			range.first == view->focus() ? "»" : " ",
 			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
@@ -603,14 +642,25 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
 			!down_rate   ? elapsed_time(get_custom_long(d, "tm_loaded")).c_str() :
 			               human_size(down_rate, 2 | 8).c_str(),
-			human_size(item->file_list()->size_bytes(), 2).c_str(),
+			human_size(item->file_list()->size_bytes(), 2).c_str()
+		);
+
+		// Render custom columns
+		column = base_offset;
+		int custom_len = render_columns(false, rpc::make_target(d), canvas, column, pos, column_defs);
+		canvas->set_attr(column, pos, custom_len, attr_map[ps::COL_DEFAULT], ps::COL_DEFAULT);
+		column += custom_len;
+		int x_name = column + 1;
+
+		// Render name
+		canvas->print(column, pos, "%s%s",
 			displayname.empty() ? "" : " ",
 			displayname.empty() ? buffer : displayname.c_str()
 		);
 
 		int x_scrape = 3 + 8*2 + 1; // lead, 8 status columns, gap
 		int x_rate = x_scrape + 3*3; // skip 3 scrape columns
-		int x_name = x_rate + 3*5 + 1; // skip 3 rate/size columns
+		//int x_name = x_rate + 3*5 + 1; // skip 3 rate/size columns
 		decorate_download_title(window, canvas, view, pos, range);
 		canvas->set_attr(2, pos, x_name-2, attr_map[col_active + offset], col_active + offset);
 		if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
@@ -841,4 +891,9 @@ void initialize_command_ui_pyroscope() {
 	PS_CMD_ANY_FUN("system.colors.max",			display::get_colors);
 	PS_CMD_ANY_FUN("system.colors.enabled",		has_colors);
 	PS_CMD_ANY_FUN("system.colors.rgb",			can_change_color);
+
+	rpc::parse_command_multiple
+		(rpc::make_target(),
+		"method.insert = ui.column.render, multi|rlookup|static\n"
+	);
 }
