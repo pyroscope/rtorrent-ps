@@ -115,7 +115,7 @@ static std::string network_history_down_str;
 
 
 // Chop off an UTF-8 string
-std::string u8_chop(std::string& text, size_t glyphs) {
+std::string u8_chop(const std::string& text, size_t glyphs) {
     std::mbstate_t mbs = std::mbstate_t();
     int bytes = 0, skip;
     const char* pos = text.c_str();
@@ -125,7 +125,7 @@ std::string u8_chop(std::string& text, size_t glyphs) {
         bytes += skip;
     }
 
-    return text.substr(0, bytes);
+    return bytes < text.length() ? text.substr(0, bytes) : text;
 }
 
 
@@ -352,12 +352,14 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
     int title_col;
     unsigned long focus_attr = range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0;
     if ((*range.first)->is_done())
-        title_col = (active ? D_INFO(item)->up_rate()->rate() ? ps::COL_SEEDING : ps::COL_COMPLETE : ps::COL_STOPPED) + offset;
+        title_col = (active ? D_INFO(item)->up_rate()->rate() ?
+                     ps::COL_SEEDING : ps::COL_COMPLETE : ps::COL_STOPPED) + offset;
     else
-        title_col = (active ? D_INFO(item)->down_rate()->rate() ? ps::COL_LEECHING : ps::COL_INCOMPLETE : ps::COL_QUEUED) + offset;
+        title_col = (active ? D_INFO(item)->down_rate()->rate() ?
+                     ps::COL_LEECHING : ps::COL_INCOMPLETE : ps::COL_QUEUED) + offset;
     canvas->set_attr(2, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
-    // show label for tracker in focus
+    // show label for active tracker (a/k/a in focus tracker)
     std::string url = get_active_tracker_domain((*range.first)->download());
     if (!url.empty()) {
         std::string alias = tracker_aliases[url];
@@ -534,8 +536,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
     // show column headers
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
-    // base_offset value depends on the static headers below!
-    int pos = 1, base_offset = 39, column = base_offset;
+    // x_base value depends on the static headers below!
+    int pos = 1, x_base = 39, column = x_base;
 
     canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇ ");
     column += render_columns(true, rpc::make_target(), canvas, column, pos, column_defs);
@@ -622,9 +624,6 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         std::string displayname = get_custom_string(d, "displayname");
         int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
         uint32_t down_rate = D_INFO(item)->down_rate()->rate();
-        char buffer[canvas->width() + 1];
-        char* last = buffer + canvas->width() - 2 + 1;
-        print_download_title(buffer, last, d);
 
         char progress_str[6] = "##";
         char ying_yang_str[6] = "##";
@@ -662,17 +661,16 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         );
 
         // Render custom columns
-        column = base_offset;
+        column = x_base;
         int custom_len = render_columns(false, rpc::make_target(d), canvas, column, pos, column_defs);
         canvas->set_attr(column, pos, custom_len, attr_map[ps::COL_DEFAULT], ps::COL_DEFAULT);
         column += custom_len;
         int x_name = column + 1;
 
         // Render name
-        canvas->print(column, pos, "%s%s",
-            displayname.empty() ? "" : " ",
-            displayname.empty() ? buffer : displayname.c_str()
-        );
+        canvas->print(column, pos, " %s", u8_chop(
+            displayname.empty() ? d->info()->name() : displayname.c_str(),
+            canvas->width() - x_name - 1).c_str());
 
         int x_scrape = 3 + 8*2 + 1; // lead, 8 status columns, gap
         int x_rate = x_scrape + 3*3; // skip 3 scrape columns
