@@ -534,9 +534,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
 	// show column headers
 	const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
-	int pos = 1, base_offset = 45, column = base_offset; // 45 depends on the static headers below
+	// base_offset value depends on the static headers below!
+	int pos = 1, base_offset = 44, column = base_offset;
 
-	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇   ");
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇  ");
 	column += render_columns(true, rpc::make_target(), canvas, column, pos, column_defs);
 	canvas->print(column, pos, " Name "); column += 6;
 	if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
