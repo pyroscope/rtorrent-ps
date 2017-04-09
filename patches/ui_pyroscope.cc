@@ -535,9 +535,9 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 	// show column headers
 	const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
 	// base_offset value depends on the static headers below!
-	int pos = 1, base_offset = 44, column = base_offset;
+	int pos = 1, base_offset = 39, column = base_offset;
 
-	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇   ✇  ");
+	canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇ ");
 	column += render_columns(true, rpc::make_target(), canvas, column, pos, column_defs);
 	canvas->print(column, pos, " Name "); column += 6;
 	if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
@@ -636,7 +636,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
 		}
 
-		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s %s",
+		canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s ",
 			range.first == view->focus() ? "»" : " ",
 			item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
 			rpc::call_command_string("d.tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
@@ -658,8 +658,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 			d->is_done() || !down_rate ? "" : " ",
 			d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
 			!down_rate   ? elapsed_time(get_custom_long(d, "tm_loaded")).c_str() :
-			               human_size(down_rate, 2 | 8).c_str(),
-			human_size(item->file_list()->size_bytes(), 2).c_str()
+			               human_size(down_rate, 2 | 8).c_str()
 		);
 
 		// Render custom columns
