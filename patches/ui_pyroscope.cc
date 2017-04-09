@@ -857,6 +857,17 @@ torrent::Object cmd_trackers_alias_items(rpc::target_type target) {
 }
 
 
+torrent::Object apply_human_size(const torrent::Object::list_type& args) {
+    if (args.size() != 1 && args.size() != 2)
+        throw torrent::input_error("convert.human_size takes 1 or 2 arguments!");
+
+    torrent::Object::value_type bytes = args.front().as_value();
+    torrent::Object::value_type format = args.size() > 1 ? args.back().as_value() : 2;
+
+    return display::human_size(bytes, format);
+}
+
+
 // register our commands
 void initialize_command_ui_pyroscope() {
 	#define PS_VARIABLE_COLOR(key, value) \
@@ -908,6 +919,8 @@ void initialize_command_ui_pyroscope() {
 	PS_CMD_ANY_FUN("system.colors.max",			display::get_colors);
 	PS_CMD_ANY_FUN("system.colors.enabled",		has_colors);
 	PS_CMD_ANY_FUN("system.colors.rgb",			can_change_color);
+
+    CMD2_ANY_LIST("convert.human_size", _cxxstd_::bind(&apply_human_size, _cxxstd_::placeholders::_2));
 
 	rpc::parse_command_multiple
 		(rpc::make_target(),
