@@ -659,7 +659,9 @@ torrent::Object cmd_system_env(const torrent::Object::string_type& arg) {
 
 // https://github.com/rakshasa/rtorrent/commit/30d8379391ad4cb3097d57aa56a488d061e68662
 torrent::Object cmd_ui_current_view() {
-    return control->ui()->download_list()->current_view()->name();
+    ui::DownloadList* dl = control->ui()->download_list();
+    core::View* view = dl ? dl->current_view() : 0;
+    return view ? view->name() : std::string();
 }
 #endif
 
