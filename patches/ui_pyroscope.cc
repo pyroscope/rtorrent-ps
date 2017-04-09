@@ -537,9 +537,9 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     // show column headers
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
     // x_base value depends on the static headers below!
-    int pos = 1, x_base = 39, column = x_base;
+    int pos = 1, x_base = 31, column = x_base;
 
-    canvas->print(2, pos, " ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇ ");
+    canvas->print(2, pos, " ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇ ");
     column += render_columns(true, rpc::make_target(), canvas, column, pos, column_defs);
     canvas->print(column, pos, " Name "); column += 6;
     if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
@@ -619,8 +619,6 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
                 alert = "⨂ ";
         }
 
-        const char* prios[] = {"✖ ", "⇣ ", "  ", "⇡ "};
-
         std::string displayname = get_custom_string(d, "displayname");
         int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
         uint32_t down_rate = D_INFO(item)->down_rate()->rate();
@@ -635,12 +633,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
         }
 
-        canvas->print(0, pos, "%s  %s%s%s%s%s%s%s%s %s %s %s %s %s%s ",
+        canvas->print(0, pos, "%s  %s%s%s%s %s %s %s %s %s%s ",
             range.first == view->focus() ? "»" : " ",
-            item->is_open() ? item->is_active() ? "▹ " : "╍ " : "▪ ",
-            rpc::call_command_string("d.tied_to_file", rpc::make_target(d)).empty() ? "  " : "⚯ ",
-            rpc::call_command_value("d.ignore_commands", rpc::make_target(d)) == 0 ? "⚒ " : "◌ ",
-            prios[d->priority() % 4],
             d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
                 item->file_list()->completed_chunks() * PROGRESS_STEPS
                 / item->file_list()->size_chunks()],
@@ -672,7 +666,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             displayname.empty() ? d->info()->name() : displayname.c_str(),
             canvas->width() - x_name - 1).c_str());
 
-        int x_scrape = 3 + 8*2 + 1; // lead, 8 status columns, gap
+        int x_scrape = 3 + 4*2 + 1; // lead, 4 status columns, gap
         int x_rate = x_scrape + 3*3; // skip 3 scrape columns
         //int x_name = x_rate + 3*5 + 1; // skip 3 rate/size columns
         decorate_download_title(window, canvas, view, pos, range);
