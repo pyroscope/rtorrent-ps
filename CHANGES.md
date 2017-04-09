@@ -12,7 +12,7 @@
 * Command: Added `d.multicall.filtered`
 * Command: Added `string.contains` and `string.contains_i`
 * Command: Added `value` conversion command
-* Command: Added `convert.human_size` command
+* Command: Added `convert.human_size` and `convert.magnitude`
 * Fix: Prevent filtering of ``started`` and ``stopped`` views [@chros73] (issue #36)
 * Fix: `system.file.allocate.set=[0|1]` semantics [@chros73] (issue #41)
 * Build: Improved git build process
