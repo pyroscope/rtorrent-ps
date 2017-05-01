@@ -48,6 +48,10 @@ export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 : ${CFG_OPTS_RT:=}
 export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPTS CFG_OPTS_LT CFG_OPTS_RT
 
+export SRC_DIR=$(cd $(dirname $0) && pwd)
+LT_PATCHES=( )
+RT_PATCHES=( )
+
 # Distro specifics
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
@@ -59,6 +63,7 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         BUILD_PKG_DEPS=( ncurses openssl cppunit )
         source /etc/makepkg.conf 2>/dev/null
         MAKE_OPTS="${MAKEFLAGS}${MAKE_OPTS:+ }${MAKE_OPTS}"
+        LT_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     NonLSB)
         # Place tests for MacOSX etc. here
@@ -192,7 +197,6 @@ pkg-config:pkg-config
 
 set -e
 set +x
-export SRC_DIR=$(cd $(dirname $0) && pwd)
 SUBDIRS="c-ares-*[0-9] curl-*[0-9] xmlrpc-c-advanced-$XMLRPC_REV libtorrent-*[0-9] rtorrent-*[0-9]"
 ESC=$(echo -en \\0033)
 BOLD="$ESC[1m"
@@ -384,7 +388,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Patch libtorrent
     pushd libtorrent-$LT_VERSION
 
-    for corepatch in $SRC_DIR/patches/lt-ps-*_{${LT_VERSION},all}.patch; do
+    for corepatch in $SRC_DIR/patches/lt-ps-*_{${LT_VERSION},all}.patch "${LT_PATCHES[@]}"; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
@@ -398,7 +402,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     # Patch rTorrent
     pushd rtorrent-$RT_VERSION
 
-    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION},all}.patch; do
+    for corepatch in $SRC_DIR/patches/ps-*_{${RT_VERSION},all}.patch "${RT_PATCHES[@]}"; do
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
