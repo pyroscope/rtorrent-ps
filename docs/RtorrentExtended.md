@@ -71,9 +71,13 @@ you will get the following additional features in your `rTorrent-PS` installatio
   1. the `!` key is bound to a `messages` view, listing all items that currently have a non-empty message, sorted in order of the message text.
   1. the `^` key is bound to the `rtcontrol` search result view, so you can easily return to your last search.
   1. the `?` key is bound to the `indemand` view, which sorts all open items by their activity, with the most recently active on top.
+  1. ``Page ↑`` and ``Page ↓`` scroll by 50 items at a time (or whatever other value ``ui.focus.page_size`` has).
+  1. ``Home`` / ``End`` jump to the first / last item in the current view.
   1. the `~` key rotates through all available color themes, or a user-selected subset.
   1. the `<` and `>` keys rotate through all added category views (`pyro.category.add=‹name›`), with filtering based on the ruTorrent label (`custom_1=‹name›`).
+  1. ``|`` reapplies the category filter and thus updates the current category view.
   1. the `u` key shows the uptime and some other essential data of your rTorrent instance.
+  1. ``F2`` shows some important help resources (web links) in the console log.
   1. `*` toggles between the collapsed (as described on [Extended Canvas Explained](https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#extended-canvas-explained)) and the expanded display of the current view. <br /><br /> ![rt-ps-name-view](https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-name-view.png)
   1. The `active` view is changed to include all incomplete items regardless of whether they have any traffic, and then groups the list into complete, incomplete, and queued items, in that order. Within each group, they're sorted by download and then upload speed.
   1. The commands `s=«keyword»`, `t=«tracker_alias»`, and `f=«filter_condition»` are pre-defined for searching using a Ctrl-X prompt.
@@ -83,6 +87,8 @@ you will get the following additional features in your `rTorrent-PS` installatio
      or alternatively use `--to-view tagged` to populate the `tagged` view,
      then deselect some items interactively with the `.` key, and finally mass-control the rest.
   1. You can use the `purge=` and `cull=` commands (on a Ctrl-X prompt) for deleting the current item and its (incomplete) data.
+  1. ``Ctrl-g`` shows the tags of an item (as managed by ``rtcontrol``); ``tag.add=‹tag›`` and ``tag.rm=‹tag›`` can be used to change the set of tags, both also show the new set of tags after changing them.
+  1. Trackers are scraped regularly (active items relatively often, inactive items including closed ones seldomly), so that the display of downloads / seeders / leechers is not totally outdated.
 
 > ✪ _Do not forget to set the value of `pyro.extended` to 1!_
 
