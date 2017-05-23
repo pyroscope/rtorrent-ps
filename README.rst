@@ -224,8 +224,20 @@ This is intended to be used for checking compatibility of patches with the head 
 and preparing PRs for it.
 You will *not get a stable system* and these builds are in no way recommended for production use.
 
-Start by checking out the two projects as siblings of the ``rtorrent-ps`` workdir.
-Then use these commands to build them:
+Start by checking out the two projects as siblings of the ``rtorrent-ps`` workdir,
+leading to a folder structure like this:
+
+.. code-block::
+
+    .
+    ├── libtorrent
+    ├── rakshasa-rtorrent
+    └── rtorrent-ps
+
+As you can see, the sibling folders can have an optional ``rakshasa-`` prefix.
+
+Then use these commands within ``rtorrent-ps`` to build all dependencies and
+the git HEAD code from the sibling folders:
 
 .. code-block:: bash
 
