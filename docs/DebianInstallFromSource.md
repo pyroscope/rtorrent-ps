@@ -157,7 +157,7 @@ nor another version of rTorrent you've installed the same way.
 
 ```sh
 # Run this in your NORMAL user account!
-mkdir -p ~/src/; cd ~/src/
+mkdir -p ~/src/; cd $_
 git clone https://github.com/pyroscope/rtorrent-ps.git
 cd rtorrent-ps
 
