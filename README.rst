@@ -266,14 +266,10 @@ Startup Failure: ‘your terminal only supports 8 colors’
 
 Read these instructions:
 
--  `color
-   configuration <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uicolortypesetcolor-def>`_
--  `tmux and 256
-   colors <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#using-the-extended-canvas-with-tmux--screen-and-256-colors>`_
--  `(Windows) Terminal
-   Setup <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal>`_,
-   and `Font Linking on
-   Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
+-  `color configuration <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uicolortypesetcolor-def>`_
+-  `tmux and 256 colors <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#using-the-extended-canvas-with-tmux--screen-and-256-colors>`_
+-  `(Windows) Terminal Setup <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal>`_,
+   and `Font Linking on Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
 
 If all else fails, you can add a
 `configuration snippet <https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/color-schemes/default-8.rc>`_
@@ -283,12 +279,15 @@ to ``rtorrent.rc`` so that only 8 colors are used.
 References
 ----------
 
--  https://github.com/rakshasa/rtorrent
+-  The `rTorrent <https://github.com/rakshasa/rtorrent>`_
+   and `libtorrent <https://github.com/rakshasa/libtorrent>`_ projects
 -  `rTorrent Documentation Wiki`_
+-  `rTorrent Community Wiki`_
+   and the `rTorrent Handbook <http://rtorrent-docs.rtfd.io/>`_
 
 .. _`official release`: https://github.com/pyroscope/rtorrent-ps/releases
 .. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/CHANGES.md
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
 .. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
-.. _`rTorrent Community Wiki`: http://community.rutorrent.org/
+.. _`rTorrent Community Wiki`: https://github.com/rtorrent-community/rtorrent-community.github.io/wiki
