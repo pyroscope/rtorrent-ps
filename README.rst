@@ -276,6 +276,23 @@ If all else fails, you can add a
 to ``rtorrent.rc`` so that only 8 colors are used.
 
 
+Startup Failure: ‘libxmlrpc_*.so cannot open shared object file’
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On newer systems, ``RPATH`` is replaced by ``RUNPATH`` with consequences
+regarding the search path for *transitive* library dependencies (like that of
+``libxmlrpc`` to the other ``libxmlrpc_*`` libraries).
+In the end, those transitive dependencies cannot be resolved without some
+extra config.
+
+The solution is to use the provided `start script`_, which explicitly sets
+``LD_LIBRARY_PATH`` from any ``RPATH`` or ``RUNPATH`` found in the executable.
+Or if you use a systemd unit, use an ``Environment`` directive to set the
+library path, e.g. ``Environment=LD_LIBRARY_PATH=/opt/rtorrent/lib``.
+
+.. _start script: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh
+
+
 References
 ----------
 
