@@ -333,7 +333,9 @@ build_deps() {
         && ./configure --prefix=$INSTALL_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
         && $MAKE $MAKE_OPTS && $MAKE install )
-    $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/bin/xmlrpc-c-config
+    $SED_I s:/usr/local:$INSTALL_DIR: \
+        -re 's:^NEED_WL_RPATH=.+$:NEED_WL_RPATH="yes":' \
+        $INSTALL_DIR/bin/xmlrpc-c-config
 }
 
 core_unpack() { # Unpack original LT/RT source
