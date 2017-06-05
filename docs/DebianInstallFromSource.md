@@ -248,7 +248,6 @@ so you can easily add your own customizations in new ``rtorrent.d/*.rc`` files.
 
 ```sh
 # Run this in your NORMAL user account!
-export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
 ~/.local/pyroscope/src/scripts/make-rtorrent-config.sh
 ```
 
