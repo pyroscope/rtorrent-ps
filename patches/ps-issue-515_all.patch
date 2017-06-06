@@ -1,0 +1,25 @@
+--- a/src/rpc/command_scheduler.cc
++++ b/src/rpc/command_scheduler.cc
+@@ -64,14 +64,19 @@ CommandScheduler::insert(const std::string& key) {
+     throw torrent::input_error("Scheduler received an empty key.");
+ 
+   iterator itr = find(key);
++  CommandSchedulerItem* old = NULL;
+ 
+   if (itr == end())
+     itr = base_type::insert(end(), NULL);
+   else
+-    delete *itr;
++    old = *itr;
++
++  CommandSchedulerItem* current = new CommandSchedulerItem(key);
++  current->slot() = std::tr1::bind(&CommandScheduler::call_item, this, current);
+ 
+-  *itr = new CommandSchedulerItem(key);
+-  (*itr)->slot() = std::tr1::bind(&CommandScheduler::call_item, this, *itr);
++  // swap in fully initialized command, and THEN delete a possibly replaced one
++  *itr = current;
++  delete old;
+ 
+   return itr;
+ }
