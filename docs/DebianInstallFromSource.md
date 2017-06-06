@@ -70,7 +70,7 @@ apt-get install tmux curl wget build-essential git locales \
     python-setuptools python-virtualenv python-dev \
     libssl-dev libncurses-dev libncursesw5-dev libcppunit-dev \
     autoconf automake libtool \
-    libxml2-dev libxslt1-dev
+    libxml2-dev libxslt1-dev zlib1g-dev
 ```
 
 Note that you can always show Debian's current build dependencies for rTorrent using this command:
