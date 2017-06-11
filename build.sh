@@ -1,7 +1,38 @@
 #! /usr/bin/env bash
 #
-# Build rTorrent including patches
+# Build rpath-linked rTorrent including patches and dependencies.
 #
+# Patches Explained
+# -----------------
+#
+# In the 'extend' action, the release tarballs are unpacked and
+# then all relevant patches are applied before compiling.
+#
+# The lt-ps/ps patches are feature additions, or bug fixes developed
+# originally for rTorrent-PS, that change the core code.
+#
+# The backport patch file names can contain several version numbers,
+# namely those versions they apply to.
+#
+# libtorrent patches:
+#   * lt-ps-*_{0.13.N,all}.patch
+#   * backport*_0.13.N_*.patch
+#   * the 'LT_PATCHES' array (conditional patches)
+#
+# rtorrent patches:
+#   * ps-*_{0.9.N,all}.patch
+#   * backport*_0.9.N_*.patch
+#   * the 'RT_PATCHES' array (conditional patches)
+#
+# Original PyroScope patches (new commands and canvas):
+#   * pyroscope.patch
+#   * ui_pyroscope.patch
+#
+# Patches that contain neither a LT/RT version or 'all' are ones
+# added dynamically in the build script (e.g. platform-specific ones).
+#
+# Note that patches are only tested for the current stable release,
+# so older versions might get regressions over time (failing patches).
 
 # Get git metadata
 now_iso="$(date +'%Y%m%d-%H%M')"
