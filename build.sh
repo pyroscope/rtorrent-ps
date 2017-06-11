@@ -18,11 +18,15 @@
 #   * lt-ps-*_{0.13.N,all}.patch
 #   * backport*_0.13.N_*.patch
 #   * the 'LT_PATCHES' array (conditional patches)
+#   * 'LT_BASE_PATCHES' also apply to vanilla builds
+#   * note that all of these patches ALSO influence the vanilla version
+#     at runtime (via dynamic linking)
 #
 # rtorrent patches:
 #   * ps-*_{0.9.N,all}.patch
 #   * backport*_0.9.N_*.patch
 #   * the 'RT_PATCHES' array (conditional patches)
+#   * 'RT_BASE_PATCHES' also apply to vanilla builds
 #
 # Original PyroScope patches (new commands and canvas):
 #   * pyroscope.patch
@@ -82,19 +86,25 @@ export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPT
 export SRC_DIR=$(cd $(dirname $0) && pwd)
 LT_PATCHES=( )
 RT_PATCHES=( )
+LT_BASE_PATCHES=( )
+RT_BASE_PATCHES=( )
 
 # Distro specifics
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
         ;;
-    *-vivid|*-wily|*-xenial|*-yakkety|*-jessie|*-stretch)
+    *-vivid|*-wily|*-xenial|*-yakkety|*-jessie)
         export CARES_VERSION=1.11.0 # 2016-02
+        ;;
+    *-stretch)
+        export CARES_VERSION=1.11.0 # 2016-02
+        LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     Arch-*) # 0.9.[46] only!
         BUILD_PKG_DEPS=( ncurses openssl cppunit )
         source /etc/makepkg.conf 2>/dev/null
         MAKE_OPTS="${MAKEFLAGS}${MAKE_OPTS:+ }${MAKE_OPTS}"
-        LT_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
+        LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     NonLSB)
         # Place tests for MacOSX etc. here
@@ -375,6 +385,20 @@ core_unpack() { # Unpack original LT/RT source
 
     tar xfz tarballs/libtorrent-$LT_VERSION.tar.gz
     tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
+
+    # Patch libtorrent (vanilla)
+    pushd libtorrent-$LT_VERSION
+    for corepatch in "${LT_BASE_PATCHES[@]}"; do
+        test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
+    done
+    popd
+
+    # Patch rTorrent (vanilla)
+    pushd rtorrent-$RT_VERSION
+    for corepatch in "${RT_BASE_PATCHES[@]}"; do
+        test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
+    done
+    popd
 }
 
 build() { # Build and install all components
