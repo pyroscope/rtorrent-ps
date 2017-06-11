@@ -336,16 +336,19 @@ build_deps() {
     $SED_I s:/usr/local:$INSTALL_DIR: \
         -re 's:^NEED_WL_RPATH=.+$:NEED_WL_RPATH="yes":' \
         $INSTALL_DIR/bin/xmlrpc-c-config
+    touch $INSTALL_DIR/lib/DEPS-DONE
 }
 
 core_unpack() { # Unpack original LT/RT source
-    test -e $INSTALL_DIR/lib/libxmlrpc.a || fail "You need to '$0 build' first!"
+    test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
 
     tar xfz tarballs/libtorrent-$LT_VERSION.tar.gz
     tar xfz tarballs/rtorrent-$RT_VERSION.tar.gz
 }
 
 build() { # Build and install all components
+    test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
+
     ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
@@ -363,6 +366,8 @@ build_git() { # Build and install libtorrent and rtorrent from git checkouts
     local lt_src="../rakshasa-libtorrent"; test -d "$lt_src" || lt_src="../libtorrent"
     local rt_src="../rakshasa-rtorrent"; test -d "$rt_src" || rt_src="../rtorrent"
 
+    test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
+
     # TODO: ++ LIBTORRENT_CURRENT=19
     $SED_I 's/^AC_INIT(libtorrent, '${LT_VERSION}'/AC_INIT(libtorrent, '${LT_VERSION%.*}.$GIT_MINOR'/' "$lt_src/configure.ac"
     $SED_I 's/^AC_INIT(rtorrent, '$RT_RELEASE_VERSION'/AC_INIT(rtorrent, '$RT_VERSION'/' "$rt_src/configure.ac"
@@ -379,6 +384,7 @@ build_git() { # Build and install libtorrent and rtorrent from git checkouts
 }
 
 extend() { # Rebuild and install libtorrent and rTorrent with patches applied
+    test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
     core_unpack
 
     # Version handling
@@ -552,8 +558,16 @@ build_everything() {
     # Go through all build steps
     set_build_env
     ${NODEPS:-false} || build_deps
+
     build
     symlink_binary -vanilla
+    check
+
+    rt_binary="$SRC_DIR/rtorrent-$RT_RELEASE_VERSION/src/rtorrent"
+    test -e "$rt_binary" || fail "Something went wrong! ($rt_binary not found)"
+
+    extend
+    symlink_binary -extended
     check
 }
 
@@ -562,52 +576,58 @@ build_everything() {
 # MAIN
 #
 cd "$SRC_DIR"
-case "$1" in
-    all)        prep; download; build_everything ;;
-    clean)      clean ;;
-    clean_all)  clean_all ;;
-    download)   prep; download ;;
-    env)        prep; set +x; set_build_env echo '"';;
-    build)      prep; build_everything ;;
-    git|build_git)
-                BUILD_GIT=true
-                prep
-                set_build_env
-                rt_binary="$SRC_DIR/rtorrent-$RT_RELEASE_VERSION/src/rtorrent"
-                test -e "$rt_binary" || fail "You need to '$0 all' first! ($rt_binary not found)"
-                build_git
-                symlink_binary -git
-                check
-                ;;
-    rtorrent)   prep; core_unpack; NODEPS=true; build_everything ;;
-    extend)     prep
-                set_build_env
-                rt_binary="$SRC_DIR/rtorrent-$RT_RELEASE_VERSION/src/rtorrent"
-                test -e "$rt_binary" || fail "You need to '$0 all' first! ($rt_binary not found)"
-                extend
-                symlink_binary -extended
-                check
-                ;;
-    check)      check ;;
-    install)    install;;
-    pkg2deb)    pkg2deb;;
-    pkg2pacman) pkg2pacman;;
-    *)
-        echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
-        echo >&2 "Build rTorrent$VERSION_EXTRAS $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"
-        echo >&2
-        echo >&2 "Custom environment variables:"
-        echo >&2 "    CURL_OPTS=\"${CURL_OPTS}\" (e.g. --insecure)"
-        echo >&2 "    MAKE_OPTS=\"${MAKE_OPTS}\""
-        echo >&2 "    CFG_OPTS=\"${CFG_OPTS}\" (e.g. --enable-debug --enable-extra-debug)"
-        echo >&2 "    CFG_OPTS_LT=\"${CFG_OPTS_LT}\" (e.g. --disable-instrumentation for MIPS, PowerPC, ARM)"
-        # MIPS | PowerPC | ARM users, read https://github.com/rakshasa/rtorrent/issues/156
-        echo >&2 "    CFG_OPTS_RT=\"${CFG_OPTS_RT}\""
-        echo >&2
-        echo >&2 "Build actions:"
-        grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | while read i; do
-            echo "   " $(eval "echo $i") | tr @ \\t
-        done
-        exit 1
-        ;;
-esac
+while test -n "$1"; do
+    action="$1"; shift
+    case "$action" in
+        all)        prep; download; build_everything ;;
+        clean)      clean ;;
+        clean_all)  clean_all ;;
+        download)   prep; download ;;
+        env)        prep; set +x; set_build_env echo '"';;
+        build)      prep; build_everything ;;
+        deps)       prep; set_build_env; build_deps ;;
+        git|build_git)
+                    BUILD_GIT=true
+                    prep
+                    set_build_env
+                    build_git
+                    symlink_binary -git
+                    check
+                    ;;
+        vanilla)    prep
+                    set_build_env
+                    core_unpack
+                    build
+                    symlink_binary -vanilla
+                    check
+                    ;;
+        extend)     prep
+                    set_build_env
+                    extend
+                    symlink_binary -extended
+                    check
+                    ;;
+        check)      check ;;
+        install)    install;;
+        pkg2deb)    pkg2deb;;
+        pkg2pacman) pkg2pacman;;
+        *)
+            echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
+            echo >&2 "Build rTorrent$VERSION_EXTRAS $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"
+            echo >&2
+            echo >&2 "Custom environment variables:"
+            echo >&2 "    CURL_OPTS=\"${CURL_OPTS}\" (e.g. --insecure)"
+            echo >&2 "    MAKE_OPTS=\"${MAKE_OPTS}\""
+            echo >&2 "    CFG_OPTS=\"${CFG_OPTS}\" (e.g. --enable-debug --enable-extra-debug)"
+            echo >&2 "    CFG_OPTS_LT=\"${CFG_OPTS_LT}\" (e.g. --disable-instrumentation for MIPS, PowerPC, ARM)"
+            # MIPS | PowerPC | ARM users, read https://github.com/rakshasa/rtorrent/issues/156
+            echo >&2 "    CFG_OPTS_RT=\"${CFG_OPTS_RT}\""
+            echo >&2
+            echo >&2 "Build actions:"
+            grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | while read i; do
+                echo "   " $(eval "echo $i") | tr @ \\t
+            done
+            exit 1
+            ;;
+    esac
+done
