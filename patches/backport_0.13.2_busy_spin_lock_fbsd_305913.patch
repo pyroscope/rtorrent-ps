@@ -1,5 +1,5 @@
---- src/torrent/utils/thread_base.cc,orig	2013-01-10 19:42:12.000000000 +0100
-+++ src/torrent/utils/thread_base.cc	2013-01-10 19:45:50.000000000 +0100
+--- a/src/torrent/utils/thread_base.cc,orig	2013-01-10 19:42:12.000000000 +0100
++++ b/src/torrent/utils/thread_base.cc	2013-01-10 19:45:50.000000000 +0100
 @@ -90,2 +90,4 @@
  thread_base::interrupt() {
 +  int sleep_length = 0;

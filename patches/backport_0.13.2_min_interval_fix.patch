@@ -1,5 +1,5 @@
---- src/torrent/tracker_controller.cc,orig	2012-09-25 20:14:48.000000000 +0200
-+++ src/torrent/tracker_controller.cc	2012-09-25 20:26:06.000000000 +0200
+--- a/src/torrent/tracker_controller.cc,orig	2012-09-25 20:14:48.000000000 +0200
++++ b/src/torrent/tracker_controller.cc	2012-09-25 20:26:06.000000000 +0200
 @@ -397,4 +397,2 @@
      interval = 5 << std::min<int>(tracker->failed_counter() - 1, 6);
 -  else if (tracker->success_counter() < 2 && tracker->latest_sum_peers() < 10)

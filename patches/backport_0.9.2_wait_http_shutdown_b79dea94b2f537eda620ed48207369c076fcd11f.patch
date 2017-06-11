@@ -1,5 +1,5 @@
---- src/control.cc
-+++ src/control.cc
+--- a/src/control.cc
++++ b/src/control.cc
 @@ -44,6 +44,7 @@
  #include "core/download_store.h"
  #include "core/view_manager.h"
@@ -26,4 +26,3 @@
  }
  
  void
-
