@@ -68,8 +68,8 @@ These are the only steps that must be performed by the `root` user
 ```sh
 apt-get install tmux curl wget build-essential git locales \
     python-setuptools python-virtualenv python-dev \
-    libssl-dev libncurses-dev libncursesw5-dev libcppunit-dev \
-    autoconf automake libtool \
+    libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
+    libcppunit-dev autoconf automake libtool \
     libxml2-dev libxslt1-dev
 ```
 
