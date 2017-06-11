@@ -86,8 +86,8 @@ export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPT
 export SRC_DIR=$(cd $(dirname $0) && pwd)
 LT_PATCHES=( )
 RT_PATCHES=( )
-LT_BASE_PATCHES=( )
-RT_BASE_PATCHES=( )
+LT_BASE_PATCHES=( $SRC_DIR/patches/lt-base-cppunit-pkgconfig.patch )
+RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
 
 # Distro specifics
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
