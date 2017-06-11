@@ -165,10 +165,8 @@ cd rtorrent-ps
 # and the amount of free memory you have available.
 export MAKE_OPTS="-j4"
 
-# check the VERSION SELECTION at the top of the script, and edit as needed,
-# then call BOTH these commands…
-nice time ./build.sh all  # build 'rtorrent-vanilla', and then ALSO…
-nice time ./build.sh extend  # apply patches and build 'rtorrent-ps' ON TOP of that
+# check the VERSION SELECTION at the top of the script, and edit as needed
+nice time ./build.sh all  # build 'deps, 'vanilla', and then 'extended'
 ```
 
 This is what you'll get:
