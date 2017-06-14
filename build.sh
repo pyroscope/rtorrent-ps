@@ -148,8 +148,8 @@ unset LC_ALL
 export LC_ALL
 
 # Select build tools (prefer 'g' variants if there)
-command which gmake && export MAKE=gmake || export MAKE=make
-command which glibtoolize && export LIBTOOLIZE=glibtoolize || export LIBTOOLIZE=libtoolize
+command which gmake >/dev/null && export MAKE=gmake || export MAKE=make
+command which glibtoolize >/dev/null && export LIBTOOLIZE=glibtoolize || export LIBTOOLIZE=libtoolize
 
 # Platform magic
 export SED_I="sed -i -e"
