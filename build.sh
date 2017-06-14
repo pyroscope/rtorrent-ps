@@ -53,7 +53,7 @@ export GIT_MINOR=$(( $RT_MINOR + 1 ))  # ensure git version has a bumped version
 export VERSION_EXTRAS=" $git_id"
 
 # Debian-like deps, see below for other distros
-BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev libcppunit-dev locales )
+BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev zlib1g-dev libcppunit-dev locales )
 test "$RT_VERSION" != "0.9.2" || BUILD_PKG_DEPS+=( libsigc++-2.0-dev )
 
 # Fitting / tested dependency versions for major platforms
