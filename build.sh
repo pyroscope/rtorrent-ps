@@ -614,6 +614,7 @@ build_everything() {
     set_build_env
     ${NODEPS:-false} || build_deps
 
+    core_unpack
     build
     symlink_binary -vanilla
     check
