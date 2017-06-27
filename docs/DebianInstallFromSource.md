@@ -66,7 +66,8 @@ These are the only steps that must be performed by the `root` user
 (i.e. in a root shell, or by writing `sudo` before the actual command):
 
 ```sh
-apt-get install tmux curl wget build-essential git locales \
+apt-get install sudo locales lsb-release build-essential pkg-config \
+    subversion git time tmux curl wget \
     python-setuptools python-virtualenv python-dev \
     libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
     libcppunit-dev autoconf automake libtool \
