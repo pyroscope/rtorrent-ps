@@ -585,8 +585,8 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
     fpm_iteration="$RT_PS_REVISION~"$(lsb_release -cs)
     fpm_license="GPL v2"
     deps=$(ldd "$PACKAGE_ROOT"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
-        | sed -r -e 's:^/lib:&\n/usr&:' | xargs -n1 dpkg 2>/dev/null -S \
-        | cut -f1 -d: | sort -u | xargs -n1 echo -d)
+        | sed -r -e 's:^/lib.+:&\n/usr&:' | xargs -n1 dpkg 2>/dev/null -S \
+        | cut -f1 -d: | sort -u | xargs -n1 echo '-d')
 
     ( cd "$DIST_DIR" && call_fpm -t deb --category "net" $deps )
 
