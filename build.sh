@@ -554,7 +554,7 @@ package_prep() # make $PACKAGE_ROOT lean and mean
     mkdir -p "$DIST_DIR"
 
     rm -rf "$PACKAGE_ROOT/"{lib/*.a,lib/*.la,lib/pkgconfig,share/man,man,share,include} || :
-    rm "$PACKAGE_ROOT/bin/"{curl,*-config} || :
+    rm -f "$PACKAGE_ROOT/bin/"{curl,*-config} || :
     chmod -R a+rX "$PACKAGE_ROOT/"
 
     . "$PACKAGE_ROOT"/version-info.sh
