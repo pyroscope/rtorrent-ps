@@ -31,7 +31,7 @@ run)
     su - rtorrent -c "bash /srv/launch-rtorrent.sh"
     ;;
 *)
-    docker run --name rtps -v $(dirname "$0"):/srv -it debian:stretch \
-               bash /srv/launch-stretch.sh run
+    docker run -v $(command cd i$(dirname "$0") && pwd):/srv -it \
+               --name rtps debian:stretch bash /srv/launch-stretch.sh run
     ;;
 esac
