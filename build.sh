@@ -670,7 +670,7 @@ while test -n "$1"; do
         clean)      clean ;;
         clean_all)  clean_all ;;
         download)   prep; download ;;
-        env)        prep; set +x; set_build_env echo '"';;
+        env)        prep; set +x; set_build_env echo '"' ;;
         build)      prep; build_everything ;;
         deps)       prep; set_build_env; build_deps ;;
         git|build_git)
@@ -694,11 +694,16 @@ while test -n "$1"; do
                     symlink_binary -extended
                     check
                     ;;
-        check)      check ;;
-        install)    install ;;
-        pkg2deb)    pkg2deb ;;
-        pkg2pacman) pkg2pacman ;;
-        docker_deb) docker_deb "$@" ;;
+        check)      check
+                    ;;
+        install)    install
+                    ;;
+        pkg2deb)    pkg2deb
+                    ;;
+        pkg2pacman) pkg2pacman
+                    ;;
+        docker_deb) docker_deb "$@"
+                    ;;
         *)
             echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
             echo >&2 "Build rTorrent$VERSION_EXTRAS $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"
