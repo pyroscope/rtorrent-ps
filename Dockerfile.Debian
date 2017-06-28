@@ -4,6 +4,8 @@
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
 #
 # Build with "./build.sh docker_deb [‹distro›:‹codename› [‹build-opts›…]]"
+#
+# The ruby1.9 handling in 'package' is only needed for 'precise'.
 
 FROM #DISTRO#:#CODENAME# as build
 WORKDIR /build
@@ -27,9 +29,9 @@ WORKDIR /package
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qq && apt-get install -qy \
         lsb-release build-essential ruby rubygems ruby-dev \
-    && ( test $(printf "%02d%02d" $(ruby --version | tr . ' ' | cut -f2-3 -d' ')) -ge 0109 \
-         || apt-get install -qy ruby1.9.3 \
-            && update-alternatives --set gem /usr/bin/gem1.9.1 ) \
+    && ( test $(printf "%d%02d" $(ruby --version | tr . ' ' | cut -f2-3 -d' ')) -ge 109 \
+         || ( apt-get install -qy ruby1.9.3 \
+              && update-alternatives --set gem /usr/bin/gem1.9.1 ) ) \
     && rm -rf /var/lib/apt/lists/*
 RUN gem install --no-rdoc --no-ri fpm -v 1.8.1
 COPY --from=build /opt/rtorrent /opt/rtorrent/
