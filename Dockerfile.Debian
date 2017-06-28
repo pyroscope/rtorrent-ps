@@ -7,8 +7,6 @@
 
 FROM #DISTRO#:#CODENAME# as build
 WORKDIR /build
-COPY build.sh tmp-docker/ ./
-COPY patches/ ./patches
 RUN apt-get update -qq && apt-get install -y \
         locales lsb-release build-essential pkg-config \
         subversion git time tmux curl wget ruby-dev \
@@ -16,16 +14,18 @@ RUN apt-get update -qq && apt-get install -y \
         libcppunit-dev autoconf automake libtool \
     && rm -rf /var/lib/apt/lists/*
 RUN echo "en_US.UTF-8 UTF-8" >/etc/locale.gen && locale-gen
+COPY patches/ ./patches
+COPY build.sh tmp-docker/ ./
 RUN ./build.sh install
 
 FROM #DISTRO#:#CODENAME# as package
 ENV DEBFULLNAME=pyroscope
 ENV DEBEMAIL=pyroscope.project@gmail.com
 WORKDIR /package
-COPY build.sh tmp-docker/ ./
-COPY --from=build /opt/rtorrent /opt/rtorrent/
 RUN apt-get update -qq && apt-get install -y \
         lsb-release build-essential ruby ruby-dev \
     && rm -rf /var/lib/apt/lists/*
 RUN gem install --no-rdoc --no-ri fpm -v 1.8.1
+COPY --from=build /opt/rtorrent /opt/rtorrent/
+COPY build.sh tmp-docker/ ./
 RUN ./build.sh pkg2deb
