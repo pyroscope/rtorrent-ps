@@ -42,8 +42,8 @@
 if test ! -d .git -a -f docker-env; then
     . docker-env
 else
-    git_now_iso="$(date +'%Y%m%d-%H%M')"
-    git_id="$(git describe --long --tags --dirty="-$git_now_iso")"
+    git_stamp_iso="$(stat -c '%y' * | sed -re 's/(.+) (..):(..).+/\1-\2\3/' | sort -u | tail -n1)"
+    git_id="$(git describe --long --tags --dirty="-$git_stamp_iso")"
     git_commits_since_release=$(sed -re 's/.+-([0-9]+)-g[0-9a-fA-F]{7}.*/\1/' <<<"$git_id")
 fi
 export RT_PS_REVISION="${git_id%%-$git_commits_since_release-g*}"
