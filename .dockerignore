@@ -1,0 +1,15 @@
+.git/
+orig-*/
+src
+wiki/
+
+# Download cache
+tarballs/
+
+# Component subdirs
+c-ares-*/
+curl-*/
+libtorrent-*/
+rtorrent-*/
+rtorrent-extended/
+xmlrpc-c-advanced-*/

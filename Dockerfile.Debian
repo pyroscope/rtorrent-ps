@@ -1,0 +1,28 @@
+# Build Debian Package in Docker
+#
+# Needs docker 17.05!
+# https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
+#
+# Build with "./build.sh docker_deb [‹distro›:‹codename› [‹build-opts›…]]"
+
+FROM #DISTRO#:#CODENAME# as build
+WORKDIR /build
+COPY build.sh tmp-docker/ ./
+COPY patches/ ./patches
+RUN apt-get update -qq && apt-get install -y \
+    locales lsb-release build-essential pkg-config \
+    subversion git time tmux curl wget ruby-dev \
+    libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
+    libcppunit-dev autoconf automake libtool
+RUN echo "en_US.UTF-8 UTF-8" >/etc/locale.gen && locale-gen
+RUN ./build.sh install
+
+FROM #DISTRO#:#CODENAME# as package
+ENV DEBFULLNAME=pyroscope
+ENV DEBEMAIL=pyroscope.project@gmail.com
+WORKDIR /package
+COPY build.sh tmp-docker/ ./
+COPY --from=build /opt/rtorrent /opt/rtorrent/
+RUN apt-get update -qq && apt-get install -y lsb-release build-essential ruby-dev
+RUN gem install -N fpm
+RUN ./build.sh pkg2deb

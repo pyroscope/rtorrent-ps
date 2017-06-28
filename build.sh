@@ -39,11 +39,15 @@
 # so older versions might get regressions over time (failing patches).
 
 # Get git metadata
-now_iso="$(date +'%Y%m%d-%H%M')"
-git_id="$(git describe --long --tags --dirty="-$now_iso")"
-commits_since_release=$(sed -re 's/.+-([0-9]+)-g[0-9a-fA-F]{7}.*/\1/' <<<"$git_id")
-export RT_PS_REVISION="${git_id%%-$commits_since_release-g*}"
-test "$commits_since_release" -eq 0 || \
+if test ! -d .git -a -f docker-env; then
+    . docker-env
+else
+    git_now_iso="$(date +'%Y%m%d-%H%M')"
+    git_id="$(git describe --long --tags --dirty="-$git_now_iso")"
+    git_commits_since_release=$(sed -re 's/.+-([0-9]+)-g[0-9a-fA-F]{7}.*/\1/' <<<"$git_id")
+fi
+export RT_PS_REVISION="${git_id%%-$git_commits_since_release-g*}"
+test "$git_commits_since_release" -eq 0 || \
     RT_PS_REVISION="${RT_PS_REVISION%.*}.$(( ${RT_PS_REVISION##*.} + 1 ))-dev"
 
 # Version selection
@@ -77,7 +81,7 @@ export XMLRPC_REV=2775 # Release 1.43.01 2015-10
 : ${INSTALL_DIR:=$INSTALL_ROOT/.local/rtorrent/$RT_VERSION-$RT_PS_REVISION}
 : ${BIN_DIR:=$INSTALL_ROOT/bin}
 : ${CURL_OPTS:=-sLS}
-: ${MAKE_OPTS:=}
+: ${MAKE_OPTS:=-j4}
 : ${CFG_OPTS:=}
 : ${CFG_OPTS_LT:=}
 : ${CFG_OPTS_RT:=}
@@ -335,7 +339,11 @@ prep() {
 }
 
 download() { # Download and unpack sources
-    test -d .git || { git clone $SELF_URL tarballs/self ; rm tarballs/self/build.sh; mv tarballs/self/* tarballs/self/.git . ; }
+    if test ! -d .git -a ! -d patches; then
+        git clone $SELF_URL tarballs/self
+        rm tarballs/self/build.sh
+        mv tarballs/self/* tarballs/self/.git .
+    fi
 
     if $XMLRPC_SVN; then
         test -d xmlrpc-c-advanced-$XMLRPC_REV || ( echo "Getting xmlrpc-c r$XMLRPC_REV" && \
@@ -582,7 +590,7 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
     package_prep
 
     fpm_pkg_ext="deb"
-    fpm_iteration="$RT_PS_REVISION~"$(lsb_release -cs)
+    fpm_iteration="${VERSION_EXTRAS# }~"$(lsb_release -cs)
     fpm_license="GPL v2"
     deps=$(ldd "$PACKAGE_ROOT"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | sed -r -e 's:^/lib.+:&\n/usr&:' | xargs -n1 dpkg 2>/dev/null -S \
@@ -597,7 +605,6 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
 
 pkg2pacman() { # Package current $PACKAGE_ROOT installation for PACMAN [needs fpm]
     # You need to install fpm from the AUR
-
     package_prep
 
     fpm_pkg_ext="tar.xz"
@@ -629,6 +636,28 @@ build_everything() {
     check
 }
 
+docker_deb() { # Build Debian packages via Docker
+    local distro_code DISTRO_NAME DISTRO_CODENAME DOCKER_TAG
+    #DISTRO_NAME=debian ; DISTRO_CODENAME=stretch
+    #DISTRO_NAME=ubuntu ; DISTRO_CODENAME=xenial
+    distro_code="${1:-debian:stretch}"; test "$#" -eq 0 || shift
+    DISTRO_NAME=${distro_code%%:*}
+    DISTRO_CODENAME=${distro_code#*:}
+    DOCKER_TAG=rtps-deb-$DISTRO_CODENAME
+
+    mkdir -p tmp-docker
+    set \
+        | egrep '^(git_[_a-z]+|[_A-Z]+_OPTS|[_A-Z]+_ROOT|CFG_[_A-Z]+)' \
+        | sed -re 's/^/export /' >tmp-docker/docker-env
+    sed -r <Dockerfile.Debian >tmp-docker/Dockerfile \
+        -e "s/#DISTRO#/$DISTRO_NAME/g" \
+        -e "s/#CODENAME#/$DISTRO_CODENAME/g"
+    ##exit 0
+
+    docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile "$@" .
+    docker run --rm -u $(id -u):$(id -g) -v "$PWD:/pwd" $DOCKER_TAG \
+               bash -c "cp /tmp/rt-ps-dist/rtorrent-ps_*.deb /pwd"
+}
 
 #
 # MAIN
@@ -666,9 +695,10 @@ while test -n "$1"; do
                     check
                     ;;
         check)      check ;;
-        install)    install;;
-        pkg2deb)    pkg2deb;;
-        pkg2pacman) pkg2pacman;;
+        install)    install ;;
+        pkg2deb)    pkg2deb ;;
+        pkg2pacman) pkg2pacman ;;
+        docker_deb) docker_deb "$@" ;;
         *)
             echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
             echo >&2 "Build rTorrent$VERSION_EXTRAS $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"

@@ -1,3 +1,8 @@
+orig-*/
+src
+wiki/
+tmp-docker/
+
 # Download cache
 tarballs/
 
