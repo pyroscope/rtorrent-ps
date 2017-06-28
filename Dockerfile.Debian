@@ -7,7 +7,8 @@
 
 FROM #DISTRO#:#CODENAME# as build
 WORKDIR /build
-RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qy \
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && apt-get install -qy \
         locales lsb-release build-essential pkg-config \
         subversion git time tmux curl wget ruby-dev \
         libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
@@ -23,10 +24,12 @@ FROM #DISTRO#:#CODENAME# as package
 ENV DEBFULLNAME=pyroscope
 ENV DEBEMAIL=pyroscope.project@gmail.com
 WORKDIR /package
-RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qy \
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && apt-get install -qy \
         lsb-release build-essential ruby rubygems ruby-dev \
     && ( test $(printf "%02d%02d" $(ruby --version | tr . ' ' | cut -f2-3 -d' ')) -ge 0109 \
-         || apt-get install -qy ruby1.9.3 && update-alternatives --set gem /usr/bin/gem1.9.1 ) \
+         || apt-get install -qy ruby1.9.3 \
+            && update-alternatives --set gem /usr/bin/gem1.9.1 ) \
     && rm -rf /var/lib/apt/lists/*
 RUN gem install --no-rdoc --no-ri fpm -v 1.8.1
 COPY --from=build /opt/rtorrent /opt/rtorrent/
