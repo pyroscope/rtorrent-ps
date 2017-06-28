@@ -703,6 +703,7 @@ while test -n "$1"; do
         pkg2pacman) pkg2pacman
                     ;;
         docker_deb) docker_deb "$@"
+                    break
                     ;;
         *)
             echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
