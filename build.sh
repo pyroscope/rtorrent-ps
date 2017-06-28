@@ -56,6 +56,15 @@ export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export GIT_MINOR=$(( $RT_MINOR + 1 ))  # ensure git version has a bumped version number
 export VERSION_EXTRAS=" $git_id"
 
+# List of platforms to build DEBs for with "docker_all"
+docker_distros=(
+    debian:stretch
+    ubuntu:xenial
+    debian:jessie
+    ubuntu:trusty
+    ubuntu:precise
+)
+
 # Debian-like deps, see below for other distros
 BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev zlib1g-dev libcppunit-dev locales )
 test "$RT_VERSION" != "0.9.2" || BUILD_PKG_DEPS+=( libsigc++-2.0-dev )
@@ -703,6 +712,13 @@ while test -n "$1"; do
         pkg2pacman) pkg2pacman
                     ;;
         docker_deb) docker_deb "$@"
+                    break
+                    ;;
+        docker_all) for distro in "${docker_distros[@]}"; do
+                        docker_deb "$distro" "$@" \
+                            || echo -e "\n\n*** WARNING: $distro does not build ***\n\n"
+                    done
+                    ls -lrt *.deb
                     break
                     ;;
         *)
