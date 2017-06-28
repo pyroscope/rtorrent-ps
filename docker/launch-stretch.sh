@@ -19,7 +19,7 @@ run)
     echo >/etc/apt/sources.list.d/rtps.list \
          "deb [trusted=yes] https://dl.bintray.com/pyroscope/rtorrent-ps /"
     apt update -qq
-    apt install -y rtorrent-ps=0.9.6-PS-1.1-dev~stretch
+    apt install -y rtorrent-ps=0.9.6-PS-1.0-94-g5a987ef~stretch
     ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
     rtorrent -h | head -n1
 
