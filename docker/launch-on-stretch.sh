@@ -78,7 +78,7 @@ EOF
     ;;
 
 *)
-    docker rm rtps-on-stretch 2>/dev/null || :
+    docker rm rtps-on-stretch >/dev/null 2>&1 || :
     docker run -v $(command cd $(dirname "$0") && pwd):/srv -it \
                --name rtps-on-stretch debian:stretch bash "/srv/$(basename $0)" as-root
     ;;
