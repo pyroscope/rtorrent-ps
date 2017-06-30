@@ -67,18 +67,31 @@ detailed reference information can be found on the
 and
 `RtorrentExtendedCanvas <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md>`_
 pages.
-`DebianInstallFromSource <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md>`_
-contains installation instructions for a working rTorrent instance in
-combination with ``pyrocore``, on Debian and most Debian-derived distros
+
+`DebianInstallFromSource`_ contains installation instructions for a working rTorrent instance
+in combination with ``pyrocore``, on Debian and most Debian-derived distros
 — i.e. a manual way to do parts of what
 `pimp-my-box <https://github.com/pyroscope/pimp-my-box>`_ does
 automatically for you.
 Another option for automatic setup of a similar system is the one by
 `chros73 <https://github.com/chros73/rtorrent-ps_setup/wiki>`_.
 
-You can also add your own content to the
+To try it out without any headaches, and *if you have Docker installed*, you can use
+the `launch-on-stretch.sh`_ script to run an *emphemeral* rTorrent-PS instance in a
+Debian Stretch container, like this:
+
+.. code-block:: bash
+
+    git clone "https://github.com/pyroscope/rtorrent-ps.git" ~/src/rtorrent-ps
+    ~/src/rtorrent-ps/docker/launch-on-stretch.sh
+
+Incidentally, that script is also a condensed version of the `DebianInstallFromSource`_ instructions.
+Such a container instance can also be used to test out experimental configurations and such,
+without any impact on your main installation.
+
+To help out other users, you can add your own content with configuration tricks and the like to the
 `project's wiki <https://github.com/pyroscope/rtorrent-ps/wiki#community-documentation>`_,
-to help out other users, and show to the world you're awesome.
+and show to the world you're awesome.
 
 
 Installation
@@ -300,9 +313,11 @@ References
 -  `rTorrent Community Wiki`_
    and the `rTorrent Handbook <http://rtorrent-docs.rtfd.io/>`_
 
+.. _launch-on-stretch.sh: https://github.com/pyroscope/rtorrent-ps/blob/master/docker/launch-on-stretch.sh
 .. _`official release`: https://github.com/pyroscope/rtorrent-ps/releases
 .. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/CHANGES.md
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
 .. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
 .. _`rTorrent Community Wiki`: https://github.com/rtorrent-community/rtorrent-community.github.io/wiki
+.. _`DebianInstallFromSource`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md
