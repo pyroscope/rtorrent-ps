@@ -1,3 +1,4 @@
+#! /usr/bin/env bash
 #
 # Run an EMPHEMERAL rTorrent-PS instance in a Stretch container, like this:
 #
