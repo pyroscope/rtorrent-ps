@@ -16,7 +16,7 @@ as-root)
     # Install basics
     apt update -qq
     apt-get install -y apt-transport-https lsb-release locales \
-        less git tmux curl wget \
+        less git tmux curl wget libcppunit-1.13-0v5 \
         python-setuptools python-virtualenv python-dev
     echo "en_US.UTF-8 UTF-8" >/etc/locale.gen
     locale-gen
@@ -77,8 +77,8 @@ EOF
     ;;
 
 *)
-    #docker rm rtps 2>/dev/null || :
+    docker rm rtps 2>/dev/null || :
     docker run -v $(command cd $(dirname "$0") && pwd):/srv -it \
-               --name rtps debian:stretch bash /srv/launch-stretch.sh as-root
+               --name rtps debian:stretch bash "/srv/$(basename $0)" as-root
     ;;
 esac
