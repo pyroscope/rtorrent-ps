@@ -96,6 +96,10 @@ and call ``reset`` to reset your terminal.
 Reattach with ``docker attach rtps-on-stretch``,
 then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
 
+If you want to do that directly via SSH from a remote machine,
+call ``ssh -t YOU@HOST "docker attach rtps-on-stretch"``
+and then refresh with ``Ctrl-A r``.
+
 Another use for such a container instance, besides taking a first look,
 is trying out experimental configurations, without any impact on your main installation.
 
