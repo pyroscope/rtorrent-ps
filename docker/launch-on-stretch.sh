@@ -9,8 +9,16 @@
 #
 #   https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md
 #
+# Detach from the process using ``Ctrl-P Ctrl-Q``,
+# and call ``reset`` to reset your terminal.
+#
+# Reattach with ``docker attach rtps-on-stretch``,
+# then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
+#
 
 rtps_version=0.9.6-PS-1.0-94-g5a987ef~stretch
+
+ALREADY_IN_TMUX=${2:-0}
 
 case "$1" in
 as-root)
@@ -35,7 +43,7 @@ as-root)
     useradd -g rtorrent -G rtorrent,users -c "rTorrent client" -s /bin/bash --create-home rtorrent
     chmod 750 ~rtorrent
     su - rtorrent -c "mkdir -p ~/bin"
-    su - rtorrent -c "bash $0 as-rtorrent"
+    su - rtorrent -c "bash $0 as-rtorrent $ALREADY_IN_TMUX"
     ;;
 
 as-rtorrent)
@@ -74,12 +82,19 @@ EOF
 
     # Start tmux session
     cp --no-clobber ~/.local/pyroscope/docs/examples/tmux.conf ~/.tmux.conf
-    tmux -2u new -n rT-PS -s rtorrent "~/rtorrent/start; exec bash"
+    if test "$ALREADY_IN_TMUX" = 1; then
+        ~/rtorrent/start
+    else
+        tmux -2u new -n rT-PS -s rtorrent "~/rtorrent/start; exec bash"
+        while true; do sleep 1; tmux -2u attach -t rtorrent || break; done
+    fi
     ;;
 
 *)
+    test -z "$TMUX"; ALREADY_IN_TMUX=$?
     docker rm rtps-on-stretch >/dev/null 2>&1 || :
-    docker run -v $(command cd $(dirname "$0") && pwd):/srv -it \
-               --name rtps-on-stretch debian:stretch bash "/srv/$(basename $0)" as-root
+    docker run -it -v $(command cd $(dirname "$0") && pwd):/srv \
+               --name rtps-on-stretch "$@" debian:stretch \
+               bash "/srv/$(basename $0)" as-root $ALREADY_IN_TMUX
     ;;
 esac
