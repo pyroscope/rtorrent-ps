@@ -73,22 +73,34 @@ automatically for you.
 Another option for automatic setup of a similar system is the one by
 `chros73 <https://github.com/chros73/rtorrent-ps_setup/wiki>`_.
 
-To try it out without any headaches, and *if you have Docker installed*, you can use
-the `launch-on-stretch.sh`_ script to run an *emphemeral* rTorrent-PS instance in a
-Debian Stretch container, like this:
+To help out other users, you can add your own content with configuration tricks and the like to the
+`project's wiki <https://github.com/pyroscope/rtorrent-ps/wiki#community-documentation>`_,
+and show to the world you're awesome.
+
+
+Running rTorrent-PS Inside a Docker Container
+---------------------------------------------
+
+To try out *rTorrent-PS* without any headaches, and *if you have Docker installed*, you can use
+the `launch-on-stretch.sh`_ script to run an *emphemeral* instance in a
+*Debian Stretch* container, like this:
 
 .. code-block:: bash
 
     git clone "https://github.com/pyroscope/rtorrent-ps.git" ~/src/rtorrent-ps
     ~/src/rtorrent-ps/docker/launch-on-stretch.sh
 
-Incidentally, that script is also a condensed version of the `DebianInstallFromSource`_ instructions.
-Another use for such a container instance is testing out experimental configurations and such,
-without any impact on your main installation.
+Detach from the process using ``Ctrl-P Ctrl-Q``,
+and call ``reset`` to reset your terminal.
 
-To help out other users, you can add your own content with configuration tricks and the like to the
-`project's wiki <https://github.com/pyroscope/rtorrent-ps/wiki#community-documentation>`_,
-and show to the world you're awesome.
+Reattach with ``docker attach rtps-on-stretch``,
+then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
+
+Another use for such a container instance, besides taking a first look,
+is trying out experimental configurations, without any impact on your main installation.
+
+Incidentally, that script is also a condensed version of the `DebianInstallFromSource`_ instructions,
+and can be used as a blue-print for your own ``Dockerfile``.
 
 
 Installation
