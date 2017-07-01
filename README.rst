@@ -1,8 +1,8 @@
 rTorrent-PS
 ===========
 
-Extended `rTorrent`_ distribution with UI enhancements, colorization,
-and some added features.
+Extended `rTorrent`_ *distribution* with UI enhancements, colorization,
+some added features, and a comprehensive standard configuration.
 
 .. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png
    :align: center
@@ -15,8 +15,8 @@ Introduction
 ------------
 
 ``rTorrent-PS`` is a `rTorrent`_ *distribution* (*not* a fork of it),
-in form of a set of patches that improve the user experience and
-stability of official ``rTorrent`` releases.
+in form of a set of patches that **improve the user experience and stability**
+of official ``rTorrent`` releases.
 See the `changelog`_ for a timeline of applied changes,
 especially those since the last `official release`_.
 
@@ -38,12 +38,12 @@ Feature Overview
 
 The main changes compared to vanilla `rTorrent`_ are these:
 
--  self-contained install into any location of your choosing, including
-   your home directory, offering the ability to run several versions at
-   once (in different client instances).
--  rpath-linked to the major dependencies, so you can upgrade those
+-  **self-contained installation** into any location of your choosing, including
+   your home directory, offering the ability to **run several versions at once**
+   (in different client instances).
+-  **rpath-linked** to the major dependencies, so you can upgrade those
    independently from your OS distribution's versions.
--  extended command set:
+-  **extended command set**:
 
    -  sort views by more than one value, and set the sort direction for
       each of these.
@@ -53,20 +53,17 @@ The main changes compared to vanilla `rTorrent`_ are these:
 
 -  interface additions:
 
-   -  easily customizable colors.
-   -  collapsed 1-line item display with condensed information.
-   -  network bandwidth graph.
-   -  displaying the tracker domain for each item.
+   -  easily **customizable colors**.
+   -  **collapsed 1-line item display** with condensed information.
+   -  **network bandwidth graph**.
+   -  **displaying the tracker domain** for each item.
    -  some more minor modifications to the download list view.
 
-To get those, you just need to either follow the build instructions, or
+To get those features, you just need to either follow the build instructions, or
 download and install a package from Bintray — assuming one is available
 for your platform. See below for installation instructions — more
-detailed reference information can be found on the
-`RtorrentExtended <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md>`_
-and
-`RtorrentExtendedCanvas <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md>`_
-pages.
+detailed reference information can be found on
+the `RtorrentExtended`_ and `RtorrentExtendedCanvas`_ pages.
 
 `DebianInstallFromSource`_ contains installation instructions for a working rTorrent instance
 in combination with ``pyrocore``, on Debian and most Debian-derived distros
@@ -86,7 +83,7 @@ Debian Stretch container, like this:
     ~/src/rtorrent-ps/docker/launch-on-stretch.sh
 
 Incidentally, that script is also a condensed version of the `DebianInstallFromSource`_ instructions.
-Such a container instance can also be used to test out experimental configurations and such,
+Another use for such a container instance is testing out experimental configurations and such,
 without any impact on your main installation.
 
 To help out other users, you can add your own content with configuration tricks and the like to the
@@ -313,6 +310,7 @@ References
 -  `rTorrent Community Wiki`_
    and the `rTorrent Handbook <http://rtorrent-docs.rtfd.io/>`_
 
+
 .. _launch-on-stretch.sh: https://github.com/pyroscope/rtorrent-ps/blob/master/docker/launch-on-stretch.sh
 .. _`official release`: https://github.com/pyroscope/rtorrent-ps/releases
 .. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/CHANGES.md
@@ -321,3 +319,5 @@ References
 .. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
 .. _`rTorrent Community Wiki`: https://github.com/rtorrent-community/rtorrent-community.github.io/wiki
 .. _`DebianInstallFromSource`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md
+.. _`RtorrentExtended`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md
+.. _`RtorrentExtendedCanvas`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md
