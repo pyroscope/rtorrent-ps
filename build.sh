@@ -675,7 +675,7 @@ docker_deb() { # Build Debian packages via Docker
     ##exit 0
 
     docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile "$@" .
-    docker run --rm -u $(id -u):$(id -g) -v "$PWD:/pwd" $DOCKER_TAG \
+    docker run --rm -u $(id -u):$(id -g) --userns host -v "$PWD:/pwd" $DOCKER_TAG \
                bash -c "cp /tmp/rt-ps-dist/rtorrent-ps_*.deb /pwd"
 }
 
