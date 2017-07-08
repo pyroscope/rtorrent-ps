@@ -8,7 +8,10 @@
 # The ruby1.9 handling in 'package' is only needed for 'precise'.
 # Trusty does not provide 'rubygems'.
 
-FROM #DISTRO#:#CODENAME# as build
+ARG DISTRO=ubuntu
+ARG CODENAME=xenial
+
+FROM ${DISTRO}:${CODENAME} as build
 WORKDIR /build
 ARG DEBIAN_FRONTEND=noninteractive
 RUN echo 'Acquire::http::Timeout "90";' >/etc/apt/apt.conf.d/90docker.conf \
@@ -24,7 +27,7 @@ COPY patches/ ./patches
 COPY build.sh tmp-docker/ ./
 RUN ./build.sh install
 
-FROM #DISTRO#:#CODENAME# as package
+FROM ${DISTRO}:${CODENAME} as package
 ENV DEBFULLNAME=pyroscope
 ENV DEBEMAIL=pyroscope.project@gmail.com
 WORKDIR /package

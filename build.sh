@@ -669,12 +669,12 @@ docker_deb() { # Build Debian packages via Docker
     set \
         | egrep '^(git_[_a-z]+|[_A-Z]+_OPTS|[_A-Z]+_ROOT|CFG_[_A-Z]+)' \
         | sed -re 's/^/export /' >tmp-docker/docker-env
-    sed -r <Dockerfile.Debian >tmp-docker/Dockerfile \
-        -e "s/#DISTRO#/$DISTRO_NAME/g" \
-        -e "s/#CODENAME#/$DISTRO_CODENAME/g"
-    ##exit 0
+    ln -f Dockerfile.Debian tmp-docker/Dockerfile
 
-    docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile "$@" .
+    docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile \
+                 --build-arg DISTRO=$DISTRO_NAME \
+                 --build-arg CODENAME=$DISTRO_CODENAME \
+                 "$@" .
     docker run --rm -u $(id -u):$(id -g) --userns host -v "$PWD:/pwd" $DOCKER_TAG \
                bash -c "cp /tmp/rt-ps-dist/rtorrent-ps_*.deb /pwd"
 }
