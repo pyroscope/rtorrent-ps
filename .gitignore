@@ -2,6 +2,7 @@ orig-*/
 src
 wiki/
 tmp-docker/
+docs/build/
 
 # Download cache
 tarballs/

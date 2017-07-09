@@ -1,0 +1,8 @@
+# requirements for building the docs
+
+bpython==0.16
+invoke<0.15
+
+Sphinx==1.5.5
+sphinx-rtd-theme==0.2.4
+sphinx-autobuild==0.6.0
