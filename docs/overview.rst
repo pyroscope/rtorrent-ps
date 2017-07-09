@@ -1,6 +1,10 @@
 Overview
 ========
 
+**See the** `README`_ **for now.**
+
+.. _README: https://github.com/pyroscope/rtorrent-ps#rtorrent-ps
+
 
 .. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png
    :align: center

@@ -1,6 +1,11 @@
 Installation Guide
 ==================
 
+**See the** `README`_ **for now.**
+
+.. _README: https://github.com/pyroscope/rtorrent-ps#rtorrent-ps
+
+
 Note that this cannot be a Linux shell 101, so if the commands that follow
 are new for you, refer to the usual sources like
 `The Debian Administrator's Handbook`_, `The Linux Command Line`_, and
