@@ -44,6 +44,43 @@ use the mailing list or IRC for that.
 Common Problems & Solutions
 ---------------------------
 
-None so far.
-Please `open an issue`_ on *GitHub* if you think that your problem happens a lot,
-or you know several other people have the same problem.
+Please `open an issue`_ on *GitHub* if you think that you have a problem that happens a lot,
+or you know several other people have the same problem,
+and it's not already mentioned below.
+
+
+.. _term-8colors:
+
+Startup Failure: ‘your terminal only supports 8 colors’
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Read these instructions:
+
+-  `color configuration <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uicolortypesetcolor-def>`_
+-  `tmux and 256 colors <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#using-the-extended-canvas-with-tmux--screen-and-256-colors>`_
+-  `(Windows) Terminal Setup <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal>`_,
+   and `Font Linking on Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
+
+If all else fails, you can add a `configuration snippet`_
+to ``rtorrent.rc`` so that only 8 colors are used.
+
+.. _`configuration snippet: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/color-schemes/default-8.rc
+
+
+.. _ldd-runpath:
+
+Startup Failure: ‘libxmlrpc_*.so cannot open shared object file’
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+On newer systems, ``RPATH`` is replaced by ``RUNPATH`` with consequences
+regarding the search path for *transitive* library dependencies (like that of
+``libxmlrpc`` to the other ``libxmlrpc_*`` libraries).
+In the end, those transitive dependencies cannot be resolved without some
+extra config.
+
+The solution is to use the provided `start script`_, which explicitly sets
+``LD_LIBRARY_PATH`` from any ``RPATH`` or ``RUNPATH`` found in the executable.
+Or if you use a systemd unit, use an ``Environment`` directive to set the
+library path, e.g. ``Environment=LD_LIBRARY_PATH=/opt/rtorrent/lib``.
+
+.. _start script: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh
