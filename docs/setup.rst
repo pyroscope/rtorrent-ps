@@ -115,8 +115,8 @@ dependencies on Mac OSX.
 
 .. _DebianInstallFromSource:
 
-Manual Installation
--------------------
+Manual Turn-Key System Setup
+----------------------------
 
 Introduction
 ^^^^^^^^^^^^
