@@ -80,7 +80,7 @@ for installing on *Arch* via ``pacman``.
 
 #. The ``pkg2pacman`` command of ``build.sh`` creates a package similar to the
    Debian one, embedding a tested version combination of dependencies.
-   See *“Building the Debian Package”* for general instructions on building that
+   See :ref:`build-pkg2deb` for general instructions on building that
    variant, and use ``pkg2pacman`` instead of ``pkg2deb``.
 #. The *“Arch User Repository”* (AUR) PKGBUILDs maintained by @xsmile.
    These use a standard *Arch* build process, but include the usual *rTorrent-PS*

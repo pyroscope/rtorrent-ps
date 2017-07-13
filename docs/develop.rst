@@ -1,6 +1,7 @@
 Development Guide
 =================
 
+.. _build-pkg2deb:
 
 Building the Debian Package
 ---------------------------
