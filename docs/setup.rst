@@ -135,6 +135,15 @@ instructions should work as-is on practically any Linux and (F)BSD.
 These instructions are explicitly known to work on *Debian Jessie*, and
 *Ubuntu Trusty + Xenial*.
 
+The whole procedure takes 15 – 20 minutes,
+including full compilation from source.
+Subtract about 5 minutes if you install rTorrent via a package.
+This on a quad-core 3.3 GHz Xeon CPU with 32 GiB RAM,
+and assuming you are familiar with the procedure,
+or just blindly paste the command blocks that follow.
+Add plenty of reading time whne doing your first setup,
+and it's still under an hour.
+
 .. note::
 
     If you don't understand a word of what follows,
@@ -196,6 +205,9 @@ performed by the ``root`` user (i.e. in a root shell, or by writing
         libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
         libcppunit-dev autoconf automake libtool \
         libffi-dev libxml2-dev libxslt1-dev
+    test "$LANG" = "en_US.UTF-8" \
+        || echo "en_US.UTF-8 UTF-8" >>/etc/locale.gen \
+        && locale-gen --lang en_US.UTF-8
 
 Note that you can always show Debian's current build dependencies for
 rTorrent using this command:
@@ -316,7 +328,8 @@ for more details.
     ~/.local/pyroscope/update-to-head.sh
 
     # Check success
-    exec $SHELL -l; pyroadmin --version
+    exec $SHELL -l
+    pyroadmin --version
 
 .. _manual: https://pyrocore.readthedocs.org/en/latest/installation.html
 
