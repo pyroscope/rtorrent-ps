@@ -141,7 +141,7 @@ Subtract about 5 minutes if you install rTorrent via a package.
 This on a quad-core 3.3 GHz Xeon CPU with 32 GiB RAM,
 and assuming you are familiar with the procedure,
 or just blindly paste the command blocks that follow.
-Add plenty of reading time whne doing your first setup,
+Add plenty of reading time when doing your first setup,
 and it's still under an hour.
 
 .. note::
