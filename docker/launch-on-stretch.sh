@@ -25,7 +25,7 @@ as-root)
     # Install basics
     apt update -qq
     apt-get install -y apt-transport-https lsb-release locales \
-        less git tmux curl wget libcppunit-1.13-0v5 \
+        less lsof git tmux curl wget libcppunit-1.13-0v5 \
         python-setuptools python-virtualenv python-dev
     echo "en_US.UTF-8 UTF-8" >/etc/locale.gen
     locale-gen
