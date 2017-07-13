@@ -129,7 +129,7 @@ installation — this page is just a reference of the core installation steps
 (if you run into problems, join the ``freenode`` IRC channel for help).
 
 While the package names and the use of ``apt-get`` are somewhat
-dependant on Debian, the *Preparatory Steps* commands which are executed
+dependant on Debian, the `Preparatory Steps`_ commands which are executed
 under ``root`` are similar for other distributions, and the compilation
 instructions should work as-is on practically any Linux and (F)BSD.
 These instructions are explicitly known to work on *Debian Jessie + Stretch*, and
@@ -159,7 +159,7 @@ concurrently.
 For shared multi-user setups, this works fine also — compile and install
 to ``/opt/rtorrent`` using ``./build.sh install``, then provide access
 to all users by calling ``chmod -R go+rX /opt/rtorrent``. Perform the
-steps from *PyroScope Installation* onwards for each user repeatedly, so
+steps from `PyroScope Installation`_ onwards for each user repeatedly, so
 they get their own instance.
 
 .. note::
@@ -200,7 +200,7 @@ performed by the ``root`` user (i.e. in a root shell, or by writing
 .. code-block:: shell
 
     apt-get install sudo locales lsb-release build-essential pkg-config \
-        subversion git time tmux curl wget \
+        subversion git time lsof tmux curl wget \
         python-setuptools python-virtualenv python-dev \
         libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
         libcppunit-dev autoconf automake libtool \
