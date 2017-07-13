@@ -40,6 +40,7 @@ Full Contents
 
    overview
    setup
+   howto
    develop
    troubleshooting
 
