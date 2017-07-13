@@ -14,10 +14,8 @@ are new for you, refer to the usual sources like
 General Installation Options
 ----------------------------
 
-See the `instructions
-here <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md#build-rtorrent-and-core-dependencies-from-source>`_
-for building from source using the provided ``build.sh`` script, which
-will install *rTorrent-PS* into ``~/.local/rtorrent/‹version›``.
+See :ref:`build-from-source` on using the provided ``build.sh`` script,
+which will install *rTorrent-PS* into ``~/.local/rtorrent/‹version›``.
 
 .. note:: If you also install the `PyroScope command line
     utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to
@@ -252,6 +250,8 @@ Then skip the next section and continue with `PyroScope Installation`_.
 .. _Bintray: https://bintray.com/pkg/show/general/pyroscope/rtorrent-ps/rtorrent-ps
 .. _rTorrent-PS: https://github.com/pyroscope/rtorrent-ps
 
+
+.. _build-from-source:
 
 Build from Source
 """""""""""""""""
