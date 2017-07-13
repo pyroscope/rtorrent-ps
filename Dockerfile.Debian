@@ -11,7 +11,7 @@
 ARG DISTRO=ubuntu
 ARG CODENAME=xenial
 
-FROM ${DISTRO}:${CODENAME} as build
+FROM ${DISTRO}:${CODENAME} AS build
 WORKDIR /build
 ARG DEBIAN_FRONTEND=noninteractive
 RUN echo 'Acquire::http::Timeout "90";' >/etc/apt/apt.conf.d/90docker.conf \
@@ -27,7 +27,7 @@ COPY patches/ ./patches
 COPY build.sh tmp-docker/ ./
 RUN ./build.sh install
 
-FROM ${DISTRO}:${CODENAME} as package
+FROM ${DISTRO}:${CODENAME} AS package
 ENV DEBFULLNAME=pyroscope
 ENV DEBEMAIL=pyroscope.project@gmail.com
 WORKDIR /package
