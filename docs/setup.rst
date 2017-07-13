@@ -132,7 +132,7 @@ While the package names and the use of ``apt-get`` are somewhat
 dependant on Debian, the *Preparatory Steps* commands which are executed
 under ``root`` are similar for other distributions, and the compilation
 instructions should work as-is on practically any Linux and (F)BSD.
-These instructions are explicitly known to work on *Debian Jessie*, and
+These instructions are explicitly known to work on *Debian Jessie + Stretch*, and
 *Ubuntu Trusty + Xenial*.
 
 The whole procedure takes 15 – 20 minutes,
