@@ -36,6 +36,8 @@ changed again.
 OS-Specific Installation Options
 --------------------------------
 
+.. _install-deb:
+
 Installation Using Debian Packages
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -46,13 +48,14 @@ package from `Bintray`_ —
 assuming one is available for your platform. The packages install the
 *rTorrent-PS* binary including some libraries into ``/opt/rtorrent``.
 
-Example on Raspbian Jessie:
+Example on *Debian Stretch*:
 
 .. code-block:: bash
 
-    version="0.9.6-20160308-c7c8d31~jessie_armhf"
+    version="0.9.6-PS-1.0-94-g5a987ef~stretch_amd64"
+    bintray="https://bintray.com/artifact/download/pyroscope"
     cd /tmp
-    curl -Lko rt-ps.deb "https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-ps_$version.deb"
+    curl -Lko rt-ps.deb "$bintray/rtorrent-ps/rtorrent-ps_$version.deb"
     dpkg -i rt-ps.deb
 
 After installation, you must provide a configuration file
@@ -215,7 +218,8 @@ account.
 .. code-block:: shell
 
     groupadd rtorrent
-    useradd -g rtorrent -G rtorrent,users -c "rTorrent client" -s /bin/bash --create-home rtorrent
+    useradd -g rtorrent -G rtorrent,users -c "rTorrent client" \
+            -s /bin/bash --create-home rtorrent
     chmod 750 ~rtorrent
     su - rtorrent -c "mkdir -p ~/bin"
 
@@ -227,19 +231,9 @@ rTorrent Installation
 Install via Debian Packages
 """""""""""""""""""""""""""
 
-For a limited set of platforms, there are packages available that
-contain pre-compiled binaries (and only those, configuration must be
-provided on top). You can download and install such a package from
-`Bintray`_ — assuming one is available for your platform. It installs
-the `rTorrent-PS`_ binary including some libraries into
-``/opt/rtorrent``, the only thing you need to do after installation is
-to symlink the executable into your path:
-
-.. code-block:: shell
-
-    ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
-
-Then skip the next section and continue with `PyroScope Installation`_.
+See :ref:`install-deb` above for details.
+After adding the right package for your platform,
+skip the next section and continue with `PyroScope Installation`_.
 
 .. note::
 
