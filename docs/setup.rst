@@ -200,7 +200,7 @@ performed by the ``root`` user (i.e. in a root shell, or by writing
 .. code-block:: shell
 
     apt-get install sudo locales lsb-release build-essential pkg-config \
-        subversion git time lsof tmux curl wget \
+        subversion git time lsof binutils tmux curl wget \
         python-setuptools python-virtualenv python-dev \
         libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
         libcppunit-dev autoconf automake libtool \
