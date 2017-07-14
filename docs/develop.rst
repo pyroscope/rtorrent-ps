@@ -51,7 +51,7 @@ You will *not get a stable system* and these builds are in no way recommended fo
 Start by checking out the two projects as siblings of the ``rtorrent-ps`` workdir,
 leading to a folder structure like this:
 
-.. code-block::
+::
 
     .
     ├── libtorrent
