@@ -9,8 +9,8 @@ some added features, and a comprehensive standard configuration.
    :alt: Extended Canvas Screenshot
 
 
-Introduction
-------------
+What is this?
+-------------
 
 ``rTorrent-PS`` is a `rTorrent`_ *distribution* (*not* a fork of it),
 in form of a set of patches that **improve the user experience and stability**
@@ -24,9 +24,13 @@ doesn't depend on them; the same is true the other way 'round. It's just
 that both unsurprisingly have synergies if used together, and some
 features *do* only work when both are present.
 
-**See the**
+
+How do I use it?
+----------------
+
+See the
 `main documentation <http://rtorrent-ps.readthedocs.io/en/latest/overview.html>`_
-**for more**.
+for details about installing and using ``rTorrent-PS``.
 
 To get in contact and share your experiences with other users of
 ``rTorrent-PS``, join the
