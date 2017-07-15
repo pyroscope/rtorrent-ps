@@ -54,17 +54,21 @@ and it's not already mentioned below.
 Startup Failure: ‘your terminal only supports 8 colors’
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Read these instructions:
+See the :doc:`setup` chapter for detailed help on proper terminal setup.
 
--  `color configuration <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uicolortypesetcolor-def>`_
--  `tmux and 256 colors <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#using-the-extended-canvas-with-tmux--screen-and-256-colors>`_
--  `(Windows) Terminal Setup <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal>`_,
-   and `Font Linking on Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
+If all else fails or you're in a rush, you can switch to the 8-color theme
+by calling the ``echo`` command as shown and then start *rTorrent-PS* again:
 
-If all else fails, you can add a `configuration snippet`_
-to ``rtorrent.rc`` so that only 8 colors are used.
+.. code-block:: shell
 
-.. _`configuration snippet: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/color-schemes/default-8.rc
+    echo default-8 >~/.pyroscope/color-schemes/.current
+    ~/rtorrent/start
+
+If you don't use the standard configuration (where theme support comes from),
+then add the ``ui.color.*`` commands from this `configuration snippet`_ to ``rtorrent.rc``,
+which does the same thing.
+
+.. _`configuration snippet`: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/color-schemes/default-8.rc
 
 
 .. _ldd-runpath:
