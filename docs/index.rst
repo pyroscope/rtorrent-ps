@@ -39,6 +39,7 @@ Full Contents
    :maxdepth: 3
 
    overview
+   install
    setup
    manual
    howto
