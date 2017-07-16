@@ -82,7 +82,6 @@ To help out other users, you can add your own content with configuration tricks 
 `project's wiki <https://github.com/pyroscope/rtorrent-ps/wiki#community-documentation>`_,
 and show to the world you're awesome.
 
-.. _`DebianInstallFromSource`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md
 .. _`RtorrentExtended`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md
 .. _`RtorrentExtendedCanvas`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md
 
