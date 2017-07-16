@@ -33,8 +33,7 @@ Also consider these sources:
 
 -  `color configuration <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uicolortypesetcolor-def>`_
 -  `tmux and 256 colors <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#using-the-extended-canvas-with-tmux--screen-and-256-colors>`_
--  `(Windows) Terminal Setup <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal>`_,
-   and `Font Linking on Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
+-  `(Windows) Terminal Setup <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal>`_
 
 
 .. _term-win:
@@ -44,7 +43,7 @@ Terminal Setup on Windows
 
 To get full coverage of all Unicode glyphs used in the :ref:`extended canvas <extended-canvas>`,
 the steps below show you how to use font linking to make ``Everson Mono`` complement ``DevaVu Sans Mono``
-when used in ``PuTTY``.
+when used in ``PuTTY`` version 0.70 or higher.
 
 #. Download and install the `DejaVu Sans Mono`_ and `Everson Mono`_ fonts.
 #. Next, add or edit a multi-string value for your preferred font under this Windows registry key::
@@ -63,11 +62,21 @@ when used in ``PuTTY``.
 
 #. After closing ``regedit``, logout from Windows and back in again to activate the font link,
    but a full reboot is safer (hey, it's Windows, you should be used to it).
-#. Start ``PuTTY`` and select ``Change settings`` from the menu. Go to ``Window › Appearance``
-   and select ``DejaVu Sans Mono``.
+#. Start ``PuTTY`` and select ``Change settings`` from the menu.
+
+      * In ``Window › Appearance`` select ``DejaVu Sans Mono``.
+      * Under ``Terminal`` check ``Use background colour to erase screen``.
+      * In ``SSH › Data``, make sure to use ``putty-256color`` for the ``terminal`` setting.
+
 #. Connect, and check the display.
 
-    -- based on `feedback by @NoSubstitute`_, with help from `superuser.com`_ and `MSDN`_
+   -- based on `feedback by @NoSubstitute`_, with help from `superuser.com`_ and `MSDN`_
+
+.. seealso::
+
+    `Font linking on Windows <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#font-linking-on-windows>`_
+    and `Using KiTTY instead of PuTTY <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#connect-via-ssh>`_
+
 
 .. _`Everson Mono`: http://www.evertype.com/emono/
 .. _`DejaVu Sans Mono`: https://dejavu-fonts.github.io/Download.html
