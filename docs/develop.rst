@@ -1,6 +1,12 @@
 Development Guide
 =================
 
+This chapter contains some explanations of the project structure and
+activities related to development of the project.
+
+
+.. _build-sh:
+
 The Build Script
 ----------------
 
@@ -41,6 +47,10 @@ The script expects the packager's name and email in the usual
 environment variables, namely ``DEBFULLNAME`` and ``DEBEMAIL``. For a
 few platforms (recent Debian, Ubuntu, and Raspbian), you can find
 pre-built ones at `Bintray`_.
+
+.. seealso::
+
+    :ref:`build-docker_deb`
 
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
 
@@ -84,3 +94,28 @@ directly after a release, but alas…
 
 So if you want to run git HEAD concurrently to release versions,
 use a dedicated user account to build, install, and run it.
+
+
+.. _build-docker_deb:
+
+Using Docker for Building Packages
+----------------------------------
+
+The ``docker_deb`` build action uses ``Dockerfile.Debian`` to compile and package
+*rTorrent-PS* on a selected *Debian* or *Ubuntu* release.
+The ``docker_all`` action does so for the major releases
+– see the `docker_distros`_ list at the start of `build.sh`_ which ones exactly.
+
+``docker_deb`` takes an optional ``‹distro›:‹codename›`` argument,
+and defaults to ``debian:stretch``.
+Any additional arguments are passed on to ``docker build``,
+and ``docker_all`` does the same.
+Since those actions take arguments, you cannot call any further actions after them,
+in the same ``build.sh`` call.
+
+.. note::
+
+    You need Docker version ``17.06`` or higher to use this.
+
+.. _build.sh: https://github.com/pyroscope/rtorrent-ps/blob/master/build.sh
+.. _`docker_distros`: https://github.com/pyroscope/rtorrent-ps/search?type=Code&utf8=%E2%9C%93&q="platforms+to+build"+with+docker_all
