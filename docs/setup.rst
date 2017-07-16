@@ -3,6 +3,8 @@ Setup & Configuration
 
 The main part of configuration regarding *rTorrent-PS* itself is already done,
 if you followed  :ref:`DebianInstallFromSource` or used `pimp-my-box`_ for it.
+If you used neither, look into what `make-rtorrent-config.sh`_ does
+to get the features described in the :doc:`manual`.
 
 This chapter provides some background on the standard configuration and how you can tweak it,
 and contains hints on what you might need to do regarding
@@ -14,6 +16,7 @@ provided everything looks ok to you when you first started *rTorrent-PS*
 (especially if all special characters render correctly).
 
 .. _pimp-my-box: https://github.com/pyroscope/pimp-my-box
+.. _make-rtorrent-config.sh: https://github.com/pyroscope/pyrocore/blob/master/src/scripts/make-rtorrent-config.sh
 
 
 Setting up your Terminal Emulator
@@ -36,20 +39,47 @@ Also consider these sources:
 
 .. _term-win:
 
-On Windows
-^^^^^^^^^^
+Terminal Setup on Windows
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**TODO**
+To get full coverage of all Unicode glyphs used in the :ref:`extended canvas <extended-canvas>`,
+the steps below show you how to use font linking to make ``Everson Mono`` complement ``DevaVu Sans Mono``
+when used in ``PuTTY``.
 
-    -- based on `feedback by @NoSubstitute`_
+#. Download and install the `DejaVu Sans Mono`_ and `Everson Mono`_ fonts.
+#. Next, add or edit a multi-string value for your preferred font under this Windows registry key::
 
+      HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontLink\SystemLink
+
+   To do that start ``regedit`` and go to that folder. Any key there names a font for which
+   fallback fonts are registered. So add/edit the ``DejaVu Sans Mono`` key, and add fallback
+   font references as its value.
+
+      * Right click ``SystemLink`` and select ``New``, then ``Multi String Value``.
+      * Use ``DejaVu Sans Mono`` as the key's name.
+      * Double-click the new key, and enter this as the value::
+
+         Everson Mono.ttf,EversonMono
+
+#. After closing ``regedit``, logout from Windows and back in again to activate the font link,
+   but a full reboot is safer (hey, it's Windows, you should be used to it).
+#. Start ``PuTTY`` and select ``Change settings`` from the menu. Go to ``Window › Appearance``
+   and select ``DejaVu Sans Mono``.
+#. Connect, and check the display.
+
+    -- based on `feedback by @NoSubstitute`_, with help from `superuser.com`_ and `MSDN`_
+
+.. _`Everson Mono`: http://www.evertype.com/emono/
+.. _`DejaVu Sans Mono`: https://dejavu-fonts.github.io/Download.html
+.. _superuser.com: http://superuser.com/questions/393834/how-to-configure-putty-to-display-these-characters/764855#764855
+.. _MSDN: https://msdn.microsoft.com/en-us/goglobal/bb688134.aspx
 .. _`feedback by @NoSubstitute`: https://github.com/pyroscope/rtorrent-ps/issues/8
 
 
 .. _term-linux:
 
-On Linux
-^^^^^^^^
+Terminal Setup on Linux
+^^^^^^^^^^^^^^^^^^^^^^^
 
 When you use ``gnome-terminal``, everything should work out of the box,
 given you use the ``start`` script, which sets ``TERM`` correctly.

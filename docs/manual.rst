@@ -7,3 +7,9 @@ and other differences to a vanilla *rTorrent* build.
 
 Additional Features
 -------------------
+
+
+.. _extended-canvas:
+
+Extended Canvas Explained
+-------------------------
