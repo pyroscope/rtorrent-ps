@@ -17,12 +17,6 @@ General Installation Options
 See :ref:`build-from-source` on using the provided ``build.sh`` script,
 which will install *rTorrent-PS* into ``~/.local/rtorrent/‹version›``.
 
-.. note:: If you also install the `PyroScope command line
-    utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to
-    activate the extended features available together with *rTorrent-PS*, as
-    mentioned in the
-    `Configuration Guide <https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc>`_.
-
 Also take note of the
 `pimp-my-box <https://github.com/pyroscope/pimp-my-box>`_ project that
 does it all (almost) automatically for Debian-type systems (and is the
@@ -31,6 +25,12 @@ preferred way to install on those systems). The automation is done using
 admin several systems with it, and also maintain them – so it's not a
 one-shot installation bash script creating a setup that can never be
 changed again.
+
+.. note:: If you also install the `PyroScope command line
+    utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to
+    activate the extended features available together with *rTorrent-PS*, as
+    mentioned in the
+    `Configuration Guide <https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc>`_.
 
 
 OS-Specific Installation Options
