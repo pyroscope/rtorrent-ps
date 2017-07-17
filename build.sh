@@ -115,7 +115,7 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         export CURL_VERSION=7.38.0
         export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
-    *-vivid|*-wily|*-xenial|*-yakkety)
+    *-vivid|*-wily|*-xenial|*-yakkety|*-zesty)
         export CARES_VERSION=1.11.0 # 2016-02
         export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
