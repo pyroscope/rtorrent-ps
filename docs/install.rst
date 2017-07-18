@@ -417,6 +417,7 @@ the installed software, which makes later updates a lot easier.
     [GLOBAL]
     # Location of your rtorrent configuration
     rtorrent_rc = ~/rtorrent/rtorrent.rc
+    scgi_url = scgi://$HOME/rtorrent/.scgi_local
 
     [ANNOUNCE]
     # Add alias names for announce URLs to this section; those aliases are used
