@@ -129,7 +129,7 @@ installation — this page is just a reference of the core installation steps
 (if you run into problems, join the ``freenode`` IRC channel for help).
 
 While the package names and the use of ``apt-get`` are somewhat
-dependant on Debian, the `Preparatory Steps`_ commands which are executed
+dependent on Debian, the `Preparatory Steps`_ commands which are executed
 under ``root`` are similar for other distributions, and the compilation
 instructions should work as-is on practically any Linux and (F)BSD.
 These instructions are explicitly known to work on *Debian Jessie + Stretch*, and
