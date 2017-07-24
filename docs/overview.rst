@@ -44,6 +44,7 @@ The main changes compared to vanilla `rTorrent`_ are these:
    -  bind keys in the root display to any command, e.g. change the
       built-in views.
    -  record network traffic.
+   -  … and many more, see :ref:`commands` for details.
 
 -  interface additions:
 
@@ -55,9 +56,7 @@ The main changes compared to vanilla `rTorrent`_ are these:
 
 To get those features, you just need to either follow the build instructions, or
 download and install a package from Bintray — assuming one is available
-for your platform. See below for installation instructions — more
-detailed reference information can be found on
-the `RtorrentExtended`_ and `RtorrentExtendedCanvas`_ pages.
+for your platform. See the :doc:`install` on how to get your machine set up.
 
 
 Supported Platforms

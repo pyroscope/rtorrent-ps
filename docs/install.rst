@@ -17,6 +17,14 @@ General Installation Options
 See :ref:`build-from-source` on using the provided ``build.sh`` script,
 which will install *rTorrent-PS* into ``~/.local/rtorrent/‹version›``.
 
+The stable rTorrent version **0.9.6** is built by default, but 0.9.4
+is also supported (but not tested anymore). And not all patches are
+applied equally, depending on whether they're needed, or applicable at all.
+
+After installation, make sure to read through the :doc:`setup` chapter
+in order to get the visual changes set up correctly,
+since this requires some special setup of your terminal on many machines.
+
 Also take note of the
 `pimp-my-box <https://github.com/pyroscope/pimp-my-box>`_ project that
 does it all (almost) automatically for Debian-type systems (and is the

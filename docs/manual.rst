@@ -82,7 +82,7 @@ The following is an explanation of the collapsed display of
 ``view.collapsed.toggle`` command, or set the default of a view by
 `calling that command in the configuration`_, else you won't ever see it.
 
-.. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-trackers-view.png
+.. figure:: _static/img/rt-ps-trackers-view.png
    :align: center
    :alt: rTorrent-PS Trackers View
 
@@ -166,7 +166,7 @@ Add these lines to your configuration:
 
 And you'll get this in your terminal:
 
-.. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-network-history.png
+.. figure:: _static/img/rt-ps-network-history.png
    :align: center
    :alt: rTorrent-PS Network History
 
@@ -274,3 +274,334 @@ grey, and that is used here to set the even / odd backgrounds.
 .. _as described here: http://superuser.com/a/764855
 
 .. |rt-ps-glyphs| image:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-glyphs.png
+
+
+.. _commands:
+
+Command Extensions
+------------------
+
+The following new commands are available.
+
+.. contents:: List of Commands
+   :local:
+
+
+compare=order,command1=[,...]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Compares two items like ``less=`` or ``greater=``, but allows to compare
+by several different sort criteria, and ascending or descending order
+per given field.
+
+The first parameter is a string of order indicators, either ``aA+`` for
+ascending or ``dD-`` for descending. The default, i.e. when there's more
+fields than indicators, is ascending. Field types other than value or
+string are treated as equal (or in other words, they're ignored). If all
+fields are equal, then items are ordered in a random, but stable
+fashion.
+
+Configuration example:
+
+.. code-block:: ini
+
+    # VIEW: Show active and incomplete torrents (in view #9) and update every 20 seconds
+    # Items are grouped into complete, incomplete, and queued, in that order.
+    # Within each group, they're sorted by upload and then download speed.
+    view_sort_current = active,"compare=----,d.is_open=,d.get_complete=,d.get_up_rate=,d.get_down_rate="
+    schedule = filter_active, 12, 20, \
+        "view_filter = active,\"or={d.get_up_rate=,d.get_down_rate=,not=$d.get_complete=}\" ; \
+         view_sort=active"
+
+
+ui.bind\_key=display,key,"command1=[,...]"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Binds the given key on a specified display to execute the commands when
+pressed.
+
+-  ``display`` must be equal to ``download_list`` (currently, no other
+   displays are supported).
+-  ``key`` can be either a single character for normal keys, ``^`` plus
+   a character for control keys, or a 4 digit octal key code.
+
+.. important::
+
+    This currently can NOT be used immediately when ``rtorrent.rc`` is parsed,
+    so it has to be scheduled once shortly after startup (see below example).
+
+Configuration example:
+
+.. code-block:: ini
+
+    # VIEW: Bind view #7 to the "rtcontrol" result
+    schedule = bind_7,0,0,"ui.bind_key=download_list,7,ui.current_view.set=rtcontrol"
+
+
+view.collapsed.toggle=«VIEW NAME»
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This command changes between the normal item display where each item
+takes up three lines to a more condensed form where each item only takes
+up one line. Note that each view has its own state, and that if the view
+name is empty, the current view is toggled. You can set the default
+state in your configuration, by adding a toggle command for each view
+you want collapsed after startup (the default is expanded).
+
+Also, you should bind the current view toggle to a key, like this:
+
+.. code-block:: ini
+
+    schedule = bind_collapse,0,0,"ui.bind_key=download_list,*,view.collapsed.toggle="
+
+Further explanations on what the columns show and what forms of
+abbreviations are used, to get a display as compact as possible while
+still showing all the important stuff, can be found on :ref:`extended-canvas`.
+That section also contains hints on **how to correctly setup your terminal**.
+
+
+ui.color.«TYPE».set="«COLOR DEF»"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These commands allow you to set colors for selected elements of the user
+interface, in some cases depending on their status. You can either
+provide colors by specifying the numerical index in the terminal's color
+table, or by name (for the first 16 colors).
+
+The possible color names
+are "black", "red", "green", "yellow", "blue", "magenta", "cyan",
+"gray", and "white"; you can use them for both text and background
+color, in the form "«fg» on «bg»", and you can add "bright" in front of
+a color to select a more luminous version. If you don't specify a color,
+the default of your terminal is used.
+
+Also, these additional modifiers can be placed in the color definitions,
+but it depends on the terminal you're using whether they have an effect:
+"bold", "standout", "underline", "reverse", "blink", and "dim".
+
+Here's a configuration example showing all the commands and their
+defaults:
+
+.. code-block:: ini
+
+    # UI/VIEW: Colors
+    ui.color.alarm.set="bold white on red"
+    ui.color.complete.set="bright green"
+    ui.color.even.set=""
+    ui.color.focus.set="reverse"
+    ui.color.footer.set="bold bright cyan on blue"
+    ui.color.incomplete.set="yellow"
+    ui.color.info.set="white"
+    ui.color.label.set="gray"
+    ui.color.leeching.set="bold bright yellow"
+    ui.color.odd.set=""
+    ui.color.progress0.set="red"
+    ui.color.progress20.set="bold bright red"
+    ui.color.progress40.set="bold bright magenta"
+    ui.color.progress60.set="yellow"
+    ui.color.progress80.set="bold bright yellow"
+    ui.color.progress100.set="green"
+    ui.color.progress120.set="bold bright green"
+    ui.color.queued.set="magenta"
+    ui.color.seeding.set="bold bright green"
+    ui.color.stopped.set="blue"
+    ui.color.title.set="bold bright white on blue"
+
+Note that you might need to enable support for 256 colors in your
+terminal, see this article for a description. In a nutshell, you need to
+install the ``ncurses-term`` package if you don't have it already, and
+also add these commands to your rTorrent start script:
+
+.. code-block:: shell
+
+    if [ "$TERM" = "${TERM%-256color}" ]; then
+        export TERM="$TERM-256color"
+    fi
+
+Also consider the hints at the end of the `Extended Canvas Explained`_
+page.
+
+If everything worked so far, and you now want to find you own coloring
+theme, the easiest way is to use a second shell and ``rtxmlrpc``. Try
+out some colors, and add the combinations you like to your
+``~/.rtorrent.rc``.
+
+.. code-block:: shell
+
+    # For people liking candy stores...
+    rtxmlrpc ui.color.title.set "bold magenta on bright cyan"
+
+You can use the following code in a terminal to dump a color scheme:
+
+.. code-block:: shell
+
+    for i in $(rtxmlrpc system.listMethods | grep ui.color. | grep -v '\.set$'); do
+        echo $i = $(rtxmlrpc -r $i | tr "'" '"') ;
+    done
+
+The term-256color script can help you with showing the colors your
+terminal supports, an example output using Gnome's terminal looks like
+the following...
+
+.. figure:: _static/img/xterm-256-color.png
+   :align: center
+   :alt: xterm-256-color
+
+   xterm-256-color
+
+
+ui.current\_view= (merged into 0.9.7+)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Returns the currently selected view, the vanilla 0.9.6 release only has
+a setter.
+
+Needed if you want to use a hyphen ``-`` as a view name in ``rtcontrol``
+to refer to the currently shown view. An example for that is passing
+``-M-`` as an option, which performs in-place filtering of the current
+view via ``rtcontrol``.
+
+Another use-case for this command is if you want to rotate through a set
+of views via XMLRPC.
+
+
+log.messages=«path»
+^^^^^^^^^^^^^^^^^^^
+
+(Re-)opens a log file that contains the messages normally only visible
+on the main panel and via the ``l`` key. Each line is prefixed with the
+current date and time in ISO8601 format. If an empty path is passed, the
+file is closed.
+
+
+network.history.\*=
+^^^^^^^^^^^^^^^^^^^
+
+Commands to add network traffic charts to the bottom of the collapsed
+download display. The commands added are
+``network.history.depth[.set]=``, ``network.history.sample=``,
+``network.history.refresh=``, and ``network.history.auto_scale=``.
+See the :ref:`extended-canvas` on how to use them.
+
+
+d.tracker\_domain=
+^^^^^^^^^^^^^^^^^^
+
+Returns the (shortened) tracker domain of the given download item. The
+chosen tracker is the first HTTP one with active peers (seeders or
+leechers), or else the first one.
+
+
+trackers.alias.set\_key=«domain»,«alias»
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sets an alias that replaces the given domain, when displayed on the
+right of the collapsed canvas.
+
+Configuration example:
+
+.. code-block:: ini
+
+    trackers.alias.set_key = bttracker.debian.org, Debian
+
+
+trackers.alias.items=
+^^^^^^^^^^^^^^^^^^^^^
+
+Returns all the mappings in the form ``«domain»=«alias»`` as a list.
+
+Note that domains that were not explicitly defined so far, but shown
+previously, are also contained in the list, with an empty alias. So to
+create a list for you to fill in the aliases, scroll through all your
+items on ``main`` or ``trackers``, so you can dump the domains of all
+loaded items.
+
+Example that prints all the domains and their aliases as commands that
+define them:
+
+.. code-block:: shell
+
+    rtxmlrpc trackers.alias.items \
+        | sed -r -e 's/=/, "/' -e 's/^/trackers.alias.set_key = /' -e 's/$/"/' \
+        | tee ~/rtorrent/rtorrent.d/tracker-aliases.rc
+
+This also dumps them into the ``tracker-aliases.rc`` file to persist
+your mappings, and also make them easily editable. To reload edited
+alias definitions, use this:
+
+.. code-block:: shell
+
+    rtxmlrpc "try_import=,~/rtorrent/rtorrent.d/tracker-aliases.rc"
+
+
+system.env=«name» (merged into 0.9.7+)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Returns the value of the given environment variable, or an empty string
+if it does not exist.
+
+Configuration example:
+
+.. code-block:: ini
+
+    session.path.set="$cat=\"$system.env=RTORRENT_HOME\",\"/.session\""
+
+
+system.random=[[«lower»,]«upper»]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Generate *uniformly* distributed random numbers in the range defined by
+``lower``..``upper``.
+
+The default range with no args is ``0`` … ``RAND_MAX``. Providing just
+one argument sets an *exclusive* upper bound, and two arguments define
+an *inclusive* range.
+
+An example use-case is adding jitter to time values that you later check
+with ``elapsed.greater``, to avoid load spikes and similar effects of
+clustered time triggers.
+
+
+value=«number»[,«base»]
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Converts a given number with the given base (or 10 as the default) to an
+integer value.
+
+Examples:
+
+.. code-block:: console
+
+    $ rtxmlrpc --repr value '' 1b 16
+    27
+    $ rtxmlrpc --repr value '' 1b
+    ERROR    While calling value('', '1b'): <Fault -503: 'Junk at end of number: 1b'>
+
+
+string.contains[\_i]=«haystack»,«needle»[,…]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Checks if a given string contains any of the strings following it. The
+variant with ``_i`` is case-ignoring, but *only* works for pure ASCII
+needles.
+
+Example:
+
+.. code-block:: shell
+
+    rtxmlrpc d.multicall.filtered '' '' 'string.contains_i=(d.name),x264.aac' d.hash= d.name=
+
+
+d.multicall.filtered=«viewname»,«condition»,«command»[,…]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Iterates over all items of a view (or ``default`` if the view name is
+empty), just like ``d.multicall2``, but only calls the given commands if
+``condition`` is true for an item.
+
+See directly above for an example.
+
+
+.. _Bintray: https://bintray.com/pkg/show/general/pyroscope/rtorrent-ps/rtorrent-ps
+.. _installation options: https://github.com/pyroscope/rtorrent-ps#installation
+.. _Arch Linux: http://www.archlinux.org/
