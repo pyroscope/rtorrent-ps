@@ -202,6 +202,7 @@ set_build_env() {
     export CPPFLAGS="-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
     export CXXFLAGS="$CFLAGS"
     export LDFLAGS="-L$INSTALL_RELEASE_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
+    export LDFLAGS="-Wl,-rpath,$INSTALL_RELEASE_DIR/lib ${LDFLAGS}"
     export LIBS="${LIBS}"
     export PKG_CONFIG_PATH="$INSTALL_RELEASE_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
 
