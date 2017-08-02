@@ -414,7 +414,7 @@ build_deps() {
     $SED_I s:/usr/local:$INSTALL_DIR: \
         $INSTALL_DIR/bin/xmlrpc-c-config
 
-    $(which libtool true) --finish $INSTALL_DIR/lib
+    $(command which libtool || echo true) --finish $INSTALL_DIR/lib
     touch $INSTALL_DIR/lib/DEPS-DONE
 }
 
