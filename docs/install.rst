@@ -170,7 +170,7 @@ to all users by calling ``chmod -R go+rX /opt/rtorrent``. Perform the
 steps from `PyroScope Installation`_ onwards for each user repeatedly, so
 they get their own instance.
 
-.. note::
+.. important::
 
     Most of the command blocks further below can be cut &
     pasted wholesale into a terminal. Note that ``bash`` *here documents*
