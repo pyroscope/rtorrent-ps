@@ -395,17 +395,24 @@ build_deps() {
     # Build direct dependencies
     test -e $SRC_DIR/tarballs/DONE || fail "You need to '$0 download' first!"
 
-    ( cd c-ares-$CARES_VERSION && ./configure && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install )
+    ( cd c-ares-$CARES_VERSION && ./configure \
+        && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install \
+        || fail "Cannot build or install 'c-ares'!" )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
-    ( cd curl-$CURL_VERSION && ./configure --enable-ares && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install )
+
+    ( cd curl-$CURL_VERSION && ./configure --enable-ares \
+        && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install \
+        || fail "Cannot build or install 'curl'!" )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
+
     ( cd xmlrpc-c-advanced-$XMLRPC_REV \
         && ./configure --prefix=$INSTALL_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
-        && $MAKE $MAKE_OPTS && $MAKE install )
+        && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install \
+        || fail "Cannot build or install 'xmlrpc-c'!" )
     $SED_I s:/usr/local:$INSTALL_DIR: \
-        -re 's:^NEED_WL_RPATH=.+$:NEED_WL_RPATH="yes":' \
         $INSTALL_DIR/bin/xmlrpc-c-config
+
     touch $INSTALL_DIR/lib/DEPS-DONE
 }
 
