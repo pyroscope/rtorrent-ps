@@ -71,18 +71,12 @@ BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev zlib1g-dev libcppun
 test "$RT_VERSION" != "0.9.2" || BUILD_PKG_DEPS+=( libsigc++-2.0-dev )
 
 # Fitting / tested dependency versions for major platforms
-#export CARES_VERSION=1.7.5
-#export CURL_VERSION=7.22.0
-#export XMLRPC_REV=2366
-
 #export CARES_VERSION=1.10.0
-#export CURL_VERSION=7.38.0
-#export XMLRPC_REV=2626 # Release 1.38.04 2014-07
-
-export CARES_VERSION=1.10.0
-##export CURL_VERSION=7.47.1 # 2016-02
-export CURL_VERSION=7.51.0 # 2016-11
-export XMLRPC_REV=2775 # Release 1.43.01 2015-10
+#export CURL_VERSION=7.51.0 # 2016-11
+#export XMLRPC_REV=2775     # Release 1.43.01 2015-10
+export CARES_VERSION=1.13.0 # 2017-06
+export CURL_VERSION=7.54.1  # 2017-06
+export XMLRPC_REV=2917      # Release 1.48.00 2016-12-27
 # WARNING: see rT issue #457 regarding curl configure options
 
 # Extra options handling (set overridable defaults)
@@ -106,23 +100,23 @@ RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
 # Distro specifics
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
-        export CARES_VERSION=1.10.0
-        export CURL_VERSION=7.51.0 # 2016-11
-        export XMLRPC_REV=2775 # Release 1.43.01 2015-10
+        #export CARES_VERSION=1.10.0
+        #export CURL_VERSION=7.51.0 # 2016-11
+        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
     *-jessie)
-        export CARES_VERSION=1.10.0
-        export CURL_VERSION=7.38.0
-        export XMLRPC_REV=2775 # Release 1.43.01 2015-10
+        #export CARES_VERSION=1.10.0
+        #export CURL_VERSION=7.38.0
+        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
     *-vivid|*-wily|*-xenial|*-yakkety|*-zesty)
-        export CARES_VERSION=1.11.0 # 2016-02
-        export XMLRPC_REV=2775 # Release 1.43.01 2015-10
+        #export CARES_VERSION=1.11.0 # 2016-02
+        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
     *-stretch)
-        export CARES_VERSION=1.13.0 # 2017-06
-        export CURL_VERSION=7.54.1 # 2017-06
-        export XMLRPC_REV=2775 # Release 1.43.01 2015-10
+        #export CARES_VERSION=1.13.0 # 2017-06
+        #export CURL_VERSION=7.54.1 # 2017-06
+        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     Arch-*) # 0.9.[46] only!
