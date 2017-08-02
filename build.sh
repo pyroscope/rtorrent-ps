@@ -237,7 +237,8 @@ TARBALLS=(
 
 XMLRPC_SVN=true
 case $XMLRPC_REV in
-    2775|2366|2626)
+    2917|2775|2626|2366)
+        # XMLRPC_REV=2917; tar -cvz --exclude .svn -f xmlrpc-c-advanced-$XMLRPC_REV-src.tgz xmlrpc-c-advanced-$XMLRPC_REV
         TARBALLS+=( "https://bintray.com/artifact/download/pyroscope/rtorrent-ps/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz" )
         XMLRPC_SVN=false
         ;;
