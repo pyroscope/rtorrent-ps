@@ -406,6 +406,7 @@ build_deps() {
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
 
     ( cd xmlrpc-c-advanced-$XMLRPC_REV \
+        && $SED_I s:PGROGRAMDESTDIR:PROGRAMDESTDIR: common.mk
         && ./configure --prefix=$INSTALL_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
         && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install \
@@ -413,6 +414,7 @@ build_deps() {
     $SED_I s:/usr/local:$INSTALL_DIR: \
         $INSTALL_DIR/bin/xmlrpc-c-config
 
+    libtool --finish $INSTALL_DIR/lib
     touch $INSTALL_DIR/lib/DEPS-DONE
 }
 
