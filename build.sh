@@ -143,10 +143,14 @@ esac
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
 #export CFLAGS="$CFLAGS -march=i586"
+export USE_CXXFLAGS=true
 if command which dpkg-architecture >/dev/null && dpkg-architecture -earmhf; then
     GCC_TYPE="Raspbian"
 elif command which gcc >/dev/null; then
     GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
+    # Fix libtorrent bug with gcc version >= 6 and non-empty CXXFLAGS env var
+    GCC_MAIN_VER=$(gcc --version | head -n1 | cut -d' ' -f4 | cut -d'.' -f1)
+    test "${GCC_MAIN_VER:-0}" -ge 6 && export USE_CXXFLAGS=false || :
 else
     GCC_TYPE=none
 fi
@@ -218,7 +222,7 @@ set_build_env() {
     echo "!!! Installing rTorrent$VERSION_EXTRAS v$RT_VERSION$git_tag into $INSTALL_DIR !!!"; echo
 
     printf "export CPPFLAGS=%q\n"           "${CPPFLAGS}"
-    printf "export CXXFLAGS=%q\n"           "$CFLAGS"
+    printf "export CXXFLAGS=%q # use=%s\n"  "${CXXFLAGS}" "${USE_CXXFLAGS}"
     printf "export LDFLAGS=%q\n"            "${LDFLAGS}"
     printf "export LIBS=%q\n"               "${LIBS}"
     printf "export PKG_CONFIG_PATH=%q\n"    "${PKG_CONFIG_PATH}"
@@ -434,10 +438,10 @@ core_unpack() { # Unpack original LT/RT source
 build() { # Build and install all components
     test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
 
-    ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
+    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd libtorrent-$LT_VERSION && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
-    ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
+    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd rtorrent-$RT_VERSION && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INSTALL_DIR/bin/xmlrpc-c-config && \
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
 }
@@ -458,12 +462,12 @@ build_git() { # Build and install libtorrent and rtorrent from git checkouts
     $SED_I 's/^AC_INIT(rtorrent, '$RT_RELEASE_VERSION'/AC_INIT(rtorrent, '$RT_VERSION'/' "$rt_src/configure.ac"
 
     echo; echo "*** Entering $lt_src"
-    ( set +x ; cd "$lt_src" && automagic && \
+    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd "$lt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
 
     echo; echo "*** Entering $rt_src"
-    ( set +x ; cd "$rt_src" && automagic && \
+    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd "$rt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INSTALL_RELEASE_DIR/bin/xmlrpc-c-config && \
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
 }
