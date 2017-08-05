@@ -56,12 +56,19 @@ export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export GIT_MINOR=$(( $RT_MINOR + 1 ))  # ensure git version has a bumped version number
 export VERSION_EXTRAS=" $git_id"
 
-# List of platforms to build DEBs for with "docker_all"
-docker_distros=(
+# List of platforms to build DEBs for with "docker_deb all|stable|oldstable"
+docker_distros_stable=(
     debian:stretch
     ubuntu:xenial
+)
+docker_distros_oldstable=(
     debian:jessie
     ubuntu:trusty
+)
+docker_distros_all=()
+docker_distros_all+=( "${docker_distros_stable[@]}" )
+docker_distros_all+=( "${docker_distros_oldstable[@]}" )
+docker_distros_all+=(
     debian:wheezy
     ubuntu:precise
 )
@@ -666,26 +673,36 @@ build_everything() {
 }
 
 docker_deb() { # Build Debian packages via Docker
-    local distro_code DISTRO_NAME DISTRO_CODENAME DOCKER_TAG
-    #DISTRO_NAME=debian ; DISTRO_CODENAME=stretch
-    #DISTRO_NAME=ubuntu ; DISTRO_CODENAME=xenial
-    distro_code="${1:-debian:stretch}"; test "$#" -eq 0 || shift
-    DISTRO_NAME=${distro_code%%:*}
-    DISTRO_CODENAME=${distro_code#*:}
-    DOCKER_TAG=rtps-deb-$DISTRO_CODENAME
+    local distros distro_code DISTRO_NAME DISTRO_CODENAME DOCKER_TAG
 
-    mkdir -p tmp-docker
-    set \
-        | egrep '^(git_[_a-z]+|[_A-Z]+_OPTS|[_A-Z]+_ROOT|CFG_[_A-Z]+)' \
-        | sed -re 's/^/export /' >tmp-docker/docker-env
-    ln -f Dockerfile.Debian tmp-docker/Dockerfile
+    distro_code="${1:-${docker_distros_stable[0]}}"; test "$#" -eq 0 || shift
+    case "$distro_code" in
+        all)        distros=( "${docker_distros_all[@]}" ) ;;
+        stable)     distros=( "${docker_distros_stable[@]}" ) ;;
+        oldstable)  distros=( "${docker_distros_oldstable[@]}" ) ;;
+        *)          distros=( "$distro_code" ) ;;
+    esac
 
-    docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile \
-                 --build-arg DISTRO=$DISTRO_NAME \
-                 --build-arg CODENAME=$DISTRO_CODENAME \
-                 "$@" .
-    docker run --rm -u $(id -u):$(id -g) --userns host -v "$PWD:/pwd" $DOCKER_TAG \
-               bash -c "cp /tmp/rt-ps-dist/rtorrent-ps_*.deb /pwd"
+    for distro_code in "${distros[@]}"; do
+        DISTRO_NAME=${distro_code%%:*}
+        DISTRO_CODENAME=${distro_code#*:}
+        DOCKER_TAG=rtps-deb-$DISTRO_CODENAME
+
+        mkdir -p tmp-docker
+        set \
+            | egrep '^(git_[_a-z]+|[_A-Z]+_OPTS|[_A-Z]+_ROOT|CFG_[_A-Z]+)' \
+            | sed -re 's/^/export /' >tmp-docker/docker-env
+        ln -f Dockerfile.Debian tmp-docker/Dockerfile
+
+        docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile \
+                     --build-arg DISTRO=$DISTRO_NAME \
+                     --build-arg CODENAME=$DISTRO_CODENAME \
+                     "$@" . \
+            || { echo -e "\n\n*** WARNING: $distro does not build ***\n\n"; continue; }
+        docker run --rm -u $(id -u):$(id -g) --userns host -v "$PWD:/pwd" $DOCKER_TAG \
+                   bash -c "cp /tmp/rt-ps-dist/rtorrent-ps_*.deb /pwd"
+    done
+    ls -lrt *.deb
 }
 
 #
@@ -732,13 +749,6 @@ while test -n "$1"; do
         pkg2pacman) pkg2pacman
                     ;;
         docker_deb) docker_deb "$@"
-                    break
-                    ;;
-        docker_all) for distro in "${docker_distros[@]}"; do
-                        docker_deb "$distro" "$@" \
-                            || echo -e "\n\n*** WARNING: $distro does not build ***\n\n"
-                    done
-                    ls -lrt *.deb
                     break
                     ;;
         *)
