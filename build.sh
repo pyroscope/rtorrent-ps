@@ -120,10 +120,7 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         #export CARES_VERSION=1.11.0 # 2016-02
         #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
-    *-stretch)
-        #export CARES_VERSION=1.13.0 # 2017-06
-        #export CURL_VERSION=7.54.1 # 2017-06
-        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
+    *-stretch|Fedora-TwentySix)
         LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     Arch-*) # 0.9.[46] only!
