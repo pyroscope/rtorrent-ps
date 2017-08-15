@@ -225,6 +225,16 @@ rTorrent using this command:
     echo $(apt-cache showsrc rtorrent libtorrent-dev | \
         grep Build-Depends: | cut -f2 -d: | tr ",)" " \\n" | cut -f1 -d"(")
 
+On Fedora (26), use this (**list is work in progress**):
+
+.. code-block:: shell
+
+    dnf install -y \
+        redhat-lsb-core make autoconf automake libtool gcc gcc-c++ pkgconf-pkg-config \
+        subversion git time lsof binutils tmux curl wget which \
+        python-setuptools python-virtualenv python-devel python2-cffi \
+        openssl-devel zlib-devel ncurses-devel cppunit-devel libxml2-devel libxslt-devel
+
 
 Optional ``root`` Setup Steps
 """""""""""""""""""""""""""""
