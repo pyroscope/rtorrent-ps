@@ -372,8 +372,8 @@ First, create the instance's directories and a `start script`_:
 
     # Run this in your NORMAL user account!
     export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
-    mkdir -p $RT_HOME; cd $RT_HOME
-    mkdir -p .session log work done watch/{start,load,hdtv}
+    mkdir -p $RT_HOME; cd $_
+    mkdir -p .session log work done watch/{start,load,hdtv,cleaned}
     cp ~/.local/pyroscope/docs/examples/start.sh ./start
     chmod a+x ./start
 
