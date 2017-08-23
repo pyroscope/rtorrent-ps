@@ -1,6 +1,40 @@
 Tips & How-Tos
 ==============
 
+.. _grok-std-cfg:
+
+Checking Details of the Standard Configuration
+----------------------------------------------
+
+Not every detail of the standard configuration can be documented in this manual,
+because at some point it would basically duplicate the ``*.rc`` files in English,
+and also run the risk of being out of date (i.e. wrong) very fast.
+
+To understand every nook and cranny of the features added by the config sets
+that get installed if you follow :ref:`DebianInstallFromSource`,
+look into the ``*.rc`` files and specifically read the comments in them.
+
+The ``pyrocore`` files are in the ``~/.pyroscope/rtorrent.d`` directory,
+and ``pimp-my-box`` ones in ``~/rtorrent/rtorrent.d``.
+
+Remember that ``.rcignore`` files in those directories allow to
+selectively disable parts of the standard configuration, like so:
+
+.. code-block:: shell
+
+    echo >>~/rtorrent/rtorrent.d/.rcignore "disable-control-q.rc"
+
+For finding specifics on added commands or paths and such, ``grep`` is your friend,
+as in this example:
+
+.. code-block:: console
+
+    $ grep -C1 import.rc ~/.pyroscope/rtorrent.d/*.rc ~/rtorrent/rtorrent.d/*.rc ~/rtorrent/*rt*rc
+    rtorrent/rtorrent.rc-execute2 = (cat,(pyro.bin_dir),pyroadmin),-q,--create-import,(cat,(cfg.basedir),"rtorrent.d/*.rc")
+    rtorrent/rtorrent.rc:import = (cat,(cfg.basedir),"rtorrent.d/.import.rc")
+    rtorrent/rtorrent.rc-
+
+
 Validate Self-Signed Certs
 --------------------------
 
