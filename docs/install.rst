@@ -405,6 +405,10 @@ After this, you should check at
 least the ``rtorrent.d/20-host-var-settings.rc`` file and adapt the
 values to your environment and preferences.
 
+Also check out the `_rtlocal.rc`_ file for some additional settings
+you might want to apply to your own config
+(the ``make-rtorrent-config.sh`` script does not copy that optional file).
+
 
 .. note::
 
@@ -413,6 +417,7 @@ values to your environment and preferences.
 
 .. _rtorrent.rc: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rtorrent.rc
 .. _provided include file: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-pyro.rc
+.. _`_rtlocal.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/_rtlocal.rc
 
 
 CLI Tools Configuration
