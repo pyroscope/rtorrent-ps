@@ -107,18 +107,10 @@ RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
 # Distro specifics
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
-        #export CARES_VERSION=1.10.0
-        #export CURL_VERSION=7.51.0 # 2016-11
-        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
     *-jessie)
-        #export CARES_VERSION=1.10.0
-        #export CURL_VERSION=7.38.0
-        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
     *-vivid|*-wily|*-xenial|*-yakkety|*-zesty)
-        #export CARES_VERSION=1.11.0 # 2016-02
-        #export XMLRPC_REV=2775 # Release 1.43.01 2015-10
         ;;
     *-stretch|Fedora-TwentySix)
         LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
