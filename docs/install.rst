@@ -448,6 +448,7 @@ the installed software, which makes later updates a lot easier.
     EOF
 
 Read the `pyrocore Configuration Guide`_ for more information regarding this file.
+You can come back to customizing it later, the system will work fine with the above default.
 
 .. _`pyrocore Configuration Guide`: https://pyrocore.readthedocs.org/en/latest/setup.html
 
