@@ -12,26 +12,30 @@ Additional Features
 
 If you followed the instructions in the `Extending your ‘.rtorrent.rc’`_
 section of the ``pyrocore`` manual, you will get the following
-additional features in your ``rTorrent-PS`` installation:
+`additional features`_ in your ``rTorrent-PS`` installation:
 
 #.  the ``t`` key is bound to a ``trackers`` view that shows all items
     sorted by tracker and then by name.
+    See `Additional Views`_ for details.
 #.  the ``!`` key is bound to a ``messages`` view, listing all items
     that currently have a non-empty message, sorted in order of the
     message text.
+    See `Additional Views`_ for details.
 #.  the ``^`` key is bound to the ``rtcontrol`` search result view, so
     you can easily return to your last search.
+    See `Additional Views`_ for details.
 #.  the ``?`` key is bound to the ``indemand`` view, which sorts all
     open items by their activity, with the most recently active on top.
+    See `Additional Views`_ for details.
 #.  ``Page ↑`` and ``Page ↓`` scroll by 50 items at a time (or whatever
     other value ``ui.focus.page_size`` has).
 #.  ``Home`` / ``End`` jump to the first / last item in the current
     view.
 #.  the ``~`` key rotates through all available color themes, or a
-    user-selected subset.
+    user-selected subset. See `Color Themes`_ for details.
 #.  the ``<`` and ``>`` keys rotate through all added category views
     (``pyro.category.add=‹name›``), with filtering based on the
-    ruTorrent label (``custom_1=‹name›``).
+    ruTorrent label (``custom_1=‹name›``). See `Category Views`_ for details.
 #.  ``|`` reapplies the category filter and thus updates the current
     category view.
 #.  the ``u`` key shows the uptime and some other essential data of your
@@ -55,6 +59,7 @@ additional features in your ``rTorrent-PS`` installation:
     ``rtcontrol`` on them, or alternatively use ``--to-view tagged`` to
     populate the ``tagged`` view, then deselect some items interactively
     with the ``.`` key, and finally mass-control the rest.
+    See `Additional Views`_ for details.
 #.  You can use the ``purge=`` and ``cull=`` commands (on a Ctrl-X
     prompt) for deleting the current item and its (incomplete) data.
 #.  ``Ctrl-g`` shows the tags of an item (as managed by ``rtcontrol``);
@@ -65,6 +70,10 @@ additional features in your ``rTorrent-PS`` installation:
     of downloads / seeders / leechers is not totally outdated.
 
 .. _Extending your ‘.rtorrent.rc’: https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc
+.. _`additional features`: https://pyrocore.readthedocs.io/en/latest/usage.html#std-config
+.. _`Category Views`: https://pyrocore.readthedocs.io/en/latest/usage.html#category-views
+.. _`Color Themes`: https://pyrocore.readthedocs.io/en/latest/usage.html#color-themes
+.. _`Additional Views`: https://pyrocore.readthedocs.io/en/latest/usage.html#additional-views
 
 .. |rt-ps-name-view| image:: _static/img/rt-ps-name-view.png
 
