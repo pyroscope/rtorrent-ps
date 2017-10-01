@@ -102,7 +102,7 @@ Using Docker for Building Packages
 ----------------------------------
 
 The ``docker_deb`` build action uses ``Dockerfile.Debian`` to compile and package
-*rTorrent-PS* on a selected *Debian* or *Ubuntu* release.
+*rTorrent-PS* on a given *Debian* or *Ubuntu* release.
 The ``docker_all`` action does so for the major releases
 – see the `docker_distros`_ list at the start of `build.sh`_ which ones exactly.
 
