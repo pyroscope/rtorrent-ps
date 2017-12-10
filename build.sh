@@ -112,7 +112,7 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         ;;
     *-vivid|*-wily|*-xenial|*-yakkety|*-zesty)
         ;;
-    *-stretch|Fedora-TwentySix)
+    *-stretch|*-buster|Fedora-TwentySix)
         LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     Arch-*) # 0.9.[46] only!
