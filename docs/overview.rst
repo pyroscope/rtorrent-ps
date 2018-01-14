@@ -89,7 +89,7 @@ Launching a Demo in Docker
 --------------------------
 
 To try out *rTorrent-PS* without any headaches, and *if you have Docker 17.06+ installed*, you can use
-the `launch-on-stretch.sh`_ script to run an *emphemeral* instance in a
+the `launch-on-stretch.sh`_ script to run an *ephemeral* instance in a
 *Debian Stretch* container, like this:
 
 .. code-block:: bash
