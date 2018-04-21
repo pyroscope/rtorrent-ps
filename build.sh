@@ -128,8 +128,8 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         ;;
 esac
 
-# OpenSSL version detection for patch
-case $(openssl version 2> /dev/null | grep -o "1.1.[0-9]") in
+# OpenSSL version detection for selective patching
+case $(openssl version 2> /dev/null | egrep -o "1.[0-9].[0-9]+") in
     1.1.*)
         LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
@@ -494,7 +494,7 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
         test ! -e "$corepatch" || { bold "$(basename $corepatch)"; patch -uNp1 -i "$corepatch"; }
     done
 
-    for backport in $SRC_DIR/patches/backport*_${LT_VERSION}_*.patch; do
+    for backport in $SRC_DIR/patches/backport*_{${LT_VERSION},all}_*.patch; do
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp1 -i "$backport"; }
     done
 
