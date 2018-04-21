@@ -113,13 +113,11 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
     *-vivid|*-wily|*-xenial|*-yakkety|*-zesty)
         ;;
     *-stretch|*-buster|Fedora-TwentySix)
-        LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     Arch-*) # 0.9.[46] only!
         BUILD_PKG_DEPS=( ncurses openssl cppunit )
         source /etc/makepkg.conf 2>/dev/null
         MAKE_OPTS="${MAKEFLAGS}${MAKE_OPTS:+ }${MAKE_OPTS}"
-        LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
     NonLSB)
         # Place tests for MacOSX etc. here
@@ -127,6 +125,13 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         echo
         echo "*** Build dependencies are NOT pre-checked on this platform! ***"
         echo
+        ;;
+esac
+
+# OpenSSL version detection for patch
+case $(openssl version 2> /dev/null | grep -o "1.1.[0-9]") in
+    1.1.*)
+        LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
 esac
 
