@@ -311,7 +311,7 @@ the same way.
     export MAKE_OPTS="-j4"
 
     # check the VERSION SELECTION at the top of the script, and edit as needed
-    nice time ./build.sh all  # build 'deps, 'vanilla', and then 'extended'
+    nice time ./build.sh all  # build 'deps', 'vanilla', and then 'extended'
 
 Note that the unpatched version is still available as
 ``rtorrent-vanilla``, and you can simply switch by changing the symlink
