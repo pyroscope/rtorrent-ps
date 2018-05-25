@@ -59,17 +59,18 @@ export VERSION_EXTRAS=" $git_id"
 # List of platforms to build DEBs for with "docker_deb all|stable|oldstable"
 docker_distros_stable=(
     debian:stretch
-    ubuntu:xenial
+    ubuntu:bionic
 )
 docker_distros_oldstable=(
     debian:jessie
-    ubuntu:trusty
+    ubuntu:xenial
 )
 docker_distros_all=()
 docker_distros_all+=( "${docker_distros_stable[@]}" )
 docker_distros_all+=( "${docker_distros_oldstable[@]}" )
 docker_distros_all+=(
     debian:wheezy
+    ubuntu:trusty
     ubuntu:precise
 )
 
