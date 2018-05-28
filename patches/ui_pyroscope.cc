@@ -72,6 +72,9 @@ static const char* color_names[] = {
     "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
 };
 
+// color value for custom column rendering
+static int ui_canvas_color = ps::COL_DEFAULT;
+
 // list of color configuration variables, the order MUST correspond to the ColorKind enum
 static const char* color_vars[ps::COL_MAX] = {
     0,
@@ -348,7 +351,22 @@ static int row_offset(core::View* view, Range& range) {
 }
 
 
-static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range) {
+int ui_canvas_color_get() {
+    return ::ui_canvas_color;
+}
+
+
+torrent::Object ui_canvas_color_set(int arg) {
+    // TODO: support color names
+    // TODO: ??? support 2nd arg "length"
+    // TODO: ??? support multi-args: {col1, len1}, {col2, len2}, …
+    ::ui_canvas_color = arg;
+    return torrent::Object();
+}
+
+
+static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view,
+                                    int pos, Range& range, int x_title) {
     int offset = row_offset(view, range);
     core::Download* item = *range.first;
     bool active = item->is_open() && item->is_active();
@@ -362,7 +380,7 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
     else
         title_col = (active ? D_INFO(item)->down_rate()->rate() ?
                      ps::COL_LEECHING : ps::COL_INCOMPLETE : ps::COL_QUEUED) + offset;
-    canvas->set_attr(2, pos, -1, attr_map[title_col] | focus_attr, title_col);
+    canvas->set_attr(x_title, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
     // show label for active tracker (a/k/a in focus tracker)
     std::string url = get_active_tracker_domain((*range.first)->download());
@@ -410,7 +428,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
         }
     }
 
-    decorate_download_title(window, canvas, view, pos, range);
+    decorate_download_title(window, canvas, view, pos, range, 2);
 
     // better handling for trail of line 2 (ratio etc.)
     int status_pos = 91;
@@ -487,7 +505,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
 // Render columns from `column_defs`, return total length
 int render_columns(bool headers, rpc::target_type target,
-                   display::Canvas* canvas, int column, int pos,
+                   display::Canvas* canvas, int column, int pos, int offset,
                    const torrent::Object::map_type& column_defs) {
     torrent::Object::map_const_iterator cols_itr, last_col = column_defs.end();
     int total = 0;
@@ -504,12 +522,22 @@ int render_columns(bool headers, rpc::target_type target,
         if (*header_text++ != ':') continue;
 
         // Render title text, or the result of the column command
+        ui_canvas_color = ps::COL_INFO;
         if (headers) {
             canvas->print(column, pos, " %s", header_text);
         } else {
             std::string text = rpc::call_object_nothrow(cols_itr->second, target).as_string();
             //std::string text = rpc::call_command_string(cols_itr->second.as_string().c_str(), target);
             canvas->print(column, pos, " %s", u8_chop(text, header_len).c_str());
+            //canvas->print(column, pos, " %d ", ui_canvas_color);  // debug: print color index
+
+            // apply colorization
+            if (ui_canvas_color > ps::COL_DEFAULT) {
+                // visually indicate 'color out of range'
+                if (ui_canvas_color >= ps::COL_MAX) ui_canvas_color = ps::COL_ALARM;
+                canvas->set_attr(column + 1, pos, header_len,
+                                 attr_map[ui_canvas_color + offset], ui_canvas_color + offset);
+            }
         }
 
         // Advance position
@@ -545,7 +573,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     int pos = 1, x_base = 31, column = x_base;
 
     canvas->print(2, pos, " ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇ ");
-    column += render_columns(true, rpc::make_target(), canvas, column, pos, column_defs);
+    column += render_columns(true, rpc::make_target(), canvas, column, pos, 0, column_defs);
+    int x_name = column + 1;
     canvas->print(column, pos, " Name "); column += 6;
     if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
         canvas->print(canvas->width() - 14, 1, "Tracker Domain");
@@ -660,11 +689,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         );
 
         // Render custom columns
+        canvas->set_attr(1, pos, -1, attr_map[col_active + offset], col_active + offset);
         column = x_base;
-        int custom_len = render_columns(false, rpc::make_target(d), canvas, column, pos, column_defs);
-        canvas->set_attr(column, pos, custom_len, attr_map[ps::COL_DEFAULT], ps::COL_DEFAULT);
+        int custom_len = render_columns(false, rpc::make_target(d), canvas, column, pos, offset, column_defs);
         column += custom_len;
-        int x_name = column + 1;
 
         // Render name
         canvas->print(column, pos, " %s", u8_chop(
@@ -673,9 +701,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
 
         int x_scrape = 3 + 4*2 + 1; // lead, 4 status columns, gap
         int x_rate = x_scrape + 3*3; // skip 3 scrape columns
-        //int x_name = x_rate + 3*5 + 1; // skip 3 rate/size columns
-        decorate_download_title(window, canvas, view, pos, range);
-        canvas->set_attr(2, pos, x_name-2, attr_map[col_active + offset], col_active + offset);
+        decorate_download_title(window, canvas, view, pos, range, x_name);
         if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
         // apply progress color to completion indicator
@@ -897,6 +923,9 @@ void initialize_command_ui_pyroscope() {
 
     CMD2_VAR_VALUE("ui.style.progress", 1);
     CMD2_VAR_VALUE("ui.style.ratio", 1);
+
+    CMD2_ANY        ("ui.canvas_color",         _cxxstd_::bind(&display::ui_canvas_color_get));
+    CMD2_ANY_VALUE_V("ui.canvas_color.set",     _cxxstd_::bind(&display::ui_canvas_color_set, _cxxstd_::placeholders::_2));
 
     PS_VARIABLE_COLOR("ui.color.progress0",     "red");
     PS_VARIABLE_COLOR("ui.color.progress20",    "bold bright red");
