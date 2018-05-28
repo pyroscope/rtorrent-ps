@@ -96,6 +96,11 @@ static const char* color_vars[ps::COL_MAX] = {
     "ui.color.even",
     "ui.color.info",
     "ui.color.focus",
+    "ui.color.custom1",
+    "ui.color.custom2",
+    "ui.color.custom3",
+    "ui.color.custom4",
+    "ui.color.custom5",
 };
 
 // collapsed state of views (default is false)
@@ -914,6 +919,11 @@ void initialize_command_ui_pyroscope() {
     PS_VARIABLE_COLOR("ui.color.even",          "");
     PS_VARIABLE_COLOR("ui.color.info",          "white");
     PS_VARIABLE_COLOR("ui.color.focus",         "reverse");
+    PS_VARIABLE_COLOR("ui.color.custom1",       "");
+    PS_VARIABLE_COLOR("ui.color.custom2",       "");
+    PS_VARIABLE_COLOR("ui.color.custom3",       "");
+    PS_VARIABLE_COLOR("ui.color.custom4",       "");
+    PS_VARIABLE_COLOR("ui.color.custom5",       "");
 
     PS_CMD_ANY_FUN("system.colors.max",         display::get_colors);
     PS_CMD_ANY_FUN("system.colors.enabled",     has_colors);

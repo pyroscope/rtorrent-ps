@@ -26,6 +26,11 @@ enum ColorKind {
     COL_EVEN,
     COL_INFO,
     COL_FOCUS,
+    COL_CUSTOM1,
+    COL_CUSTOM2,
+    COL_CUSTOM3,
+    COL_CUSTOM4,
+    COL_CUSTOM5,
     COL_MAX
 };
 
