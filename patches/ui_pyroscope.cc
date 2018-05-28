@@ -78,32 +78,36 @@ static int ui_canvas_color = ps::COL_DEFAULT;
 // list of color configuration variables, the order MUST correspond to the ColorKind enum
 static const char* color_vars[ps::COL_MAX] = {
     0,
-    "ui.color.progress0",
+    "ui.color.custom1",
+    "ui.color.custom2",
+    "ui.color.custom3",
+    "ui.color.custom4",
+    "ui.color.custom5",
+    "ui.color.custom6",
+    "ui.color.custom7",
+    "ui.color.custom8",
+    "ui.color.custom9",
+    "ui.color.progress0", // 10
     "ui.color.progress20",
     "ui.color.progress40",
     "ui.color.progress60",
     "ui.color.progress80",
     "ui.color.progress100",
     "ui.color.progress120",
+    "ui.color.title",
+    "ui.color.footer",
+    "ui.color.focus",
+    "ui.color.label", // 20
+    "ui.color.info",
+    "ui.color.alarm",
     "ui.color.complete",
     "ui.color.seeding",
     "ui.color.stopped",
     "ui.color.queued",
     "ui.color.incomplete",
     "ui.color.leeching",
-    "ui.color.alarm",
-    "ui.color.title",
-    "ui.color.footer",
-    "ui.color.label",
     "ui.color.odd",
     "ui.color.even",
-    "ui.color.info",
-    "ui.color.focus",
-    "ui.color.custom1",
-    "ui.color.custom2",
-    "ui.color.custom3",
-    "ui.color.custom4",
-    "ui.color.custom5",
 };
 
 // collapsed state of views (default is false)
@@ -953,6 +957,10 @@ void initialize_command_ui_pyroscope() {
     PS_VARIABLE_COLOR("ui.color.custom3",       "");
     PS_VARIABLE_COLOR("ui.color.custom4",       "");
     PS_VARIABLE_COLOR("ui.color.custom5",       "");
+    PS_VARIABLE_COLOR("ui.color.custom6",       "");
+    PS_VARIABLE_COLOR("ui.color.custom7",       "");
+    PS_VARIABLE_COLOR("ui.color.custom8",       "");
+    PS_VARIABLE_COLOR("ui.color.custom9",       "");
 
     PS_CMD_ANY_FUN("system.colors.max",         display::get_colors);
     PS_CMD_ANY_FUN("system.colors.enabled",     has_colors);
