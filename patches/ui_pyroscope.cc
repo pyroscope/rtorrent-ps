@@ -991,7 +991,17 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY_LIST("convert.human_size",         _cxxstd_::bind(&apply_human_size, _cxxstd_::placeholders::_2));
     CMD2_ANY_LIST("convert.magnitude",          _cxxstd_::bind(&apply_magnitude, _cxxstd_::placeholders::_2));
 
-    rpc::parse_command_multiple(rpc::make_target(),
+    // Set some defaults by executing an in-memory script
+    std::string init_commands;
+    for (int colidx = ps::COL_DEFAULT + 1; colidx < ps::COL_MAX; colidx++) {
+        char cmdbuf[80];
+        snprintf(cmdbuf, sizeof(cmdbuf),
+                 "method.insert = %s.index, private|value|const, %d\n",
+                 color_vars[colidx], colidx);
+        init_commands.append(cmdbuf);
+    }
+
+    init_commands.append(
         // Multi-method to store column definitions
         "method.insert = ui.column.render, multi|rlookup|static\n"
 
@@ -1016,4 +1026,7 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"910:4: ✇  \","
         "    ((convert.human_size, ((d.size_bytes)) ))\n"
     );
+
+    //printf("%s", init_commands.c_str());
+    rpc::parse_command_multiple(rpc::make_target(), init_commands.c_str());
 }
