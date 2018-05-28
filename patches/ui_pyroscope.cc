@@ -961,8 +961,29 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY_LIST("convert.human_size",         _cxxstd_::bind(&apply_human_size, _cxxstd_::placeholders::_2));
     CMD2_ANY_LIST("convert.magnitude",          _cxxstd_::bind(&apply_magnitude, _cxxstd_::placeholders::_2));
 
-    rpc::parse_command_multiple
-        (rpc::make_target(),
+    rpc::parse_command_multiple(rpc::make_target(),
+        // Multi-method to store column definitions
         "method.insert = ui.column.render, multi|rlookup|static\n"
+
+        // TODO: also add non-essential columns as default, once things settled down
+
+        // Status flags (☢ ☍ ⌘ ✰)
+        "method.set_key = ui.column.render, \"100:1:☢ \","
+        "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
+        "method.set_key = ui.column.render, \"110:1:☍ \","
+        "    ((if, ((d.tied_to_file)), ((cat, \"⚯ \")), ((cat, \"  \"))))\n"
+        "method.set_key = ui.column.render, \"120:1:⌘ \","
+        "    ((if, ((d.ignore_commands)), ((cat, \"◌ \")), ((cat, \"⚒ \"))))\n"
+        "method.set_key = ui.column.render, \"130:1:✰ \","
+        "    ((string.map, ((cat, ((d.priority)))), {0, \"✖ \"}, {1, \"⇣ \"}, {2, \"  \"}, {3, \"⇡ \"}))\n"
+
+        // Upload total and data size
+        "method.set_key = ui.column.render, \"900:4: Σ⇈ \","
+        "    ((if, ((d.up.total)),"
+        "        ((convert.human_size, ((d.up.total)), (value, 10))),"
+        "        ((cat, \"  · \"))"
+        "    ))\n"
+        "method.set_key = ui.column.render, \"910:4: ✇  \","
+        "    ((convert.human_size, ((d.size_bytes)) ))\n"
     );
 }
