@@ -519,10 +519,17 @@ int render_columns(bool headers, rpc::target_type target,
         size_t header_colon = cols_itr->first.find(':');
         if (header_colon == std::string::npos) continue;
 
-        // Parse header length
+        // Parse header length and optional color definition
         const char* header_pos = cols_itr->first.c_str() + header_colon + 1;
+        std::string color_def;
         char* header_text = 0;
         int header_len = (int)strtol(header_pos, &header_text, 10);
+        if (*header_text == 'C') {
+            int x = 0;
+            while (header_text[x] && header_text[x] != ':') x++;
+            color_def.assign(header_text, x);
+            header_text += x;
+        }
         if (*header_text++ != ':') continue;
 
         // Render title text, or the result of the column command
@@ -536,7 +543,22 @@ int render_columns(bool headers, rpc::target_type target,
             //canvas->print(column, pos, " %d ", ui_canvas_color);  // debug: print color index
 
             // apply colorization
-            if (ui_canvas_color > ps::COL_DEFAULT) {
+            if (!color_def.empty()) {
+                int attr_col = column + 1;
+                for (const char* ptr = color_def.c_str(); *ptr && *ptr++ == 'C'; ) {
+                    char* next = 0;
+                    int attr_idx = (int)strtol(ptr, &next, 10); ptr = next;
+                    if (*ptr != '/') continue;
+                    int attr_len = (int)strtol(ptr + 1, &next, 10); ptr = next;
+                    if (attr_idx && attr_len) {
+                        if (attr_idx >= ps::COL_MAX) attr_idx = ps::COL_ALARM;
+                        canvas->set_attr(attr_col, pos, attr_len, attr_map[attr_idx + offset], attr_idx + offset);
+                        attr_col += attr_len;
+                    }
+                }
+            // XXX: dynamic color should have preference
+            // XXX: 'ui_canvas_color' should also be a color def string
+            } else if (ui_canvas_color > ps::COL_DEFAULT) {
                 // visually indicate 'color out of range'
                 if (ui_canvas_color >= ps::COL_MAX) ui_canvas_color = ps::COL_ALARM;
                 canvas->set_attr(column + 1, pos, header_len,
