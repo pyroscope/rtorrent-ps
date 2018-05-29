@@ -1048,7 +1048,7 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"430:2C27/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
         // Upload total and data size
-        "method.set_key = ui.column.render, \"900:4C24C21/1: Σ⇈ \","
+        "method.set_key = ui.column.render, \"900:4C24/3C21/1: Σ⇈ \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
         "        ((cat, \"  · \"))"
