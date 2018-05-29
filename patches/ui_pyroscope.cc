@@ -596,9 +596,9 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     // show column headers
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
     // x_base value depends on the static headers below!
-    int pos = 1, x_base = 31, column = x_base;
+    int pos = 1, x_base = 22, column = x_base;
 
-    canvas->print(2, pos, " ⣿ ⚡ ☯ ⚑  ↺  ⤴  ⤵   ∆   ⌚ ≀∇ ");
+    canvas->print(2, pos, " ⣿ ⚡ ☯ ⚑   ∆   ⌚ ≀∇ ");
     column += render_columns(true, rpc::make_target(), canvas, column, pos, 0, column_defs);
     int x_name = column + 1;
     canvas->print(column, pos, " Name "); column += 6;
@@ -693,7 +693,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
         }
 
-        canvas->print(0, pos, "%s  %s%s%s%s %s %s %s %s %s%s ",
+        canvas->print(0, pos, "%s  %s%s%s%s %s %s%s ",
             range.first == view->focus() ? "»" : " ",
             d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
                 item->file_list()->completed_chunks() * PROGRESS_STEPS
@@ -704,9 +704,6 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             ying_yang_style == 0 ? ying_yang_str :
                 ratio >= YING_YANG_STEPS * 1000 ? "⊛ " : ying_yang[ying_yang_style][ratio / 1000],
             has_msg ? has_alert ? alert : "♺ " : is_tagged ? "⚑ " : "  ",
-            tracker ? num2(tracker->scrape_downloaded()).c_str() : "  ",
-            tracker ? num2(tracker->scrape_complete()).c_str() : "  ",
-            tracker ? num2(tracker->scrape_incomplete()).c_str() : "  ",
             human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
             d->is_done() || !down_rate ? "" : " ",
             d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
@@ -726,7 +723,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             canvas->width() - x_name - 1).c_str());
 
         int x_scrape = 3 + 4*2 + 1; // lead, 4 status columns, gap
-        int x_rate = x_scrape + 3*3; // skip 3 scrape columns
+        int x_rate = x_scrape; // scrape is now dynamic
         decorate_download_title(window, canvas, view, pos, range, x_name);
         if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
@@ -1007,6 +1004,31 @@ void initialize_command_ui_pyroscope() {
 
         // TODO: also add non-essential columns as default, once things settled down
 
+        //  1:    COL_CUSTOM1
+        //  …
+        //  9:    COL_CUSTOM9
+        // 10:    COL_PROGRESS0
+        // 11:    COL_PROGRESS20
+        // 12:    COL_PROGRESS40
+        // 13:    COL_PROGRESS60
+        // 14:    COL_PROGRESS80
+        // 15:    COL_PROGRESS100
+        // 16:    COL_PROGRESS120
+        // 17:    COL_TITLE
+        // 18:    COL_FOOTER
+        // 19:    COL_FOCUS
+        // 20:    COL_LABEL
+        // 21:    COL_INFO
+        // 22:    COL_ALARM
+        // 23:    COL_COMPLETE
+        // 24:    COL_SEEDING
+        // 25:    COL_STOPPED
+        // 26:    COL_QUEUED
+        // 27:    COL_INCOMPLETE
+        // 28:    COL_LEECHING
+        // 29:    COL_ODD
+        // 30:    COL_EVEN
+
         // Status flags (☢ ☍ ⌘ ✰)
         "method.set_key = ui.column.render, \"100:1:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
@@ -1016,6 +1038,14 @@ void initialize_command_ui_pyroscope() {
         "    ((if, ((d.ignore_commands)), ((cat, \"◌ \")), ((cat, \"⚒ \"))))\n"
         "method.set_key = ui.column.render, \"130:1:✰ \","
         "    ((string.map, ((cat, ((d.priority)))), {0, \"✖ \"}, {1, \"⇣ \"}, {2, \"  \"}, {3, \"⇡ \"}))\n"
+
+        // Scrape info (↺ ⤴ ⤵)
+        "method.set_key = ui.column.render, \"400:2C23/2: ↺\", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
+        "method.set_key = ui.column.render, \"410:2C24/2: ⤴\", ((convert.magnitude, ((d.tracker_scrape.complete)) ))\n"
+        "method.set_key = ui.column.render, \"420:2C28/2: ⤵\", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
+
+        // Number of connected peers (℞)
+        "method.set_key = ui.column.render, \"430:2C27/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
         // Upload total and data size
         "method.set_key = ui.column.render, \"900:4: Σ⇈ \","

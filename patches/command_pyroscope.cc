@@ -224,6 +224,29 @@ std::string get_active_tracker_domain(torrent::Download* item) {
 }
 
 
+// return various scrape information of the "main" tracker for this download item
+int64_t get_active_tracker_scrape_info(const int operation, torrent::Download* item) {
+    int64_t scrape_num = 0;
+    torrent::Tracker* tracker = get_active_tracker(item);
+
+    if (tracker) {
+        switch (operation) {
+            case 1:
+                scrape_num = tracker->scrape_downloaded();
+                break;
+            case 2:
+                scrape_num = tracker->scrape_complete();
+                break;
+            case 3:
+                scrape_num = tracker->scrape_incomplete();
+                break;
+        }
+    }
+
+    return scrape_num;
+}
+
+
 /*  @DOC
     `compare = <order>, <sort_key>=[, ...]`
 
@@ -667,6 +690,11 @@ torrent::Object cmd_d_tracker_domain(core::Download* download) {
 }
 
 
+torrent::Object cmd_d_tracker_scrape_info(const int operation, core::Download* download) {
+    return get_active_tracker_scrape_info(operation, download->download());
+}
+
+
 #if RT_HEX_VERSION <= 0x000906
 // https://github.com/rakshasa/rtorrent/commit/1f5e4d37d5229b63963bb66e76c07ec3e359ecba
 torrent::Object cmd_system_env(const torrent::Object::string_type& arg) {
@@ -717,6 +745,9 @@ void initialize_command_pyroscope() {
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_VAR_VALUE("ui.bind_key.verbose", 1);
     CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
+    CMD2_DL("d.tracker_scrape.downloaded", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 1, _cxxstd_::placeholders::_1));
+    CMD2_DL("d.tracker_scrape.complete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 2, _cxxstd_::placeholders::_1));
+    CMD2_DL("d.tracker_scrape.incomplete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 3, _cxxstd_::placeholders::_1));
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
     CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
     CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));
