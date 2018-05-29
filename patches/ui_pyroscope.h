@@ -40,4 +40,6 @@ enum ColorKind {
 
 } // namespace
 
+extern void add_capability(const char* name); // defined in command_pyroscope.cc
+
 #endif

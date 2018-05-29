@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <climits>
 #include <ctime>
+#include <set>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -52,6 +53,9 @@
     #define _cxxstd_ std
 #endif
 
+
+// List of system capabilities for `system.has` command
+static std::set<std::string> system_capabilities;
 
 // handle for message log file
 namespace core {
@@ -626,6 +630,20 @@ torrent::Object cmd_string_replace(rpc::target_type target, const torrent::Objec
 }
 
 
+void add_capability(const char* name) {
+    system_capabilities.insert(name);
+}
+
+
+torrent::Object cmd_system_has(const torrent::Object::string_type& arg) {
+    if (arg.empty()) {
+        throw torrent::input_error("Passed empty string to 'system.has'!");
+    }
+
+    return (int64_t) (system_capabilities.count(arg) != 0);
+}
+
+
 torrent::Object cmd_value(rpc::target_type target, const torrent::Object::list_type& args) {
     if (args.size() < 1) {
         throw torrent::input_error("'value' takes at least a number argument!");
@@ -740,6 +758,7 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
     CMD2_ANY_LIST("string.map", &cmd_string_map);
     CMD2_ANY_LIST("string.replace", &cmd_string_replace);
+    CMD2_ANY_STRING("system.has", _cxxstd_::bind(&cmd_system_has, _cxxstd_::placeholders::_2));
     CMD2_ANY_LIST("value", &cmd_value);
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
@@ -754,4 +773,10 @@ void initialize_command_pyroscope() {
     CMD2_ANY("ui.focus.pgup", _cxxstd_::bind(&cmd_ui_focus_pgup));
     CMD2_ANY("ui.focus.pgdn", _cxxstd_::bind(&cmd_ui_focus_pgdn));
     CMD2_VAR_VALUE("ui.focus.page_size", 50);
+
+    // List capabilities of this build
+    add_capability("system.has");         // self
+    add_capability("rtorrent-ps");        // obvious
+    add_capability("colors");             // not monochrome
+    add_capability("canvas_v2");          // new PS 1.1 canvas with fully dynamic columns
 }
