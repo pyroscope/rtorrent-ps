@@ -606,9 +606,9 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     // show column headers
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
     // x_base value depends on the static headers below!
-    int pos = 1, x_base = 22, column = x_base;
+    int pos = 1, x_base = 20, column = x_base;
 
-    canvas->print(2, pos, " ⣿ ⚡ ☯ ❢   ∆   ⌚ ≀∇ ");
+    canvas->print(2, pos, " ⣿ ☯ ❢   ∆   ⌚ ≀∇ ");
     column += render_columns(true, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
     int x_name = column + 1;
     canvas->print(column, pos, " Name "); column += 6;
@@ -690,7 +690,6 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         }
 
         std::string displayname = get_custom_string(d, "displayname");
-        int is_tagged = rpc::commands.call_command_d("d.views.has", d, torrent::Object("tagged")).as_value() == 1;
         uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 
         char progress_str[6] = "##";
@@ -703,17 +702,14 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
         }
 
-        canvas->print(0, pos, "%s  %s%s%s%s %s %s%s ",
+        canvas->print(0, pos, "%s  %s%s%s %s %s%s ",
             range.first == view->focus() ? "»" : " ",
             d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
                 item->file_list()->completed_chunks() * PROGRESS_STEPS
                 / item->file_list()->size_chunks()],
-            D_INFO(item)->down_rate()->rate() ?
-                (D_INFO(item)->up_rate()->rate() ? "⇅ " : "↡ ") :
-                (D_INFO(item)->up_rate()->rate() ? "↟ " : "  "),
             ying_yang_style == 0 ? ying_yang_str :
                 ratio >= YING_YANG_STEPS * 1000 ? "⊛ " : ying_yang[ying_yang_style][ratio / 1000],
-            has_msg ? has_alert ? alert : "♺ " : is_tagged ? "⚑ " : "  ",
+            has_msg ? has_alert ? alert : "♺ " : "  ",
             human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
             d->is_done() || !down_rate ? "" : " ",
             d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
@@ -732,7 +728,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             displayname.empty() ? d->info()->name() : displayname.c_str(),
             canvas->width() - x_name - 1).c_str());
 
-        int x_scrape = 3 + 4*2 + 1; // lead, 4 status columns, gap
+        int x_scrape = 3 + 3*2 + 1; // lead, 3 status columns, gap
         int x_rate = x_scrape; // scrape is now dynamic
         decorate_download_title(window, canvas, view, pos, range, x_name);
         if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
@@ -1049,16 +1045,19 @@ void initialize_command_ui_pyroscope() {
         "    ((if, ((d.tied_to_file)), ((cat, \"⚯ \")), ((cat, \"  \"))))\n"
         "method.set_key = ui.column.render, \"120:1:⌘ \","
         "    ((if, ((d.ignore_commands)), ((cat, \"◌ \")), ((cat, \"⚒ \"))))\n"
-        "method.set_key = ui.column.render, \"130:1:✰ \","
-        "    ((string.map, ((cat, ((d.priority)))), {0, \"✖ \"}, {1, \"⇣ \"}, {2, \"  \"}, {3, \"⇡ \"}))\n"
 
         // Scrape info (↺ ⤴ ⤵)
         "method.set_key = ui.column.render, \"400:2C23/2: ↺\", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
         "method.set_key = ui.column.render, \"410:2C24/2: ⤴\", ((convert.magnitude, ((d.tracker_scrape.complete)) ))\n"
         "method.set_key = ui.column.render, \"420:2C28/2: ⤵\", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
 
+        // Traffic indicator (⚡)
+        "method.set_key = ui.column.render, \"470:1:⚡ \","
+        "    ((string.map, ((cat, ((not, ((d.up.rate)) )), ((not, ((d.down.rate)) )) )),"
+        "    {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
+
         // Number of connected peers (℞)
-        "method.set_key = ui.column.render, \"430:2C27/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
+        "method.set_key = ui.column.render, \"480:2C27/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
         // Upload total and data size
         "method.set_key = ui.column.render, \"900:4C24/3C21/1: Σ⇈ \","
@@ -1068,6 +1067,12 @@ void initialize_command_ui_pyroscope() {
         "    ))\n"
         "method.set_key = ui.column.render, \"910:4C15/3C21/1: ✇  \","
         "    ((convert.human_size, ((d.size_bytes)) ))\n"
+
+        // Explicitly managed status (✰ = prio; ⚑ = tagged)
+        "method.set_key = ui.column.render, \"970:1C91/1:✰ \","
+        "    ((string.map, ((cat, ((d.priority)))), {0, \"✖ \"}, {1, \"⇣ \"}, {2, \"  \"}, {3, \"⇡ \"}))\n"
+        "method.set_key = ui.column.render, \"980:1C16/1:⚑ \","
+        "    ((string.map, ((cat, ((d.views.has, tagged)) )), {0, \"  \"}, {1, \"⚑ \"}))\n"
     );
 
     //printf("%s", init_commands.c_str());
