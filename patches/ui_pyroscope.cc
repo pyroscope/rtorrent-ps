@@ -67,8 +67,14 @@ int ratio_col[] = {
     ps::COL_PROGRESS100, ps::COL_PROGRESS120,
 };
 
+// ps::COL_PRIO
 static int col_idx_prio[] = {
     ps::COL_PROGRESS0, ps::COL_PROGRESS60, ps::COL_INFO, ps::COL_PROGRESS120
+};
+
+// ps::COL_STATE
+static int col_idx_state[] = {
+    ps::COL_PROGRESS0, ps::COL_PROGRESS0, ps::COL_PROGRESS80, ps::COL_PROGRESS100
 };
 
 
@@ -563,6 +569,9 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
                             case ps::COL_PRIO:
                                 attr_idx = col_idx_prio[std::min(3U, (uint32_t) item->priority())];
                                 break;
+                            case ps::COL_STATE:
+                                attr_idx = col_idx_state[(item->is_open() << 1) | item->is_active()];
+                                break;
                         }
                     }
 
@@ -1037,9 +1046,10 @@ void initialize_command_ui_pyroscope() {
 
         // 90:    COL_TRAFFIC
         // 91:    COL_PRIO
+        // 92:    COL_STATE
 
         // Status flags (☢ ☍ ⌘ ✰)
-        "method.set_key = ui.column.render, \"100:1:☢ \","
+        "method.set_key = ui.column.render, \"100:1C92/1:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
         "method.set_key = ui.column.render, \"110:1:☍ \","
         "    ((if, ((d.tied_to_file)), ((cat, \"⚯ \")), ((cat, \"  \"))))\n"
