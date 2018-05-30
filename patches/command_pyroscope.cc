@@ -640,7 +640,11 @@ torrent::Object cmd_system_has(const torrent::Object::string_type& arg) {
         throw torrent::input_error("Passed empty string to 'system.has'!");
     }
 
-    return (int64_t) (system_capabilities.count(arg) != 0);
+    bool result = (system_capabilities.count(arg) != 0);
+    if (!result && '=' == arg.at(arg.size()-1)) {
+        result = rpc::commands.has(arg.substr(0, arg.size()-1));
+    }
+    return (int64_t) result;
 }
 
 
