@@ -572,6 +572,13 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
                             case ps::COL_STATE:
                                 attr_idx = col_idx_state[(item->is_open() << 1) | item->is_active()];
                                 break;
+                            case ps::COL_RATIO:
+                                attr_idx = ratio_color(rpc::call_command_value("d.ratio", target));
+                                break;
+                            case ps::COL_PROGRESS:
+                                attr_idx = ratio_color(item->file_list()->completed_chunks() * 1000 /
+                                                       item->file_list()->size_chunks());
+                                break;
                         }
                     }
 
@@ -1047,6 +1054,8 @@ void initialize_command_ui_pyroscope() {
         // 90:    COL_TRAFFIC
         // 91:    COL_PRIO
         // 92:    COL_STATE
+        // 93:    COL_RATIO
+        // 94:    COL_PROGRESS
 
         // Status flags (☢ ☍ ⌘ ✰)
         "method.set_key = ui.column.render, \"100:1C92/1:☢ \","

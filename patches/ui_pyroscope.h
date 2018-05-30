@@ -42,6 +42,8 @@ enum ColorKind {
     COL_TRAFFIC = COL_SYS_BASE,
     COL_PRIO,
     COL_STATE,
+    COL_RATIO,
+    COL_PROGRESS,
     COL_SYS_MAX
 };
 
