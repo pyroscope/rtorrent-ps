@@ -73,7 +73,7 @@ static const char* color_names[] = {
 };
 
 // color value for custom column rendering
-static int ui_canvas_color = ps::COL_DEFAULT;
+static std::string ui_canvas_color;
 
 // list of color configuration variables, the order MUST correspond to the ColorKind enum
 static const char* color_vars[ps::COL_MAX] = {
@@ -355,15 +355,12 @@ static int row_offset(core::View* view, Range& range) {
 }
 
 
-int ui_canvas_color_get() {
+torrent::Object ui_canvas_color_get() {
     return ::ui_canvas_color;
 }
 
 
-torrent::Object ui_canvas_color_set(int arg) {
-    // TODO: support color names
-    // TODO: ??? support 2nd arg "length"
-    // TODO: ??? support multi-args: {col1, len1}, {col2, len2}, …
+torrent::Object ui_canvas_color_set(const torrent::Object::string_type& arg) {
     ::ui_canvas_color = arg;
     return torrent::Object();
 }
@@ -533,19 +530,22 @@ int render_columns(bool headers, rpc::target_type target,
         if (*header_text++ != ':') continue;
 
         // Render title text, or the result of the column command
-        ui_canvas_color = ps::COL_INFO;
+        ui_canvas_color = color_def;
         if (headers) {
             canvas->print(column, pos, " %s", header_text);
         } else {
             std::string text = rpc::call_object_nothrow(cols_itr->second, target).as_string();
             //std::string text = rpc::call_command_string(cols_itr->second.as_string().c_str(), target);
             canvas->print(column, pos, " %s", u8_chop(text, header_len).c_str());
-            //canvas->print(column, pos, " %d ", ui_canvas_color);  // debug: print color index
+            //canvas->print(column, pos, " %s ", ui_canvas_color);  // debug: print color index
 
             // apply colorization
-            if (!color_def.empty()) {
+            if (ui_canvas_color.empty()) {
+                canvas->set_attr(column + 1, pos, header_len,
+                                 attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
+            } else {
                 int attr_col = column + 1;
-                for (const char* ptr = color_def.c_str(); *ptr && *ptr++ == 'C'; ) {
+                for (const char* ptr = ui_canvas_color.c_str(); *ptr && *ptr++ == 'C'; ) {
                     char* next = 0;
                     int attr_idx = (int)strtol(ptr, &next, 10); ptr = next;
                     if (*ptr != '/') continue;
@@ -556,13 +556,6 @@ int render_columns(bool headers, rpc::target_type target,
                         attr_col += attr_len;
                     }
                 }
-            // XXX: dynamic color should have preference
-            // XXX: 'ui_canvas_color' should also be a color def string
-            } else if (ui_canvas_color > ps::COL_DEFAULT) {
-                // visually indicate 'color out of range'
-                if (ui_canvas_color >= ps::COL_MAX) ui_canvas_color = ps::COL_ALARM;
-                canvas->set_attr(column + 1, pos, header_len,
-                                 attr_map[ui_canvas_color + offset], ui_canvas_color + offset);
             }
         }
 
@@ -948,7 +941,7 @@ void initialize_command_ui_pyroscope() {
     CMD2_VAR_VALUE("ui.style.ratio", 1);
 
     CMD2_ANY        ("ui.canvas_color",         _cxxstd_::bind(&display::ui_canvas_color_get));
-    CMD2_ANY_VALUE_V("ui.canvas_color.set",     _cxxstd_::bind(&display::ui_canvas_color_set, _cxxstd_::placeholders::_2));
+    CMD2_ANY_STRING ("ui.canvas_color.set",     _cxxstd_::bind(&display::ui_canvas_color_set, _cxxstd_::placeholders::_2));
 
     PS_VARIABLE_COLOR("ui.color.progress0",     "red");
     PS_VARIABLE_COLOR("ui.color.progress20",    "bold bright red");
