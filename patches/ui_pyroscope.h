@@ -3,6 +3,8 @@
 
 namespace ps {
 
+#define COL_SYS_BASE 90
+
 enum ColorKind {
     COL_DEFAULT,
     COL_CUSTOM1,
@@ -35,7 +37,11 @@ enum ColorKind {
     COL_LEECHING,
     COL_ODD,
     COL_EVEN,
-    COL_MAX
+    COL_MAX,
+
+    COL_TRAFFIC = COL_SYS_BASE,
+    COL_PRIO,
+    COL_SYS_MAX
 };
 
 } // namespace

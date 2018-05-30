@@ -67,6 +67,11 @@ int ratio_col[] = {
     ps::COL_PROGRESS100, ps::COL_PROGRESS120,
 };
 
+static int col_idx_prio[] = {
+    ps::COL_PROGRESS0, ps::COL_PROGRESS60, ps::COL_INFO, ps::COL_PROGRESS120
+};
+
+
 // basic color names
 static const char* color_names[] = {
     "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
@@ -505,7 +510,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
 
 // Render columns from `column_defs`, return total length
-int render_columns(bool headers, rpc::target_type target,
+int render_columns(bool headers, rpc::target_type target, core::Download* item,
                    display::Canvas* canvas, int column, int pos, int offset,
                    const torrent::Object::map_type& column_defs) {
     torrent::Object::map_const_iterator cols_itr, last_col = column_defs.end();
@@ -549,6 +554,18 @@ int render_columns(bool headers, rpc::target_type target,
                     char* next = 0;
                     int attr_idx = (int)strtol(ptr, &next, 10); ptr = next;
                     if (*ptr != '/') continue;
+
+                    // System colors – these are mapped to a 'normal' color index
+                    if (item) {
+                        switch (attr_idx) {
+                            case ps::COL_TRAFFIC:
+                                break;
+                            case ps::COL_PRIO:
+                                attr_idx = col_idx_prio[std::min(3U, (uint32_t) item->priority())];
+                                break;
+                        }
+                    }
+
                     int attr_len = (int)strtol(ptr + 1, &next, 10); ptr = next;
                     if (attr_idx && attr_len) {
                         if (attr_idx >= ps::COL_MAX) attr_idx = ps::COL_ALARM;
@@ -591,8 +608,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     // x_base value depends on the static headers below!
     int pos = 1, x_base = 22, column = x_base;
 
-    canvas->print(2, pos, " ⣿ ⚡ ☯ ⚑   ∆   ⌚ ≀∇ ");
-    column += render_columns(true, rpc::make_target(), canvas, column, pos, 0, column_defs);
+    canvas->print(2, pos, " ⣿ ⚡ ☯ ❢   ∆   ⌚ ≀∇ ");
+    column += render_columns(true, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
     int x_name = column + 1;
     canvas->print(column, pos, " Name "); column += 6;
     if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
@@ -707,7 +724,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         // Render custom columns
         canvas->set_attr(1, pos, -1, attr_map[col_active + offset], col_active + offset);
         column = x_base;
-        int custom_len = render_columns(false, rpc::make_target(d), canvas, column, pos, offset, column_defs);
+        int custom_len = render_columns(false, rpc::make_target(d), d, canvas, column, pos, offset, column_defs);
         column += custom_len;
 
         // Render name
@@ -1021,6 +1038,9 @@ void initialize_command_ui_pyroscope() {
         // 28:    COL_LEECHING
         // 29:    COL_ODD
         // 30:    COL_EVEN
+
+        // 90:    COL_TRAFFIC
+        // 91:    COL_PRIO
 
         // Status flags (☢ ☍ ⌘ ✰)
         "method.set_key = ui.column.render, \"100:1:☢ \","
