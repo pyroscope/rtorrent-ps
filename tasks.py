@@ -6,7 +6,9 @@ from __future__ import print_function, unicode_literals
 
 import os
 import time
+import glob
 import shutil
+import subprocess
 
 from invoke import task
 
@@ -65,3 +67,33 @@ def stop(ctx):
                 ctx.run('ps {}'.format(pid), pty=False)
             ctx.run('kill {}'.format(pid), pty=False)
             time.sleep(.5)
+
+@task
+def test(ctx):
+    """Run command integration tests."""
+    test_dir = 'tests/commands'
+    failures = 0
+
+    for test_file in glob.glob(os.path.join(test_dir, "*.txt")):
+        print("--- Running tests in '{}'...".format(test_file))
+
+        with open(test_file, 'r') as handle:
+            output = None
+            for line in handle:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+
+                if line.startswith('$'):
+                    output = subprocess.check_output(
+                        line[1:].strip() + '; exit 0', shell=True, stderr=subprocess.STDOUT)
+                    output = output.decode('utf-8')
+                elif all(x in output for x in line.split('…')):
+                    print('.', end='', flush=True)
+                else:
+                    failures += 1
+                    print('\nFAIL: »{l}« not found in output\n{d}\n{o}\n{d}\n'
+                          .format(l=line, o=output.rstrip(), d='~'*78))
+        print('\n')
+
+    print('\n☹ ☹ ☹  {} TEST(S) FAILED. ☹ ☹ ☹'.format(failures) if failures else '\n☺ ☺ ☺  ALL OK. ☺ ☺ ☺')
