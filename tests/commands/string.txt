@@ -1,20 +1,5 @@
 # Tests for "string.*"
 
-# string.at
-$ rtxmlrpc --repr string.at '' -- '' 42
-''
-$ rtxmlrpc --repr string.at '' -- '' 42 'Life, universe, everything'
-'Life, universe, everything'
-$ rtxmlrpc --repr string.at '' -- 'foobar' 5
-'r'
-$ rtxmlrpc --repr string.at '' -- 'foobar' 6
-''
-$ rtxmlrpc --repr string.at '' -- '➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈' 2
-u'\u2781'
-$ rtxmlrpc --repr string.at '' --
-ERROR … <Fault -503: 'string.at needs a string argument!'>
-# END
-
 # string.len
 $ rtxmlrpc --repr string.len '' -- ''
 0
@@ -37,13 +22,25 @@ $ rtxmlrpc --repr string.substr '' -- 'foo123bar' -6 3
 '123'
 $ rtxmlrpc --repr string.substr '' -- '➀ ♯'
 u'\u2780 \u266f'
-$ rtxmlrpc --repr string.substr '' -- '➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈' 2 2
+$ rtxmlrpc --repr string.substr '' -- '' 42
+''
+$ rtxmlrpc --repr string.substr '' -- '' 42 1 'Life, universe, everything'
+'Life, universe, everything'
+$ rtxmlrpc --repr string.substr '' -- 'foobar' 5
+'r'
+$ rtxmlrpc --repr string.substr '' -- 'foobar' 6
+''
+$ rtxmlrpc --repr string.substr '' -- '➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈' 2 1
+u'\u2781'
+$ rtxmlrpc --repr string.substr '' -- '➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈' 2 +2
 u'\u2781 '
+$ rtxmlrpc --repr string.substr '' -- '➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈' -3 2
+u'\u2787 '
 $ rtxmlrpc --repr string.substr '' -- 'for123bar' 3 bad
-ERROR    …: <Fault -503: 'string.substr(count): junk at end of value: bad'>
+ERROR … string.substr(count): junk at end of value: bad
 RC=65
 $ rtxmlrpc --repr string.substr '' --
-ERROR … <Fault -503: 'string.substr needs a string argument!'>
+ERROR … string.substr needs a string argument
 RC=65
 # END
 

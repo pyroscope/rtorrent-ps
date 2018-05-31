@@ -612,32 +612,53 @@ torrent::Object cmd_string_len(rpc::target_type target, const torrent::Object::l
 }
 
 
-torrent::Object cmd_string_at(rpc::target_type target, const torrent::Object::list_type& args) {
-    const std::string& text = string_get_first_arg("at", args);
-
-    torrent::Object::list_const_iterator itr = args.begin() + 1;
-    int64_t pos = 0;
-    std::string fallback;
-    if (itr != args.end()) pos = string_get_value_arg("at(pos)", itr);
-    if (itr != args.end()) fallback = (itr++)->as_string();
-    if (pos < 0) pos += text.length();
-    if (pos >= text.length()) return fallback;
-
-    return text.substr(pos, 1);
-}
-
-
 torrent::Object cmd_string_substr(rpc::target_type target, const torrent::Object::list_type& args) {
-    const std::string& text = string_get_first_arg("substr", args);
+    const std::string text = string_get_first_arg("substr", args);
 
     torrent::Object::list_const_iterator itr = args.begin() + 1;
-    int64_t pos = 0;
-    std::string::size_type count = std::string::npos;
-    if (itr != args.end()) pos = string_get_value_arg("substr(pos)", itr);
+    int64_t glyphs = 0, count = text.length();
+    std::string fallback;
+    if (itr != args.end()) glyphs = string_get_value_arg("substr(pos)", itr);
     if (itr != args.end()) count = string_get_value_arg("substr(count)", itr);
-    if (pos < 0) pos += text.length();
+    if (itr != args.end()) fallback = (itr++)->as_string();
 
-    return text.substr(pos, count);
+    if (count < 0) {
+       throw torrent::input_error("string.substr: Invalid negative count!");
+    }
+
+    std::mbstate_t mbs = std::mbstate_t();
+    const char* pos = text.c_str();
+    int bytes = 0, skip;
+
+    if (glyphs < 0) {
+        std::string::size_type offsets[text.length() + 1];
+        int64_t idx = 0;
+        while (*pos && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
+            offsets[idx++] = bytes;
+            pos += skip;
+            bytes += skip;
+        }
+        offsets[idx] = bytes;
+
+        int64_t begidx = std::max(idx + glyphs, 0L);
+        int64_t endidx = std::min(idx, begidx + count);
+        return text.substr(offsets[begidx], offsets[endidx] - offsets[begidx]);
+    }
+
+    while (glyphs-- > 0 && *pos && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
+        pos += skip;
+        bytes += skip;
+    }
+    if (!*pos) return fallback;
+
+    int bytes_pos = bytes, bytes_count = 0;
+    while (count-- > 0 && *pos && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
+        pos += skip;
+        bytes += skip;
+        bytes_count += skip;
+    }
+
+    return text.substr(bytes_pos, bytes_count);
 }
 
 
@@ -955,7 +976,6 @@ void initialize_command_pyroscope() {
 #endif
 
     CMD2_ANY_LIST("string.len", &cmd_string_len);
-    CMD2_ANY_LIST("string.at", &cmd_string_at);
     CMD2_ANY_LIST("string.substr", &cmd_string_substr);
     CMD2_ANY_LIST("string.contains", &cmd_string_contains);
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
