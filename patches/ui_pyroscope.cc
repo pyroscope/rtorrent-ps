@@ -1024,6 +1024,9 @@ void initialize_command_ui_pyroscope() {
         // Multi-method to store column definitions
         "method.insert = ui.column.render, multi|rlookup|static\n"
 
+        // Bind '*' to toggle between collapsed and expanded display
+        "schedule2 = collapsed_view_toggle, 0, 0, ((ui.bind_key,download_list,*,view.collapsed.toggle=))\n"
+
         // TODO: also add non-essential columns as default, once things settled down
 
         //  1:    COL_CUSTOM1
