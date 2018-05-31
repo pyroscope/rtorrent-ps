@@ -79,6 +79,10 @@ def test(ctx, name=''):
     test_dir = 'tests/commands'
     failures = 0
 
+    if name:
+        assert os.path.exists(os.path.join(test_dir, name + '.txt')), \
+               "Named test file does not exist!"
+
     for test_file in glob.glob(os.path.join(test_dir, name + '.txt' if name else '*.txt')):
         print("--- Running tests in '{}'...".format(test_file))
 
@@ -91,7 +95,8 @@ def test(ctx, name=''):
 
                 if line.startswith('$'):
                     cmd = line[1:].strip()
-                    output = subprocess.check_output(cmd + '; exit 0', shell=True, stderr=subprocess.STDOUT)
+                    output = subprocess.check_output(cmd + '; echo RC=$?; exit 0',
+                                                     shell=True, stderr=subprocess.STDOUT)
                     output = output.decode('utf-8')
                 elif all(x in output for x in line.split('…')):
                     print('.', end='', flush=True)
