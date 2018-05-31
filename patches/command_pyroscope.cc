@@ -499,6 +499,12 @@ torrent::Object cmd_log_messages(const torrent::Object::string_type& arg) {
 }
 
 
+torrent::Object cmd_import_return(rpc::target_type target, const torrent::Object& args) {
+    // Handled in src/rpc/parse_commands.cc::parse_command_file via patch
+    throw torrent::input_error("import.return");
+}
+
+
 torrent::Object
 d_multicall_filtered(const torrent::Object::list_type& args) {
   if (args.size() < 2)
@@ -954,7 +960,10 @@ void initialize_command_pyroscope() {
     CMD2_DL("d.tracker_scrape.downloaded", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 1, _cxxstd_::placeholders::_1));
     CMD2_DL("d.tracker_scrape.complete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 2, _cxxstd_::placeholders::_1));
     CMD2_DL("d.tracker_scrape.incomplete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 3, _cxxstd_::placeholders::_1));
+
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
+    CMD2_ANY("import.return", &cmd_import_return);
+
     CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
     CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));
     CMD2_ANY("ui.focus.pgup", _cxxstd_::bind(&cmd_ui_focus_pgup));
