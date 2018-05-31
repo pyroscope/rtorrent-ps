@@ -13,6 +13,10 @@ $ rtxmlrpc --repr math.add '' -- 1 +1
 2
 $ rtxmlrpc --repr math.add '' -- 1 -1
 0
+$ rtxmlrpc --repr math.add '' -- [1,2 3
+6
+$ rtxmlrpc --repr math.add '' -- text
+ERROR … Could not convert string to value
 # END
 
 # math.sub
@@ -20,6 +24,15 @@ $ rtxmlrpc --repr math.sub '' -- 1 1
 0
 $ rtxmlrpc --repr math.sub '' -- 1 -1
 2
+$ rtxmlrpc --repr math.sub '' -- [1 [1
+0
+$ rtxmlrpc --repr math.sub '' -- [1,2
+-1
+$ rtxmlrpc --repr math.sub '' -- [9,3,3
+3
+# this breaks the law of the least surprise (it is "3 - (1 - 2)")
+$ rtxmlrpc --repr math.sub '' -- 3 [1,2
+4
 # END
 
 # math.mul
@@ -34,8 +47,12 @@ $ rtxmlrpc --repr math.div '' -- 4 +2
 2
 $ rtxmlrpc --repr math.div '' -- 8 3
 2
-#$ rtxmlrpc --repr math.div '' -- 6 0
-#2
+$ rtxmlrpc --repr math.div '' -- 0 6
+0
+$ rtxmlrpc --repr math.div '' -- 6 0
+ERROR … math.div: Division by zero
+$ rtxmlrpc --repr math.div '' --
+ERROR … math.div: No arguments provided
 # END
 
 # math.mod

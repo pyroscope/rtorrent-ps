@@ -98,7 +98,7 @@ def test(ctx, name=''):
                     output = subprocess.check_output(cmd + '; echo RC=$?; exit 0',
                                                      shell=True, stderr=subprocess.STDOUT)
                     output = output.decode('utf-8')
-                elif all(x in output for x in line.split('…')):
+                elif all(x.strip() in output for x in line.split('…')):
                     print('.', end='', flush=True)
                 else:
                     failures += 1
