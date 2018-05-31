@@ -1068,7 +1068,7 @@ void initialize_command_ui_pyroscope() {
         // Scrape info (↺ ⤴ ⤵)
         "method.set_key = ui.column.render, \"400:2C23/2: ↺\", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
         "method.set_key = ui.column.render, \"410:2C24/2: ⤴\", ((convert.magnitude, ((d.tracker_scrape.complete)) ))\n"
-        "method.set_key = ui.column.render, \"420:2C28/2: ⤵\", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
+        "method.set_key = ui.column.render, \"420:2C14/2: ⤵\", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
 
         // Traffic indicator (⚡)
         "method.set_key = ui.column.render, \"470:1:⚡ \","
@@ -1076,7 +1076,7 @@ void initialize_command_ui_pyroscope() {
         "    {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
 
         // Number of connected peers (℞)
-        "method.set_key = ui.column.render, \"480:2C27/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
+        "method.set_key = ui.column.render, \"480:2C28/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
         // Upload total and data size
         "method.set_key = ui.column.render, \"900:4C24/3C21/1: Σ⇈ \","
