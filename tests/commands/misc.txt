@@ -1,0 +1,43 @@
+# Test miscellaneous commands
+
+$ test "$(rtxmlrpc --repr ui.focus.page_size '')" -gt 0; echo $?
+0
+
+$ test "$(rtxmlrpc --repr system.env '' HOME)" = "'$HOME'"; echo $?
+0
+$ rtxmlrpc --repr system.env ''
+ERROR … Wrong object type
+$ rtxmlrpc --repr system.env '' ''
+ERROR … system.env: Missing variable name
+
+# $ rtxmlrpc --repr system.random '' --
+
+$ rtxmlrpc --repr system.has '' 'system.has'
+1
+$ rtxmlrpc --repr system.has '' 'cute.kittens'
+0
+
+$ rtcontrol // -/1 -qV && rtxmlrpc --repr ui.current_view ''
+'rtcontrol'
+
+$ rtxmlrpc --repr d.multicall.filtered 'default' "false="
+[]
+$ rtxmlrpc d.multicall.filtered 'default' "equal=d.hash=,cat=$(rtxmlrpc download_list | head -n1)" d.hash= | wc -l
+1
+
+$ rtxmlrpc --repr throttle.names ''
+['', 'NULL'…]
+
+$ rtxmlrpc --repr value '' -- 11
+11
+$ rtxmlrpc --repr value '' -- 11 8
+9
+$ rtxmlrpc --repr value '' -- 2a 16
+42
+$ rtxmlrpc --repr value '' -- 2A 16
+42
+$ rtxmlrpc --repr value '' -- 8 8
+ERROR … Junk at end of number: 8
+
+$ rtxmlrpc --repr compare '' -- '' ''
+ERROR … Can only compare a target pair
