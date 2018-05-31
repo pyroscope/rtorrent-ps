@@ -68,32 +68,37 @@ def stop(ctx):
             ctx.run('kill {}'.format(pid), pty=False)
             time.sleep(.5)
 
-@task
-def test(ctx):
+
+@task(
+    help={
+        'name': "name of a specific group of tests to run",
+    },
+)
+def test(ctx, name=''):
     """Run command integration tests."""
     test_dir = 'tests/commands'
     failures = 0
 
-    for test_file in glob.glob(os.path.join(test_dir, "*.txt")):
+    for test_file in glob.glob(os.path.join(test_dir, name + '.txt' if name else '*.txt')):
         print("--- Running tests in '{}'...".format(test_file))
 
         with open(test_file, 'r') as handle:
-            output = None
+            cmd, output = None, None
             for line in handle:
                 line = line.strip()
                 if not line or line.startswith('#'):
                     continue
 
                 if line.startswith('$'):
-                    output = subprocess.check_output(
-                        line[1:].strip() + '; exit 0', shell=True, stderr=subprocess.STDOUT)
+                    cmd = line[1:].strip()
+                    output = subprocess.check_output(cmd + '; exit 0', shell=True, stderr=subprocess.STDOUT)
                     output = output.decode('utf-8')
                 elif all(x in output for x in line.split('…')):
                     print('.', end='', flush=True)
                 else:
                     failures += 1
-                    print('\nFAIL: »{l}« not found in output\n{d}\n{o}\n{d}\n'
-                          .format(l=line, o=output.rstrip(), d='~'*78))
+                    print('\nFAIL: »{l}« not found in output of »{cmd}«\n{d}\n{o}\n{d}\n'
+                          .format(l=line, cmd=cmd, o=output.rstrip(), d='~'*78))
         print('\n')
 
     print('\n☹ ☹ ☹  {} TEST(S) FAILED. ☹ ☹ ☹'.format(failures) if failures else '\n☺ ☺ ☺  ALL OK. ☺ ☺ ☺')
