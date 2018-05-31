@@ -1,0 +1,9 @@
+# Tests for "string.len"
+$ rtxmlrpc --repr string.len '' -- ''
+0
+$ rtxmlrpc --repr string.len '' -- 'foo123bar'
+9
+$ rtxmlrpc --repr string.len '' -- '♯'  # TODO: UTF8 support
+3
+$ rtxmlrpc --repr string.len '' --
+ERROR … <Fault -503: 'string.len needs a string argument!'>
