@@ -561,6 +561,20 @@ torrent::Object cmd_throttle_names() {
 }
 
 
+static const std::string& string_get_first_arg(const char* name, const torrent::Object::list_type& args) {
+    if (args.size() < 1) {
+        throw torrent::input_error("string." + std::string(name) + " needs a string argument!");
+    }
+    torrent::Object::list_const_iterator itr = args.begin();
+    return itr->as_string();
+}
+
+
+torrent::Object cmd_string_len(rpc::target_type target, const torrent::Object::list_type& args) {
+    return (int64_t) string_get_first_arg("len", args).length();
+}
+
+
 torrent::Object::value_type apply_string_contains(bool ignore_case, const torrent::Object::list_type& args) {
     if (args.size() < 2) {
         throw torrent::input_error("string.contains[_i] takes at least two arguments!");
@@ -757,11 +771,13 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("d.multicall.filtered", _cxxstd_::bind(&d_multicall_filtered, _cxxstd_::placeholders::_2));
 #endif
 
-    CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
+    CMD2_ANY_LIST("string.len", &cmd_string_len);
     CMD2_ANY_LIST("string.contains", &cmd_string_contains);
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
     CMD2_ANY_LIST("string.map", &cmd_string_map);
     CMD2_ANY_LIST("string.replace", &cmd_string_replace);
+
+    CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
     CMD2_ANY_STRING("system.has", _cxxstd_::bind(&cmd_system_has, _cxxstd_::placeholders::_2));
     CMD2_ANY_LIST("value", &cmd_value);
     CMD2_ANY_LIST("compare", &apply_compare);
