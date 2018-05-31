@@ -199,7 +199,7 @@ BUILD_GIT=false
 
 
 set_build_env() {
-    export CPPFLAGS="-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
+    export CPPFLAGS="-std=c++0x -I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
     export CXXFLAGS="$CFLAGS"
     export LDFLAGS="-L$INSTALL_RELEASE_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
     export LDFLAGS="-Wl,-rpath,$INSTALL_RELEASE_DIR/lib ${LDFLAGS}"
