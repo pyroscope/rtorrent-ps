@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <climits>
 #include <ctime>
+#include <cwchar>
 #include <set>
 #include <stdlib.h>
 #include <unistd.h>
@@ -596,7 +597,18 @@ static int64_t string_get_value_arg(const char* name, torrent::Object::list_cons
 
 
 torrent::Object cmd_string_len(rpc::target_type target, const torrent::Object::list_type& args) {
-    return (int64_t) string_get_first_arg("len", args).length();
+    std::mbstate_t mbs = std::mbstate_t();
+    std::string text = string_get_first_arg("len", args);
+    const char* pos = text.c_str();
+    int glyphs = 0, bytes = 0, skip;
+
+    while (*pos && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
+        pos += skip;
+        bytes += skip;
+        ++glyphs;
+    }
+
+    return (int64_t) glyphs;
 }
 
 
