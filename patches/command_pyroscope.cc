@@ -593,6 +593,21 @@ torrent::Object cmd_string_len(rpc::target_type target, const torrent::Object::l
 }
 
 
+torrent::Object cmd_string_at(rpc::target_type target, const torrent::Object::list_type& args) {
+    const std::string& text = string_get_first_arg("at", args);
+
+    torrent::Object::list_const_iterator itr = args.begin() + 1;
+    int64_t pos = 0;
+    std::string fallback;
+    if (itr != args.end()) pos = string_get_value_arg("at(pos)", itr);
+    if (itr != args.end()) fallback = (itr++)->as_string();
+    if (pos < 0) pos += text.length();
+    if (pos >= text.length()) return fallback;
+
+    return text.substr(pos, 1);
+}
+
+
 torrent::Object cmd_string_substr(rpc::target_type target, const torrent::Object::list_type& args) {
     const std::string& text = string_get_first_arg("substr", args);
 
@@ -804,6 +819,7 @@ void initialize_command_pyroscope() {
 #endif
 
     CMD2_ANY_LIST("string.len", &cmd_string_len);
+    CMD2_ANY_LIST("string.at", &cmd_string_at);
     CMD2_ANY_LIST("string.substr", &cmd_string_substr);
     CMD2_ANY_LIST("string.contains", &cmd_string_contains);
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);

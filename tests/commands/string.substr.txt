@@ -13,3 +13,5 @@ $ rtxmlrpc --repr string.substr '' -- '➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈' 3 2 
 ' ?'
 $ rtxmlrpc --repr string.substr '' -- 'for123bar' 3 bad
 ERROR    …: <Fault -503: 'string.substr(count): junk at end of value: bad'>
+$ rtxmlrpc --repr string.substr '' --
+ERROR … <Fault -503: 'string.substr needs a string argument!'>
