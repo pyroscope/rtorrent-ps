@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <rak/path.h>
+#include <rak/algorithm.h>
 #include <rak/functional.h>
 #include <rak/functional_fun.h>
 #if RT_HEX_VERSION < 0x000904
@@ -778,6 +779,122 @@ torrent::Object cmd_d_tracker_scrape_info(const int operation, core::Download* d
 }
 
 
+// MATH FUNCTIONS
+
+inline std::vector<int64_t> as_vector(const torrent::Object::list_type& args) {
+    if (args.size() == 0)
+        throw torrent::input_error("Wrong argument count in as_vector.");
+
+    std::vector<int64_t> result;
+
+    for (torrent::Object::list_const_iterator itr = args.begin(), last = args.end(); itr != last; itr++) {
+        if (itr->is_value()) {
+            result.push_back(itr->as_value());
+        } else if (itr->is_string()) {
+            result.push_back(rpc::convert_to_value(itr->as_string()));
+        } else if (itr->is_list()) {
+            std::vector<int64_t> subResult = as_vector(itr->as_list());
+            result.insert(result.end(), subResult.begin(), subResult.end());
+        } else {
+            throw torrent::input_error("Wrong type supplied to as_vector.");
+        }
+    }
+
+    return result;
+}
+
+
+int64_t apply_math_basic(const std::function<int64_t(int64_t,int64_t)> op,
+                         const torrent::Object::list_type& args) {
+    if (args.size() == 0)
+        throw torrent::input_error("Wrong argument count in apply_math_basic.");
+
+    int64_t val = 0;
+
+    for (torrent::Object::list_const_iterator itr = args.begin(), last = args.end(); itr != last; itr++) {
+        if (itr->is_value()) {
+            val = itr == args.begin() ? itr->as_value() : op(val, itr->as_value());
+        } else if (itr->is_string()) {
+            val = itr == args.begin()
+                ? rpc::convert_to_value(itr->as_string())
+                : op(val, rpc::convert_to_value(itr->as_string()));
+        } else if (itr->is_list()) {
+            val = itr == args.begin()
+                ? apply_math_basic(op, itr->as_list())
+                : op(val, apply_math_basic(op, itr->as_list()));
+        } else {
+            throw torrent::input_error("Wrong type supplied to apply_math_basic.");
+        }
+    }
+
+    return val;
+}
+
+
+int64_t apply_arith_basic(const std::function<int64_t(int64_t,int64_t)> op,
+                          const torrent::Object::list_type& args) {
+    if (args.size() == 0)
+        throw torrent::input_error("Wrong argument count in apply_arith_basic.");
+
+    int64_t val = 0;
+
+    for (torrent::Object::list_const_iterator itr = args.begin(), last = args.end(); itr != last; itr++) {
+        if (itr->is_value()) {
+            val = itr == args.begin() ? itr->as_value()
+                                      : (op(val, itr->as_value()) ? val : itr->as_value());
+        } else if (itr->is_string()) {
+            int64_t cval = rpc::convert_to_value(itr->as_string());
+            val = itr == args.begin() ? cval : (op(val, cval) ? val : cval);
+        } else if (itr->is_list()) {
+            int64_t fval = apply_arith_basic(op, itr->as_list());
+            val = itr == args.begin() ? fval : (op(val, fval) ? val : fval);
+        } else {
+            throw torrent::input_error("Wrong type supplied to apply_arith_basic.");
+        }
+    }
+
+    return val;
+}
+
+
+int64_t apply_arith_count(const torrent::Object::list_type& args) {
+    if (args.size() == 0)
+        throw torrent::input_error("Wrong argument count in apply_arith_count.");
+
+    int64_t val = 0;
+
+    for (torrent::Object::list_const_iterator itr = args.begin(), last = args.end(); itr != last; itr++) {
+        switch (itr->type()) {
+            case torrent::Object::TYPE_VALUE:
+            case torrent::Object::TYPE_STRING:
+                val++;
+                break;
+            case torrent::Object::TYPE_LIST:
+                val += apply_arith_count(itr->as_list());
+                break;
+            default:
+                throw torrent::input_error("Wrong type supplied to apply_arith_count.");
+        }
+    }
+
+    return val;
+}
+
+int64_t apply_arith_other(const char* op, const torrent::Object::list_type& args) {
+    if (args.size() == 0)
+        throw torrent::input_error("Wrong argument count in apply_arith_other.");
+
+    if (op == "average") {
+        return (int64_t)(apply_math_basic(std::plus<int64_t>(), args) / apply_arith_count(args));
+    } else if (op == "median") {
+        std::vector<int64_t> result = as_vector(args);
+        return (int64_t)rak::median(result.begin(), result.end());
+    } else {
+        throw torrent::input_error("Wrong operation supplied to apply_arith_other.");
+    }
+}
+
+
 #if RT_HEX_VERSION <= 0x000906
 // https://github.com/rakshasa/rtorrent/commit/1f5e4d37d5229b63963bb66e76c07ec3e359ecba
 torrent::Object cmd_system_env(const torrent::Object::string_type& arg) {
@@ -842,6 +959,17 @@ void initialize_command_pyroscope() {
     CMD2_ANY("ui.focus.pgup", _cxxstd_::bind(&cmd_ui_focus_pgup));
     CMD2_ANY("ui.focus.pgdn", _cxxstd_::bind(&cmd_ui_focus_pgdn));
     CMD2_VAR_VALUE("ui.focus.page_size", 50);
+
+    CMD2_ANY_LIST("math.add", std::bind(&apply_math_basic, std::plus<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.sub", std::bind(&apply_math_basic, std::minus<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.mul", std::bind(&apply_math_basic, std::multiplies<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.div", std::bind(&apply_math_basic, std::divides<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.mod", std::bind(&apply_math_basic, std::modulus<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.min", std::bind(&apply_arith_basic, std::less<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.max", std::bind(&apply_arith_basic, std::greater<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.cnt", std::bind(&apply_arith_count, std::placeholders::_2));
+    CMD2_ANY_LIST("math.avg", std::bind(&apply_arith_other, "average", std::placeholders::_2));
+    CMD2_ANY_LIST("math.med", std::bind(&apply_arith_other, "median", std::placeholders::_2));
 
     // List capabilities of this build
     add_capability("system.has");         // self

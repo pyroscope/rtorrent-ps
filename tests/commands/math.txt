@@ -1,0 +1,46 @@
+# Tests for "math.*"
+
+# math.add
+$ rtxmlrpc --repr math.add '' -- 1 1
+2
+$ rtxmlrpc --repr math.add '' -- 1 -1
+0
+$ rtxmlrpc --repr math.add '' -- +1 +1
+2
+$ rtxmlrpc --repr math.add '' -- +1 -1
+0
+$ rtxmlrpc --repr math.add '' -- 1 +1
+2
+$ rtxmlrpc --repr math.add '' -- 1 -1
+0
+# END
+
+# math.sub
+$ rtxmlrpc --repr math.sub '' -- 1 1
+0
+$ rtxmlrpc --repr math.sub '' -- 1 -1
+2
+# END
+
+# math.mul
+$ rtxmlrpc --repr math.mul '' -- 0 1
+0
+$ rtxmlrpc --repr math.mul '' -- 2 -1
+-2
+# END
+
+# math.div
+$ rtxmlrpc --repr math.div '' -- 4 +2
+2
+$ rtxmlrpc --repr math.div '' -- 8 3
+2
+#$ rtxmlrpc --repr math.div '' -- 6 0
+#2
+# END
+
+# math.mod
+# math.min
+# math.max
+# math.cnt
+# math.avg
+# math.med
