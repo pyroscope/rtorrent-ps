@@ -903,9 +903,9 @@ int64_t apply_arith_other(const char* op, const torrent::Object::list_type& args
     if (args.size() == 0)
         throw torrent::input_error("Wrong argument count in apply_arith_other.");
 
-    if (op == "average") {
+    if (strcmp(op, "average") == 0) {
         return (int64_t)(apply_math_basic(op, std::plus<int64_t>(), args) / apply_arith_count(args));
-    } else if (op == "median") {
+    } else if (strcmp(op, "median") == 0) {
         std::vector<int64_t> result = as_vector(args);
         return (int64_t)rak::median(result.begin(), result.end());
     } else {
