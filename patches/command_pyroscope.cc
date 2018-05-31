@@ -570,8 +570,40 @@ static const std::string& string_get_first_arg(const char* name, const torrent::
 }
 
 
+static int64_t string_get_value_arg(const char* name, torrent::Object::list_const_iterator& itr) {
+    int64_t result = 0;
+    if (itr->is_string()) {
+        char* junk = 0;
+        result = strtol(itr->as_string().c_str(), &junk, 10);
+        if (*junk) {
+            throw torrent::input_error("string." + std::string(name) + ": "
+                                       "junk at end of value: " + itr->as_string());
+        }
+    } else {
+        result = itr->as_value();
+    }
+
+    ++itr;
+    return result;
+}
+
+
 torrent::Object cmd_string_len(rpc::target_type target, const torrent::Object::list_type& args) {
     return (int64_t) string_get_first_arg("len", args).length();
+}
+
+
+torrent::Object cmd_string_substr(rpc::target_type target, const torrent::Object::list_type& args) {
+    const std::string& text = string_get_first_arg("substr", args);
+
+    torrent::Object::list_const_iterator itr = args.begin() + 1;
+    int64_t pos = 0;
+    std::string::size_type count = std::string::npos;
+    if (itr != args.end()) pos = string_get_value_arg("substr(pos)", itr);
+    if (itr != args.end()) count = string_get_value_arg("substr(count)", itr);
+    if (pos < 0) pos += text.length();
+
+    return text.substr(pos, count);
 }
 
 
@@ -772,6 +804,7 @@ void initialize_command_pyroscope() {
 #endif
 
     CMD2_ANY_LIST("string.len", &cmd_string_len);
+    CMD2_ANY_LIST("string.substr", &cmd_string_substr);
     CMD2_ANY_LIST("string.contains", &cmd_string_contains);
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
     CMD2_ANY_LIST("string.map", &cmd_string_map);
