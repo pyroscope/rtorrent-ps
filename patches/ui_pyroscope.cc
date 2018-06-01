@@ -1092,7 +1092,7 @@ void initialize_command_ui_pyroscope() {
 
         // Explicitly managed status (✰ = prio; ⚑ = tagged)
         "method.set_key = ui.column.render, \"970:1C91/1:✰ \","
-        "    ((cat, ((string.substr, \"✖⇣ ⇡\", ((d.priority)) )), \" \"))\n"
+        "    ((array.at, {\"✖ \", \"⇣ \", \"  \", \"⇡ \"}, ((d.priority)) ))\n"
         "method.set_key = ui.column.render, \"980:1C16/1:⚑ \","
         "    ((string.map, ((cat, ((d.views.has, tagged)) )), {0, \"  \"}, {1, \"⚑ \"}))\n"
     );
