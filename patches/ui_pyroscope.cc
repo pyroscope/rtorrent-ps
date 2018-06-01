@@ -1081,20 +1081,30 @@ void initialize_command_ui_pyroscope() {
         // Number of connected peers (℞)
         "method.set_key = ui.column.render, \"480:2C28/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
-        // Upload total and data size
+        // Upload total, ratio, and data size
         "method.set_key = ui.column.render, \"900:4C24/3C21/1: Σ⇈ \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
         "        ((cat, \"  · \"))"
         "    ))\n"
-        "method.set_key = ui.column.render, \"910:4C15/3C21/1: ✇  \","
+        "method.set_key = ui.column.render, \"910:2C94/1:⣿ \","
+        "    ((string.substr, \"  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ❚ \", ((math.mul, 2, "
+        "                     ((math.div, ((math.mul, ((d.completed_chunks)), 10)), ((d.chunk_size)) )) )), 2, \"✔ \"))\n"
+        // "  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ "
+        //⠀"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ █ "
+        "method.set_key = ui.column.render, \"920:2C93/1:☯ \","
+        "    ((string.substr, \"☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ \", ((math.mul, 2, ((math.div, ((d.ratio)), 1000)) )), 2, \"⊛ \"))\n"
+        // "☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ "
+        // "☹ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ "
+        // "☹ ➊ ➋ ➌ ➍ ➎ ➏ ➐ ➑ ➒ ➓ "
+        "method.set_key = ui.column.render, \"930:4C15/3C21/1: ✇  \","
         "    ((convert.human_size, ((d.size_bytes)) ))\n"
 
         // Explicitly managed status (✰ = prio; ⚑ = tagged)
         "method.set_key = ui.column.render, \"970:1C91/1:✰ \","
         "    ((array.at, {\"✖ \", \"⇣ \", \"  \", \"⇡ \"}, ((d.priority)) ))\n"
         "method.set_key = ui.column.render, \"980:1C16/1:⚑ \","
-        "    ((string.map, ((cat, ((d.views.has, tagged)) )), {0, \"  \"}, {1, \"⚑ \"}))\n"
+        "    ((array.at, {\"  \", \"⚑ \"}, ((d.views.has, tagged)) ))\n"
     );
 
     //printf("%s", init_commands.c_str());
