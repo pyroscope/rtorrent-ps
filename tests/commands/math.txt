@@ -49,6 +49,7 @@ $ rtxmlrpc --repr math.div '' -- 8 3
 2
 $ rtxmlrpc --repr math.div '' -- 0 6
 0
+
 $ rtxmlrpc --repr math.div '' -- 6 0
 ERROR … math.div: Division by zero
 $ rtxmlrpc --repr math.div '' --
@@ -56,8 +57,56 @@ ERROR … math.div: No arguments provided
 # END
 
 # math.mod
+$ rtxmlrpc --repr math.mod '' -- 6 7
+6
+$ rtxmlrpc --repr math.mod '' -- 7 7
+0
+$ rtxmlrpc --repr math.mod '' -- 8 7
+1
+
+$ rtxmlrpc --repr math.mod '' -- 6 0
+ERROR … math.mod: Division by zero
+# END
+
 # math.min
+$ rtxmlrpc --repr math.min '' -- 2 3 1
+1
+$ rtxmlrpc --repr math.min '' -- [2,3,1
+1
+$ rtxmlrpc --repr math.min '' -- 0 [2,3,1
+0
+$ rtxmlrpc --repr math.min '' -- [2,-3,1
+-3
+# END
+
 # math.max
+$ rtxmlrpc --repr math.max '' -- 2 3 1
+3
+$ rtxmlrpc --repr math.max '' -- 2 -3 1
+2
+# END
+
 # math.cnt
+$ rtxmlrpc --repr math.cnt '' --
+0
+$ rtxmlrpc --repr math.cnt '' -- 3 2 1
+3
+$ rtxmlrpc --repr math.cnt '' -- 3 3 1
+3
+$ rtxmlrpc --repr math.cnt '' -- 4 [3,2,1
+4
+# END
+
 # math.avg
+$ rtxmlrpc --repr math.avg '' -- 2 3 1 4
+2
+$ rtxmlrpc --repr math.avg '' -- 2 3 1 5
+2
+$ rtxmlrpc --repr math.avg '' -- 2 3 1 6
+3
+# END
+
 # math.med
+$ rtxmlrpc --repr math.med '' -- 1 3 3 3 5 42
+3
+# END
