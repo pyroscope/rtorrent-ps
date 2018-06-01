@@ -377,6 +377,40 @@ torrent::Object ui_canvas_color_set(const torrent::Object::string_type& arg) {
 }
 
 
+int64_t cmd_d_message_alert(core::Download* d) {
+    int64_t alert = ps::ALERT_NORMAL;
+
+    if (!d->message().empty()) {
+        alert = ps::ALERT_GENERIC;
+
+        if (d->message().find("Tried all trackers") != std::string::npos)
+            alert = ps::ALERT_NORMAL_CYCLING;
+        else if (d->message().find("Timeout was reached") != std::string::npos
+                    || d->message().find("Timed out") != std::string::npos)
+            alert = ps::ALERT_TIMEOUT;
+        else if (d->message().find("Connecting to") != std::string::npos)
+            alert = ps::ALERT_CONNECT;
+        else if (d->message().find("Could not parse bencoded data") != std::string::npos
+                    || d->message().find("Failed sending data") != std::string::npos
+                    || d->message().find("Server returned nothing") != std::string::npos
+                    || d->message().find("Couldn't connect to server") != std::string::npos)
+            alert = ps::ALERT_REQUEST;
+        else if (d->message().find("not registered") != std::string::npos
+                    || d->message().find("torrent cannot be found") != std::string::npos
+                    || d->message().find("unregistered") != std::string::npos)
+            alert = ps::ALERT_GONE;
+        else if (d->message().find("not authorized") != std::string::npos
+                    || d->message().find("blocked from") != std::string::npos
+                    || d->message().find("denied") != std::string::npos
+                    || d->message().find("limit exceeded") != std::string::npos
+                    || d->message().find("active torrents are enough") != std::string::npos)
+            alert = ps::ALERT_PERMS;
+    }
+
+    return alert;
+}
+
+
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view,
                                     int pos, Range& range, int x_title) {
     int offset = row_offset(view, range);
@@ -543,19 +577,19 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
         // Render title text, or the result of the column command
         ui_canvas_color = color_def;
         if (headers) {
-            canvas->print(column, pos, " %s", header_text);
+            canvas->print(column, pos, "%s", header_text);
         } else {
             std::string text = rpc::call_object_nothrow(cols_itr->second, target).as_string();
             //std::string text = rpc::call_command_string(cols_itr->second.as_string().c_str(), target);
-            canvas->print(column, pos, " %s", u8_chop(text, header_len).c_str());
+            canvas->print(column, pos, "%s", u8_chop(text, header_len).c_str());
             //canvas->print(column, pos, " %s ", ui_canvas_color);  // debug: print color index
 
             // apply colorization
             if (ui_canvas_color.empty()) {
-                canvas->set_attr(column + 1, pos, header_len,
+                canvas->set_attr(column, pos, header_len,
                                  attr_map[ps::COL_INFO + offset], ps::COL_INFO + offset);
             } else {
-                int attr_col = column + 1;
+                int attr_col = column;
                 for (const char* ptr = ui_canvas_color.c_str(); *ptr && *ptr++ == 'C'; ) {
                     char* next = 0;
                     int attr_idx = (int)strtol(ptr, &next, 10); ptr = next;
@@ -579,6 +613,11 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
                                 attr_idx = ratio_color(item->file_list()->completed_chunks() * 1000 /
                                                        item->file_list()->size_chunks());
                                 break;
+                            case ps::COL_ALERT:  // COL_ALARM is the actual color, this is the dynamic one
+                                bool has_alert = !item->message().empty()
+                                              && item->message().find("Tried all trackers") == std::string::npos;
+                                attr_idx = has_alert ? ps::COL_ALARM : ps::COL_INFO;
+                                break;
                         }
                     }
 
@@ -593,8 +632,8 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
         }
 
         // Advance position
-        column += header_len + 1;
-        total += header_len + 1;
+        column += header_len;
+        total += header_len;
     }
     return total;
 }
@@ -622,11 +661,12 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     // show column headers
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
     // x_base value depends on the static headers below!
-    int pos = 1, x_base = 20, column = x_base;
+    int pos = 1, x_base = 15, column = x_base;
 
-    canvas->print(2, pos, " ❢   ∆   ⌚ ≀∇ ");
+    // ~~~~~~~~~~~~~~~~~~~"2ntmmt89xxxx4"
+    canvas->print(2, pos, "   ∆  ⌚ ≀∇  ");
     column += render_columns(true, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
-    int x_name = column + 1;
+    int x_name = column;
     canvas->print(column, pos, " Name "); column += 6;
     if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
         canvas->print(canvas->width() - 14, 1, "Tracker Domain");
@@ -658,42 +698,15 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         core::Download* item = d;
         torrent::Tracker* tracker = get_active_tracker((*range.first)->download());
         int ratio = rpc::call_command_value("d.ratio", rpc::make_target(d));
-        bool has_msg = !d->message().empty();
-        bool has_alert = has_msg && d->message().find("Tried all trackers") == std::string::npos;
         int offset = row_offset(view, range);
         int col_active = ps::COL_INFO;
         //int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : d->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
-        const char* alert = "⚠ ";
-        if (has_alert) {
-            if (d->message().find("Timeout was reached") != std::string::npos
-                        || d->message().find("Timed out") != std::string::npos)
-                alert = "◔ ";
-            else if (d->message().find("Connecting to") != std::string::npos)
-                alert = "⚡ ";
-            else if (d->message().find("Could not parse bencoded data") != std::string::npos
-                        || d->message().find("Failed sending data") != std::string::npos
-                        || d->message().find("Server returned nothing") != std::string::npos
-                        || d->message().find("Couldn't connect to server") != std::string::npos)
-                alert = "↯ ";
-            else if (d->message().find("not registered") != std::string::npos
-                        || d->message().find("torrent cannot be found") != std::string::npos
-                        || d->message().find("unregistered") != std::string::npos)
-                alert = "¿?";
-            else if (d->message().find("not authorized") != std::string::npos
-                        || d->message().find("blocked from") != std::string::npos
-                        || d->message().find("denied") != std::string::npos
-                        || d->message().find("limit exceeded") != std::string::npos
-                        || d->message().find("active torrents are enough") != std::string::npos)
-                alert = "⨂ ";
-        }
-
         std::string displayname = get_custom_string(d, "displayname");
         uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 
-        canvas->print(0, pos, "%s  %s %s %s%s ",
+        canvas->print(0, pos, "%s  %s %s%s ",
             range.first == view->focus() ? "»" : " ",
-            has_msg ? has_alert ? alert : "♺ " : "  ",
             human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
             d->is_done() || !down_rate ? "" : " ",
             d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
@@ -712,10 +725,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             displayname.empty() ? d->info()->name() : displayname.c_str(),
             canvas->width() - x_name - 1).c_str());
 
-        int x_scrape = 3 + 2 + 1; // lead, 1 status column, gap
-        int x_rate = x_scrape; // scrape is now dynamic
+        int x_rate = 3;
         decorate_download_title(window, canvas, view, pos, range, x_name);
-        if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
 
         // color up/down rates
         canvas->set_attr(x_rate+0, pos, 4, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
@@ -926,6 +937,8 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY_LIST("trackers.alias.set_key", &cmd_trackers_alias_set_key);
     CMD2_ANY("trackers.alias.items", _cxxstd_::bind(&cmd_trackers_alias_items, _cxxstd_::placeholders::_1));
 
+    CMD2_DL("d.message.alert", _cxxstd_::bind(&display::cmd_d_message_alert, _cxxstd_::placeholders::_1));
+
     CMD2_VAR_VALUE("ui.style.progress", 1);
     CMD2_VAR_VALUE("ui.style.ratio", 1);
 
@@ -1019,52 +1032,55 @@ void initialize_command_ui_pyroscope() {
         // 92:    COL_STATE
         // 93:    COL_RATIO
         // 94:    COL_PROGRESS
+        // 95:    COL_ALERT
 
-        // Status flags (☢ ☍ ⌘ ✰)
-        "method.set_key = ui.column.render, \"100:1C92/1:☢ \","
+        // Status flags (❢ ☢ ☍ ⌘)
+        "method.set_key = ui.column.render, \"100:3C95/2:❢ \","
+        "    ((array.at, {\"  \", \"♺ \", \"⚠ \", \"◔ \", \"⚡ \", \"↯ \", \"¿?\", \"⨂ \"}, ((d.message.alert)) ))\n"
+        "method.set_key = ui.column.render, \"110:2C92/2:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
-        "method.set_key = ui.column.render, \"110:1:☍ \","
+        "method.set_key = ui.column.render, \"120:2:☍ \","
         "    ((if, ((d.tied_to_file)), ((cat, \"⚯ \")), ((cat, \"  \"))))\n"
-        "method.set_key = ui.column.render, \"120:1:⌘ \","
+        "method.set_key = ui.column.render, \"130:2:⌘ \","
         "    ((if, ((d.ignore_commands)), ((cat, \"◌ \")), ((cat, \"⚒ \"))))\n"
 
         // Scrape info (↺ ⤴ ⤵)
-        "method.set_key = ui.column.render, \"400:2C23/2: ↺\", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
-        "method.set_key = ui.column.render, \"410:2C24/2: ⤴\", ((convert.magnitude, ((d.tracker_scrape.complete)) ))\n"
-        "method.set_key = ui.column.render, \"420:2C14/2: ⤵\", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
+        "method.set_key = ui.column.render, \"400:3C23/3: ↺ \", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
+        "method.set_key = ui.column.render, \"410:3C24/3: ⤴ \", ((convert.magnitude, ((d.tracker_scrape.complete)) ))\n"
+        "method.set_key = ui.column.render, \"420:3C14/3: ⤵ \", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
 
         // Traffic indicator (⚡)
-        "method.set_key = ui.column.render, \"470:1:⚡ \","
+        "method.set_key = ui.column.render, \"470:2:⚡ \","
         "    ((string.map, ((cat, ((not, ((d.up.rate)) )), ((not, ((d.down.rate)) )) )),"
         "    {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
 
         // Number of connected peers (℞)
-        "method.set_key = ui.column.render, \"480:2C28/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
+        "method.set_key = ui.column.render, \"480:3C28/3: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
         // Upload total, progress, ratio, and data size
         // TODO: deprecate "ui.style.ratio" and "ui.style.progress"
-        "method.set_key = ui.column.render, \"900:4C24/3C21/1: Σ⇈ \","
+        "method.set_key = ui.column.render, \"900:5C24/3C21/2: Σ⇈ \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
         "        ((cat, \"  · \"))"
         "    ))\n"
-        "method.set_key = ui.column.render, \"910:2C94/1:⣿ \","
+        "method.set_key = ui.column.render, \"910:2C94/2:⣿ \","
         "    ((string.substr, \"  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ❚ \", ((math.mul, 2, "
         "                     ((math.div, ((math.mul, ((d.completed_chunks)), 10)), ((d.size_chunks)) )) )), 2, \"✔ \"))\n"
         // "  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ "
         //⠀"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ █ "
-        "method.set_key = ui.column.render, \"920:2C93/1:☯ \","
+        "method.set_key = ui.column.render, \"920:3C93/3:☯ \","
         "    ((string.substr, \"☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ \", ((math.mul, 2, ((math.div, ((d.ratio)), 1000)) )), 2, \"⊛ \"))\n"
         // "☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ "
         // "☹ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ "
         // "☹ ➊ ➋ ➌ ➍ ➎ ➏ ➐ ➑ ➒ ➓ "
-        "method.set_key = ui.column.render, \"930:4C15/3C21/1: ✇  \","
+        "method.set_key = ui.column.render, \"930:5C15/3C21/2: ✇  \","
         "    ((convert.human_size, ((d.size_bytes)) ))\n"
 
         // Explicitly managed status (✰ = prio; ⚑ = tagged)
-        "method.set_key = ui.column.render, \"970:1C91/1:✰ \","
+        "method.set_key = ui.column.render, \"970:2C91/2:✰ \","
         "    ((array.at, {\"✖ \", \"⇣ \", \"  \", \"⇡ \"}, ((d.priority)) ))\n"
-        "method.set_key = ui.column.render, \"980:1C16/1:⚑ \","
+        "method.set_key = ui.column.render, \"980:2C16/2:⚑ \","
         "    ((array.at, {\"  \", \"⚑ \"}, ((d.views.has, tagged)) ))\n"
     );
 

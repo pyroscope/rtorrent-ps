@@ -1,9 +1,25 @@
 #ifndef UI_PYROSCOPE_H
 #define UI_PYROSCOPE_H
 
+#include <string>
+
+
 namespace ps {
 
 #define COL_SYS_BASE 90
+
+enum AlertKind {
+    ALERT_NORMAL,
+    ALERT_NORMAL_CYCLING, // Tried all trackers
+    ALERT_GENERIC,
+    ALERT_TIMEOUT,
+    ALERT_CONNECT,
+    ALERT_REQUEST,
+    ALERT_GONE,
+    ALERT_PERMS,
+    ALERT_MAX
+};
+
 
 enum ColorKind {
     COL_DEFAULT,
@@ -44,6 +60,7 @@ enum ColorKind {
     COL_STATE,
     COL_RATIO,
     COL_PROGRESS,
+    COL_ALERT,
     COL_SYS_MAX
 };
 
