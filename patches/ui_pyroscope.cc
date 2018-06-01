@@ -1089,7 +1089,7 @@ void initialize_command_ui_pyroscope() {
         "    ))\n"
         "method.set_key = ui.column.render, \"910:2C94/1:⣿ \","
         "    ((string.substr, \"  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ❚ \", ((math.mul, 2, "
-        "                     ((math.div, ((math.mul, ((d.completed_chunks)), 10)), ((d.chunk_size)) )) )), 2, \"✔ \"))\n"
+        "                     ((math.div, ((math.mul, ((d.completed_chunks)), 10)), ((d.size_chunks)) )) )), 2, \"✔ \"))\n"
         // "  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ "
         //⠀"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ █ "
         "method.set_key = ui.column.render, \"920:2C93/1:☯ \","
