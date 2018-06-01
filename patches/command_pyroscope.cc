@@ -769,6 +769,18 @@ torrent::Object cmd_system_has(const torrent::Object::string_type& arg) {
 }
 
 
+torrent::Object cmd_system_has_list() {
+    torrent::Object result = torrent::Object::create_list();
+    torrent::Object::list_type& resultList = result.as_list();
+
+    for (std::set<std::string>::const_iterator itr = system_capabilities.begin(); itr != system_capabilities.end(); itr++) {
+       resultList.push_back(*itr);
+    }
+
+    return result;
+}
+
+
 torrent::Object cmd_value(rpc::target_type target, const torrent::Object::list_type& args) {
     if (args.size() < 1) {
         throw torrent::input_error("'value' takes at least a number argument!");
@@ -1006,6 +1018,7 @@ void initialize_command_pyroscope() {
 
     CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
     CMD2_ANY_STRING("system.has", _cxxstd_::bind(&cmd_system_has, _cxxstd_::placeholders::_2));
+    CMD2_ANY("system.has.list", _cxxstd_::bind(&cmd_system_has_list));
     CMD2_ANY_LIST("value", &cmd_value);
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
