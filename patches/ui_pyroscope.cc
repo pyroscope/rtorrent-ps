@@ -624,7 +624,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     // x_base value depends on the static headers below!
     int pos = 1, x_base = 20, column = x_base;
 
-    canvas->print(2, pos, " ⣿ ☯ ❢   ∆   ⌚ ≀∇ ");
+    canvas->print(2, pos, " ❢   ∆   ⌚ ≀∇ ");
     column += render_columns(true, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
     int x_name = column + 1;
     canvas->print(column, pos, " Name "); column += 6;
@@ -644,23 +644,6 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         canvas->print(0, pos+1, "%s", network_history_down_str.c_str());
         canvas->set_attr(0, pos+1, -1, attr_map[ps::COL_LEECHING], ps::COL_LEECHING);
     }
-
-    // Styles
-    #define PROGRESS_STEPS 9
-    const char* progress[3][PROGRESS_STEPS] = {
-        {},
-        {"⠀ ", "⠁ ", "⠉ ", "⠋ ", "⠛ ", "⠟ ", "⠿ ", "⡿ ", "⣿ "},
-        {"⠀ ", "▁ ", "▂ ", "▃ ", "▄ ", "▅ ", "▆ ", "▇ ", "█ "},
-    };
-    unsigned int progress_style = std::min<unsigned int>(rpc::call_command_value("ui.style.progress"), 2);
-    #define YING_YANG_STEPS 11
-    const char* ying_yang[4][YING_YANG_STEPS] = {
-        {},
-        {"☹ ", "➀ ", "➁ ", "➂ ", "➃ ", "➄ ", "➅ ", "➆ ", "➇ ", "➈ ", "➉ "},
-        {"☹ ", "① ", "② ", "③ ", "④ ", "⑤ ", "⑥ ", "⑦ ", "⑧ ", "⑨ ", "⑩ "},
-        {"☹ ", "➊ ", "➋ ", "➌ ", "➍ ", "➎ ", "➏ ", "➐ ", "➑ ", "➒ ", "➓ "},
-    };
-    unsigned int ying_yang_style = std::min<unsigned int>(rpc::call_command_value("ui.style.ratio"), 3);
 
     // define iterator range
     Range range = rak::advance_bidirectional(
@@ -708,23 +691,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         std::string displayname = get_custom_string(d, "displayname");
         uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 
-        char progress_str[6] = "##";
-        char ying_yang_str[6] = "##";
-        if (progress_style == 0) {
-            sprintf(progress_str, item->file_list()->completed_chunks() ? "%2.2d" : "--",
-                item->file_list()->completed_chunks() * 100 / item->file_list()->size_chunks());
-        }
-        if (ying_yang_style == 0 && ratio < 9949) {
-            sprintf(ying_yang_str, ratio ? "%2.2d" : "--", ratio / 100);
-        }
-
-        canvas->print(0, pos, "%s  %s%s%s %s %s%s ",
+        canvas->print(0, pos, "%s  %s %s %s%s ",
             range.first == view->focus() ? "»" : " ",
-            d->is_done() ? "✔ " : progress_style == 0 ? progress_str : progress[progress_style][
-                item->file_list()->completed_chunks() * PROGRESS_STEPS
-                / item->file_list()->size_chunks()],
-            ying_yang_style == 0 ? ying_yang_str :
-                ratio >= YING_YANG_STEPS * 1000 ? "⊛ " : ying_yang[ying_yang_style][ratio / 1000],
             has_msg ? has_alert ? alert : "♺ " : "  ",
             human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
             d->is_done() || !down_rate ? "" : " ",
@@ -744,18 +712,10 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             displayname.empty() ? d->info()->name() : displayname.c_str(),
             canvas->width() - x_name - 1).c_str());
 
-        int x_scrape = 3 + 3*2 + 1; // lead, 3 status columns, gap
+        int x_scrape = 3 + 2 + 1; // lead, 1 status column, gap
         int x_rate = x_scrape; // scrape is now dynamic
         decorate_download_title(window, canvas, view, pos, range, x_name);
         if (has_alert) canvas->set_attr(x_scrape-3, pos, 2, attr_map[ps::COL_ALARM + offset], ps::COL_ALARM + offset);
-
-        // apply progress color to completion indicator
-        int pcol = ratio_color(item->file_list()->completed_chunks() * 1000 / item->file_list()->size_chunks());
-        canvas->set_attr(x_scrape-9, pos, 2, attr_map[pcol + offset], pcol + offset);
-
-        // show ratio progress by color
-        int rcol = ratio_color(ratio);
-        canvas->set_attr(x_scrape-5, pos, 2, attr_map[rcol + offset], rcol + offset);
 
         // color up/down rates
         canvas->set_attr(x_rate+0, pos, 4, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
@@ -1081,7 +1041,8 @@ void initialize_command_ui_pyroscope() {
         // Number of connected peers (℞)
         "method.set_key = ui.column.render, \"480:2C28/2: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
-        // Upload total, ratio, and data size
+        // Upload total, progress, ratio, and data size
+        // TODO: deprecate "ui.style.ratio" and "ui.style.progress"
         "method.set_key = ui.column.render, \"900:4C24/3C21/1: Σ⇈ \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
