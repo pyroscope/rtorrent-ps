@@ -55,12 +55,13 @@ enum ColorKind {
     COL_EVEN,
     COL_MAX,
 
-    COL_TRAFFIC = COL_SYS_BASE,
+    COL_DOWN_TIME = COL_SYS_BASE,
     COL_PRIO,
     COL_STATE,
     COL_RATIO,
     COL_PROGRESS,
     COL_ALERT,
+    COL_UP_TIME,
     COL_SYS_MAX
 };
 

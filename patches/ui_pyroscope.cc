@@ -597,9 +597,20 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
 
                     // System colors – these are mapped to a 'normal' color index
                     if (item) {
+                        const char* c_down = "C28/4C27/2";             // leeching + incomplete
+                        const char* c_seed = "C24/4C21/2";             // seeding + info
+                        const char* c_done = "C21/1C24/1C21/2C24/2";   // info + seeding (is_done)
+                        const char* c_part = "C21/1C27/1C21/2C27/2";   // info + incomplete
+
                         switch (attr_idx) {
-                            case ps::COL_TRAFFIC:
-                                break;
+                            case ps::COL_DOWN_TIME:  // C90/6
+                                ptr = item->is_done()                   ? c_done :
+                                      D_INFO(item)->down_rate()->rate() ? c_down : c_part;
+                                continue; // with new color definition
+                            case ps::COL_UP_TIME:  // C96/6
+                                ptr = D_INFO(item)->up_rate()->rate()   ? c_seed :
+                                      item->is_done()                   ? c_done : c_part;
+                                continue; // with new color definition
                             case ps::COL_PRIO:
                                 attr_idx = col_idx_prio[std::min(3U, (uint32_t) item->priority())];
                                 break;
@@ -661,12 +672,11 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     // show column headers
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
     // x_base value depends on the static headers below!
-    int pos = 1, x_base = 15, column = x_base;
+    int pos = 1, x_base = 2, column = x_base;
 
-    // ~~~~~~~~~~~~~~~~~~~"2ntmmt89xxxx4"
-    canvas->print(2, pos, "   ∆  ⌚ ≀∇  ");
+    canvas->print(0, pos, "⇳ ");
     column += render_columns(true, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
-    int x_name = column;
+    int x_name = column + 1;
     canvas->print(column, pos, " Name "); column += 6;
     if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
         canvas->print(canvas->width() - 14, 1, "Tracker Domain");
@@ -705,18 +715,11 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         std::string displayname = get_custom_string(d, "displayname");
         uint32_t down_rate = D_INFO(item)->down_rate()->rate();
 
-        canvas->print(0, pos, "%s  %s %s%s ",
-            range.first == view->focus() ? "»" : " ",
-            human_size(D_INFO(item)->up_rate()->rate(), 2 | 8).c_str(),
-            d->is_done() || !down_rate ? "" : " ",
-            d->is_done() ? elapsed_time(get_custom_long(d, "tm_completed")).c_str() :
-            !down_rate   ? elapsed_time(get_custom_long(d, "tm_loaded")).c_str() :
-                           human_size(down_rate, 2 | 8).c_str()
-        );
+        canvas->print(0, pos, range.first == view->focus() ? "> " : "  ");
 
         // Render custom columns
-        canvas->set_attr(1, pos, -1, attr_map[col_active + offset], col_active + offset);
-        column = x_base;
+        canvas->set_attr(1, pos, -1, attr_map[col_active + offset], col_active + offset); // base color, whole line
+        column = 2;
         int custom_len = render_columns(false, rpc::make_target(d), d, canvas, column, pos, offset, column_defs);
         column += custom_len;
 
@@ -725,20 +728,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             displayname.empty() ? d->info()->name() : displayname.c_str(),
             canvas->width() - x_name - 1).c_str());
 
-        int x_rate = 3;
         decorate_download_title(window, canvas, view, pos, range, x_name);
-
-        // color up/down rates
-        canvas->set_attr(x_rate+0, pos, 4, attr_map[ps::COL_SEEDING + offset], ps::COL_SEEDING + offset);
-        if (d->is_done() || !down_rate) {
-            // time display
-            int tm_color = (d->is_done() ? ps::COL_SEEDING : ps::COL_INCOMPLETE) + offset;
-            canvas->set_attr(x_rate+5+1, pos, 1, attr_map[tm_color], tm_color);
-            canvas->set_attr(x_rate+5+4, pos, 1, attr_map[tm_color], tm_color);
-        } else {
-            // down rate
-            canvas->set_attr(x_rate+5, pos, 5, attr_map[ps::COL_LEECHING + offset], ps::COL_LEECHING + offset);
-        }
 
         // is this the item in focus?
         if (range.first == view->focus()) {
@@ -1036,12 +1026,13 @@ void initialize_command_ui_pyroscope() {
         // 29:    COL_ODD
         // 30:    COL_EVEN
 
-        // 90:    COL_TRAFFIC
+        // 90:    COL_DOWN_TIME
         // 91:    COL_PRIO
         // 92:    COL_STATE
         // 93:    COL_RATIO
         // 94:    COL_PROGRESS
         // 95:    COL_ALERT
+        // 96:    COL_UP_TIME
 
         // Status flags (❢ ☢ ☍ ⌘)
         "method.set_key = ui.column.render, \"100:3C95/2:❢ \","
@@ -1059,12 +1050,24 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"420:3C14/3: ⤵ \", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
 
         // Traffic indicator (⚡)
-        "method.set_key = ui.column.render, \"470:2:⚡ \","
+        "method.set_key = ui.column.render, \"500:2:⚡ \","
         "    ((string.map, ((cat, ((not, ((d.up.rate)) )), ((not, ((d.down.rate)) )) )),"
         "    {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
 
         // Number of connected peers (℞)
-        "method.set_key = ui.column.render, \"480:3C28/3: ℞\", ((convert.magnitude, ((d.peers_connected)) ))\n"
+        "method.set_key = ui.column.render, \"510:3C28/3:℞  \", ((convert.magnitude, ((d.peers_connected)) ))\n"
+
+        // Up / Down|Time
+        "method.set_key = ui.column.render, \"520:6C96/6:∆≀⌚☑  \","
+        "    ((if, ((d.up.rate)),"
+        "        ((convert.human_size, ((d.up.rate)), (value, 10))),"
+        "        ((convert.ui.elapsed_time, ((value, ((d.custom, tm_completed)) )) ))"
+        "    ))\n"
+        "method.set_key = ui.column.render, \"530:6C90/6:∇≀⌚☐  \","
+        "    ((if, ((d.down.rate)),"
+        "        ((convert.human_size, ((d.down.rate)), (value, 10))),"
+        "        ((convert.ui.elapsed_time, ((value, ((d.custom, tm_loaded)) )) ))"
+        "    ))\n"
 
         // Upload total, progress, ratio, and data size
         // TODO: deprecate "ui.style.ratio" and "ui.style.progress"
