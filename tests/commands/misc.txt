@@ -17,6 +17,22 @@ $ rtxmlrpc --repr system.has '' 'system.has'
 $ rtxmlrpc --repr system.has '' 'cute.kittens'
 0
 
+$ test "$(rtxmlrpc system.has.private_methods | wc -l)" -ge 50
+RC=0
+$ test "$(rtxmlrpc system.has.public_methods | wc -l)" -ge 500
+RC=0
+$ test "$( ( rtxmlrpc system.has.public_methods ; rtxmlrpc system.has.private_methods ) | sort | uniq -c | awk '{print $1}' | sort | uniq -c | wc -l )" -eq 1
+RC=0
+$ ( rtxmlrpc system.has.public_methods ; rtxmlrpc system.listMethods )   | sort | uniq -c | egrep -v '^ +2 ' | awk '{print $2}'
+system.capabilities
+system.getCapabilities
+system.listMethods
+system.methodExist
+system.methodHelp
+system.methodSignature
+system.multicall
+system.shutdown
+
 $ rtcontrol // -/1 -qV && rtxmlrpc --repr ui.current_view ''
 'rtcontrol'
 

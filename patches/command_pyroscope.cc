@@ -781,6 +781,20 @@ torrent::Object cmd_system_has_list() {
 }
 
 
+torrent::Object cmd_system_has_methods(bool filter_public) {
+    torrent::Object result = torrent::Object::create_list();
+    torrent::Object::list_type& resultList = result.as_list();
+
+    for (rpc::CommandMap::const_iterator itr = rpc::commands.begin(), last = rpc::commands.end(); itr != last; itr++) {
+        if (bool(itr->second.m_flags & rpc::CommandMap::flag_public_xmlrpc) == filter_public) {
+            resultList.push_back(itr->first);
+        }
+    }
+
+    return result;
+}
+
+
 torrent::Object cmd_value(rpc::target_type target, const torrent::Object::list_type& args) {
     if (args.size() < 1) {
         throw torrent::input_error("'value' takes at least a number argument!");
@@ -1019,6 +1033,9 @@ void initialize_command_pyroscope() {
     CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
     CMD2_ANY_STRING("system.has", _cxxstd_::bind(&cmd_system_has, _cxxstd_::placeholders::_2));
     CMD2_ANY("system.has.list", _cxxstd_::bind(&cmd_system_has_list));
+    CMD2_ANY("system.has.private_methods", _cxxstd_::bind(&cmd_system_has_methods, false));
+    CMD2_ANY("system.has.public_methods", _cxxstd_::bind(&cmd_system_has_methods, true));
+
     CMD2_ANY_LIST("value", &cmd_value);
     CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
