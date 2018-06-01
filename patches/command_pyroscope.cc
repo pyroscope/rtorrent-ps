@@ -731,6 +731,26 @@ torrent::Object cmd_string_replace(rpc::target_type target, const torrent::Objec
 }
 
 
+torrent::Object cmd_array_at(rpc::target_type target, const torrent::Object::list_type& args) {
+    if (args.size() != 2) {
+        throw torrent::input_error("array.at takes at exactly two arguments!");
+    }
+
+    torrent::Object::list_const_iterator itr = args.begin();
+    torrent::Object::list_type array = (itr++)->as_list();
+    torrent::Object::value_type index = (itr++)->as_value();
+
+    if (array.empty()) {
+        throw torrent::input_error("array.at: array is empty!");
+    }
+    if (index < 0 || array.size() <= index) {
+        throw torrent::input_error("array.at: index out of bounds!");
+    }
+
+    return array.at(index);
+}
+
+
 void add_capability(const char* name) {
     system_capabilities.insert(name);
 }
@@ -981,6 +1001,8 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
     CMD2_ANY_LIST("string.map", &cmd_string_map);
     CMD2_ANY_LIST("string.replace", &cmd_string_replace);
+
+    CMD2_ANY_LIST("array.at", &cmd_array_at);
 
     CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
     CMD2_ANY_STRING("system.has", _cxxstd_::bind(&cmd_system_has, _cxxstd_::placeholders::_2));

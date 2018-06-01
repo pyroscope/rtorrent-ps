@@ -1,0 +1,23 @@
+# Tests for "array.*"
+
+# array.at
+$ rtxmlrpc --repr array.at '' -- '[0,1,2' +0
+0
+$ rtxmlrpc --repr array.at '' -- '[0,1,2' +1
+1
+$ rtxmlrpc --repr array.at '' -- '[0,1,2' +2
+2
+
+$ rtxmlrpc --repr array.at '' -- '[0,1,2' +4
+ERROR … array.at: index out of bounds
+$ rtxmlrpc --repr array.at '' -- '[,' -1
+ERROR … array.at: index out of bounds
+
+# 1 element arrays do not work somehow (but also aren't that useful)
+$ rtxmlrpc --repr array.at '' -- '[a' +0
+ERROR … Wrong object type
+$ rtxmlrpc --repr array.at '' -- '[]' +0
+ERROR … Wrong object type
+# END
+
+# END array.*
