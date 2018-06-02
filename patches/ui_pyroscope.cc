@@ -174,14 +174,14 @@ std::string get_custom_string(core::Download* d, const char* name) {
 
 
 // convert absolute timestamp to approximate human readable time diff (5 chars wide)
-std::string elapsed_time(unsigned long dt)  {
+std::string elapsed_time(unsigned long dt, unsigned long t0)  {
     if (dt == 0) return std::string("⋅ ⋅⋅ ");
 
     const char* unit[] = {"”", "’", "h", "d", "w", "m", "y"};
     unsigned long threshold[] = {1, 60, 3600, 86400, 7*86400, 30*86400, 365*86400, 0};
 
     int dim = 0;
-    dt = time(NULL) - dt;
+    dt = std::labs((t0 ? t0 : time(NULL)) - dt);
     while (threshold[dim] && dt >= threshold[dim]) ++dim;
     if (dim) --dim;
     float val = float(dt) / float(threshold[dim]);
@@ -897,10 +897,14 @@ torrent::Object cmd_trackers_alias_items(rpc::target_type target) {
 
 
 torrent::Object apply_ui_elapsed_time(const torrent::Object::list_type& args) {
-    if (args.size() != 1)
-        throw torrent::input_error("convert.ui.elapsed_time takes exactly 1 argument!");
+    if (args.size() != 1 && args.size() != 2)
+        throw torrent::input_error("convert.ui.elapsed_time takes 1 or 2 arguments!");
+    if (!args.front().is_value())
+        throw torrent::input_error("convert.ui.elapsed_time: time argument must be a value!");
+    if (args.size() == 2 && !args.back().is_value())
+        throw torrent::input_error("convert.ui.elapsed_time: time-base argument must be a value!");
 
-    return elapsed_time(args.front().as_value());
+    return elapsed_time(args.front().as_value(), args.size() == 2 ? args.back().as_value() : 0L);
 }
 
 

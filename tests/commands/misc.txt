@@ -1,5 +1,12 @@
 # Test miscellaneous commands
 
+# convert.ui.elapsed_time
+$ rtxmlrpc convert.ui.elapsed_time '' +1527903580 +1527903500
+1’20”
+$ rtxmlrpc convert.ui.elapsed_time '' +1527903500 +1527903580
+1’20”
+# END
+
 # d.custom.if_z
 $ rtxmlrpc --repr d.custom.set $(rtxmlrpc download_list | head -n1) test_value d_custom_if_z
 0
