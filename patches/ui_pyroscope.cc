@@ -200,7 +200,7 @@ std::string elapsed_time(unsigned long dt, unsigned long t0)  {
 // return 2-digits number, or digit + dimension indicator
 std::string num2(int64_t num) {
     if (num < 0 || 10*1000*1000 <= num) return std::string("♯♯");
-    if (!num) return std::string(" ·");
+    if (!num) return std::string(" ⋅");
 
     char buffer[10];
     if (num < 100) {
@@ -1089,7 +1089,7 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"900:5C24/3C21/2: Σ⇈ \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
-        "        ((cat, \"  · \"))"
+        "        ((cat, \"  ⋅ \"))"
         "    ))\n"
         "method.set_key = ui.column.render, \"910:2C94/2:⣿ \","
         "    ((string.substr, \"  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ❚ \", ((math.mul, 2, "
