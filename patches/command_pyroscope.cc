@@ -524,19 +524,19 @@ torrent::Object retrieve_d_custom_if_z(core::Download* download, const torrent::
 }
 
 
-torrent::Object retrieve_d_custom_keys(core::Download* download, const torrent::Object::list_type& args) {
+torrent::Object retrieve_d_custom_map(core::Download* download, bool keys_only, const torrent::Object::list_type& args) {
     if (args.begin() != args.end())
-        throw torrent::bencode_error("d.custom.keys takes no arguments.");
+        throw torrent::bencode_error("d.custom.keys/items takes no arguments.");
 
-    torrent::Object resultRaw = torrent::Object::create_list();
-    torrent::Object::list_type& resultList = resultRaw.as_list();
+    torrent::Object result = keys_only ? torrent::Object::create_list() : torrent::Object::create_map();
     torrent::Object::map_type& entries = download->bencode()->get_key("rtorrent").get_key("custom").as_map();
 
     for (torrent::Object::map_type::const_iterator itr = entries.begin(), last = entries.end(); itr != last; itr++) {
-        resultList.push_back(itr->first);
+        if (keys_only) result.as_list().push_back(itr->first);
+        else           result.as_map()[itr->first] = itr->second;
     }
 
-    return resultRaw;
+    return result;
 }
 
 
@@ -1083,8 +1083,10 @@ void initialize_command_pyroscope() {
     CMD2_ANY_P("import.return", &cmd_import_return);
     CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,
                                                  _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
-    CMD2_DL_LIST("d.custom.keys", _cxxstd_::bind(&retrieve_d_custom_keys,
-                                                 _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.keys", _cxxstd_::bind(&retrieve_d_custom_map,
+                                                 _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
+                                                 _cxxstd_::placeholders::_1, false, _cxxstd_::placeholders::_2));
 
     CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
     CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));

@@ -44,7 +44,18 @@ $ rtxmlrpc --repr d.custom.keys $(rtxmlrpc download_list | head -n1)
 […'test_value'…]
 
 $ rtxmlrpc d.custom.keys $(rtxmlrpc download_list | head -n1) unexpected
-ERROR … d.custom.keys takes no arguments
+ERROR … d.custom.… takes no arguments
+# END
+
+# d.custom.items
+# relies on d.custom.if_z test above
+$ rtxmlrpc --repr d.custom.items $(rtxmlrpc download_list | head -n1)
+{…
+ 'test_value': 'd_custom_if_z',
+…}
+
+$ rtxmlrpc d.custom.items $(rtxmlrpc download_list | head -n1) unexpected
+ERROR … d.custom.… takes no arguments
 # END
 
 $ test "$(rtxmlrpc --repr ui.focus.page_size '')" -gt 0; echo $?
