@@ -7,8 +7,10 @@ $ rtxmlrpc convert.time_delta '' +1527903580 +1527903500
 1’20”
 $ rtxmlrpc convert.time_delta '' +1527903500 +1527903580
 1’20”
-$ rtxmlrpc --repr convert.time_delta '' +0
+$ rtxmlrpc --repr convert.time_delta '' +86400 +86400
 u'\u22c5 \u22c5\u22c5 '
+$ rtxmlrpc --repr convert.time_delta '' +0
+u'\u22c6 \u22c6\u22c6 '
 
 $ rtxmlrpc convert.time_delta ''
 ERROR … convert.time_delta takes … arguments

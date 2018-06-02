@@ -175,13 +175,14 @@ std::string get_custom_string(core::Download* d, const char* name) {
 
 // convert absolute timestamp to approximate human readable time diff (5 chars wide)
 std::string elapsed_time(unsigned long dt, unsigned long t0)  {
-    if (dt == 0) return std::string("⋅ ⋅⋅ ");
+    if (dt == 0) return std::string("⋆ ⋆⋆ ");
 
     const char* unit[] = {"”", "’", "h", "d", "w", "m", "y"};
     unsigned long threshold[] = {1, 60, 3600, 86400, 7*86400, 30*86400, 365*86400, 0};
 
     int dim = 0;
     dt = std::labs((t0 ? t0 : time(NULL)) - dt);
+    if (dt == 0) return std::string("⋅ ⋅⋅ ");
     while (threshold[dim] && dt >= threshold[dim]) ++dim;
     if (dim) --dim;
     float val = float(dt) / float(threshold[dim]);
