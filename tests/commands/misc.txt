@@ -36,6 +36,15 @@ $ rtxmlrpc d.custom.if_z $(rtxmlrpc download_list | head -n1) test
 ERROR … d.custom.if_z: Missing default argument
 # END
 
+# d.custom.keys
+# relies on d.custom.if_z test above
+$ rtxmlrpc --repr d.custom.keys $(rtxmlrpc download_list | head -n1)
+[…'test_value'…]
+
+$ rtxmlrpc d.custom.keys $(rtxmlrpc download_list | head -n1) unexpected
+ERROR … d.custom.keys takes no arguments
+# END
+
 $ test "$(rtxmlrpc --repr ui.focus.page_size '')" -gt 0; echo $?
 0
 
