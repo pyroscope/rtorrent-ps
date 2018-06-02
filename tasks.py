@@ -106,4 +106,4 @@ def test(ctx, name=''):
                           .format(l=line, cmd=cmd, o=output.rstrip(), d='~'*78))
         print('\n')
 
-    print('\n☹ ☹ ☹  {} TEST(S) FAILED. ☹ ☹ ☹'.format(failures) if failures else '\n☺ ☺ ☺  ALL OK. ☺ ☺ ☺')
+    print('\n☹ ☹ ☹  {} TEST(S) FAILED. ☹ ☹ ☹ '.format(failures) if failures else '\n☺ ☺ ☺  ALL OK. ☺ ☺ ☺ ')
