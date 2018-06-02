@@ -1,10 +1,23 @@
 # Test miscellaneous commands
 
-# convert.ui.elapsed_time
-$ rtxmlrpc convert.ui.elapsed_time '' +1527903580 +1527903500
+# convert.time_delta
+$ rtxmlrpc --repr convert.time_delta '' +"$(echo $(( $(date +'%s') + 86400 + 40000)) )"
+'1d1…h'
+$ rtxmlrpc convert.time_delta '' +1527903580 +1527903500
 1’20”
-$ rtxmlrpc convert.ui.elapsed_time '' +1527903500 +1527903580
+$ rtxmlrpc convert.time_delta '' +1527903500 +1527903580
 1’20”
+
+$ rtxmlrpc convert.time_delta ''
+ERROR … convert.time_delta takes … arguments
+$ rtxmlrpc convert.time_delta '' abc
+ERROR … convert.time_delta: … must be a value
+$ rtxmlrpc convert.time_delta '' +0 abc
+ERROR … convert.time_delta: … must be a value
+$ rtxmlrpc convert.time_delta '' 123
+ERROR … convert.time_delta: … must be a value
+$ rtxmlrpc convert.time_delta '' +0 123
+ERROR … convert.time_delta: … must be a value
 # END
 
 # d.custom.if_z
