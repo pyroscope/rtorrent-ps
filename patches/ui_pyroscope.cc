@@ -53,6 +53,7 @@ extern torrent::Tracker* get_active_tracker(torrent::Download* item);
 extern std::string get_active_tracker_domain(torrent::Download* item);
 
 
+#define CANVAS_POS_1ST_ITEM 2
 #define TRACKER_LABEL_WIDTH 20U
 
 // definition from display/window_download_list.cc that is not in the header file
@@ -579,8 +580,17 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
         if (headers) {
             canvas->print(column, pos, "%s", header_text);
         } else {
-            std::string text = rpc::call_object_nothrow(cols_itr->second, target).as_string();
-            //std::string text = rpc::call_command_string(cols_itr->second.as_string().c_str(), target);
+            std::string text;
+            try {
+                text = rpc::call_object(cols_itr->second, target).as_string();
+            } catch (torrent::input_error& e) {
+                // Rows will rotate through the error string (assuming it is thrown for each row)
+                char buf[10];
+                int what_pos = *e.what() ? (pos - CANVAS_POS_1ST_ITEM) * header_len % strlen(e.what()) : 0;
+                snprintf(buf, sizeof(buf), "C22/%d", header_len);
+                ui_canvas_color = buf;
+                text = std::string(e.what()).substr(what_pos, header_len);
+            }
             canvas->print(column, pos, "%s", u8_chop(text, header_len).c_str());
             //canvas->print(column, pos, " %s ", ui_canvas_color);  // debug: print color index
 
@@ -703,7 +713,7 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             view->end_visible(),
             canvas->height()-2-2-network_history_lines);
 
-    pos = 2;
+    pos = CANVAS_POS_1ST_ITEM;
     while (range.first != range.second) {
         core::Download* d = *range.first;
         core::Download* item = d;
