@@ -1014,7 +1014,9 @@ void initialize_command_ui_pyroscope() {
         // Bind '*' to toggle between collapsed and expanded display
         "schedule2 = collapsed_view_toggle, 0, 0, ((ui.bind_key,download_list,*,view.collapsed.toggle=))\n"
 
-        // TODO: also add non-essential columns as default, once things settled down
+        // TODO: copy (parts of) timestamp cfg here (~/.pyroscope/rtorrent.d/timestamps.rc)
+        //       Do NOT move it, since then rT vanilla gets unusable with rtcontrol.
+        //       'system.has' allows to have both.
 
         //  1:    COL_CUSTOM1
         //  …
@@ -1073,11 +1075,13 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"510:3C28/3:℞  \", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
         // Up|Leech Time / Down|Completion or Loaded Time
+        // TODO: Could use "d.timestamp.started" and "d.timestamp.finished" here, but need to check
+        //       when they were introduced, and if they're always set (e.g. what about fast-resumed items?)
         "method.set_key = ui.column.render, \"520:6C96/6:∆⋮ ⌛  \","
         "    ((if, ((d.up.rate)),"
         "        ((convert.human_size, ((d.up.rate)), ((value, 10)) )),"
         "        ((convert.time_delta, ((value, ((d.custom, tm_completed)) )),"
-        "                              ((value, ((d.custom,    tm_loaded)) )) ))"
+        "                              ((value, ((d.custom.if_z, tm_started, ((d.custom, tm_loaded)) )) )) ))"
         "    ))\n"
         "method.set_key = ui.column.render, \"530:6C90/6:∇⋮ ⌚  \","
         "    ((if, ((d.down.rate)),"
