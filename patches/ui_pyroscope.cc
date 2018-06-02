@@ -1060,9 +1060,9 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"110:2C92/2:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
         "method.set_key = ui.column.render, \"120:2:☍ \","
-        "    ((if, ((d.tied_to_file)), ((cat, \"⚯ \")), ((cat, \"  \"))))\n"
+        "    ((array.at, {\"⚯ \", \"  \"}, ((not, ((d.tied_to_file)) )) ))\n"
         "method.set_key = ui.column.render, \"130:2:⌘ \","
-        "    ((if, ((d.ignore_commands)), ((cat, \"◌ \")), ((cat, \"⚒ \"))))\n"
+        "    ((array.at, {\"⚒ \", \"◌ \"}, ((d.ignore_commands)) ))\n"
 
         // Scrape info (↺ ⤴ ⤵)
         "method.set_key = ui.column.render, \"400:3C23/3: ↺ \", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
