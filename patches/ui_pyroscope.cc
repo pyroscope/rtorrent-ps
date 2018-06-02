@@ -54,7 +54,9 @@ extern std::string get_active_tracker_domain(torrent::Download* item);
 
 
 #define CANVAS_POS_1ST_ITEM 2
-#define TRACKER_LABEL_WIDTH 20U
+#define X_OF_Y_CANVAS_MIN_WIDTH 28
+#define NAME_RESERVED_WIDTH 6
+#define TRACKER_LABEL_WIDTH 20
 
 // definition from display/window_download_list.cc that is not in the header file
 typedef std::pair<core::View::iterator, core::View::iterator> Range;
@@ -141,7 +143,7 @@ static std::string network_history_down_str;
 // Chop off an UTF-8 string
 std::string u8_chop(const std::string& text, size_t glyphs) {
     std::mbstate_t mbs = std::mbstate_t();
-    int bytes = 0, skip;
+    size_t bytes = 0, skip;
     const char* pos = text.c_str();
 
     while (*pos && glyphs-- > 0 && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
@@ -302,7 +304,7 @@ void ui_pyroscope_colormap_init() {
         short col_idx = 0; // 0 = fg; 1 = bg
         short bright = 0;
         unsigned long attr = A_NORMAL;
-        for (int i = 0; i < words.size(); i++) { // look at all the words
+        for (size_t i = 0; i < words.size(); i++) { // look at all the words
             if (words[i] == "bold") attr |= A_BOLD;
             else if (words[i] == "standout") attr |= A_STANDOUT;
             else if (words[i] == "underline") attr |= A_UNDERLINE;
@@ -326,7 +328,7 @@ void ui_pyroscope_colormap_init() {
         }
 
         // check that fg & bg color index is valid
-        if (col[0] != -1 && col[0] >= get_colors() || col[1] != -1 && col[1] >= get_colors()) {
+        if ((col[0] != -1 && col[0] >= get_colors()) || (col[1] != -1 && col[1] >= get_colors())) {
             char buf[33];
             sprintf(buf, "%d", get_colors());
             Canvas::cleanup();
@@ -419,6 +421,8 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
     core::Download* item = *range.first;
     bool active = item->is_open() && item->is_active();
 
+    if (int(canvas->width()) <= x_title) return;
+
     // download title color
     int title_col;
     unsigned long focus_attr = range.first == view->focus() ? attr_map[ps::COL_FOCUS] : 0;
@@ -431,16 +435,20 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
     canvas->set_attr(x_title, pos, -1, attr_map[title_col] | focus_attr, title_col);
 
     // show label for active tracker (a/k/a in focus tracker)
+    if (int(canvas->width()) <= x_title + NAME_RESERVED_WIDTH + 3) return;
     std::string url = get_active_tracker_domain((*range.first)->download());
-    if (!url.empty()) {
-        std::string alias = tracker_aliases[url];
-        if (!alias.empty()) url = alias;
+    if (url.empty()) return;
+    std::string alias = tracker_aliases[url];
+    if (!alias.empty()) url = alias;
 
-        // shorten label if too long
+    // shorten label if too long
+    int max_len = std::min(TRACKER_LABEL_WIDTH,
+                           int(canvas->width()) - x_title - NAME_RESERVED_WIDTH - 3);
+    if (max_len > 0) {
         int len = url.length();
-        if (len > TRACKER_LABEL_WIDTH) {
-            url = "…" + url.substr(len - TRACKER_LABEL_WIDTH);
-            len = TRACKER_LABEL_WIDTH + 1;
+        if (len > max_len) {
+            url = "…" + url.substr(len - max_len);
+            len = max_len + 1;
         }
 
         // print it right-justified and in braces
@@ -450,7 +458,8 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
         canvas->print(xpos, pos, "{%s}", url.c_str());
         canvas->set_attr(xpos + 1, pos, len, attr_map[td_col + offset] | focus_attr, td_col + offset);
         canvas->set_attr(xpos, pos, 1, (attr_map[td_col + offset] | focus_attr) ^ A_BOLD, td_col + offset);
-        canvas->set_attr(canvas->width() - 1, pos, 1, (attr_map[td_col + offset] | focus_attr) ^ A_BOLD, td_col + offset);
+        canvas->set_attr(canvas->width() - 1, pos, 1,
+                         (attr_map[td_col + offset] | focus_attr) ^ A_BOLD, td_col + offset);
     }
 }
 
@@ -482,7 +491,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
     int status_pos = 91;
     int ratio = rpc::call_command_value("d.ratio", rpc::make_target(*range.first));
 
-    if (status_pos < canvas->width()) {
+    if (status_pos < int(canvas->width())) {
         canvas->print(status_pos, pos+1, "R:%6.2f [%c%c] %-4.4s  ",
             float(ratio) / 1000.0,
             rpc::call_command_string("d.tied_to_file", rpc::make_target(*range.first)).empty() ? ' ' : 'T',
@@ -494,7 +503,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
     }
 
     // if space is left, show throttle name
-    if (status_pos < canvas->width()) {
+    if (status_pos < int(canvas->width())) {
         std::string item_status;
 
         if (!(*range.first)->bencode()->get_key("rtorrent").get_key_string("throttle_name").empty()) {
@@ -523,7 +532,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
     // apply basic "info" style, and then revert static text to "label"
     canvas->set_attr(2, pos+1, canvas->width() - 1, attr_map[col_active + offset], col_active + offset);
-    for (int label_idx = 0; label_idx < sizeof(label_pos) / sizeof(int); label_idx += 2) {
+    for (size_t label_idx = 0; label_idx < sizeof(label_pos) / sizeof(int); label_idx += 2) {
         if (labels[label_idx/2]) canvas->print(label_pos[label_idx], pos+1, labels[label_idx/2]);
         canvas->set_attr(label_pos[label_idx], pos+1, label_pos[label_idx+1], attr_map[ps::COL_LABEL + offset], ps::COL_LABEL + offset);
     }
@@ -552,7 +561,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
 
 // Render columns from `column_defs`, return total length
-int render_columns(bool headers, rpc::target_type target, core::Download* item,
+int render_columns(bool headers, bool narrow, rpc::target_type target, core::Download* item,
                    display::Canvas* canvas, int column, int pos, int offset,
                    const torrent::Object::map_type& column_defs) {
     torrent::Object::map_const_iterator cols_itr, last_col = column_defs.end();
@@ -562,19 +571,33 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
         // Skip sort key (format is "sort:len:title")
         size_t header_colon = cols_itr->first.find(':');
         if (header_colon == std::string::npos) continue;
-
-        // Parse header length and optional color definition
         const char* header_pos = cols_itr->first.c_str() + header_colon + 1;
-        std::string color_def;
+
+        // Check for 'sacrificial' marker
+        if (*header_pos == '?') {
+            if (narrow) continue; // skip this column
+            ++header_pos;
+        }
+
+        // Parse header length
         char* header_text = 0;
         int header_len = (int)strtol(header_pos, &header_text, 10);
+
+        // Check available space
+        if (int(canvas->width()) - NAME_RESERVED_WIDTH < column + header_len) {
+            if (!narrow && headers) return -1; // trigger narrow mode
+            break; // all the space we have used up, get us out of here
+        }
+
+        // Do we have a colordef?
+        std::string color_def;
         if (*header_text == 'C') {
             int x = 0;
             while (header_text[x] && header_text[x] != ':') x++;
             color_def.assign(header_text, x);
             header_text += x;
         }
-        if (*header_text++ != ':') continue;
+        if (*header_text++ != ':') continue; // Header text is missing
 
         // Render title text, or the result of the column command
         ui_canvas_color = color_def;
@@ -666,8 +689,8 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
 // function is left immediately (i.e. true indicates we took over ALL redrawing)
 bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view) {
     // show "X of Y"
-    if (canvas->width() > 16) {
-        int item_idx = view->focus() - view->begin_visible();
+    if (canvas->width() >= X_OF_Y_CANVAS_MIN_WIDTH) {
+        size_t item_idx = view->focus() - view->begin_visible();
         if (item_idx == view->size())
             canvas->print(canvas->width() - 16, 0, "[ none of %-5d]", view->size());
         else
@@ -681,19 +704,23 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     if (view->empty_visible() || canvas->width() < 5 || canvas->height() < 2)
         return true;
 
-    // show column headers
+    // Prepare rendering
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
-    // x_base value depends on the static headers below!
     int pos = 1, x_base = 2, column = x_base;
+    bool narrow = false;
 
+    // Render header line
     canvas->print(0, pos, "⇳ ");
-    column += render_columns(true, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
-    int x_name = column + 1;
-    canvas->print(column, pos, " Name "); column += 6;
-    if (canvas->width() - column > TRACKER_LABEL_WIDTH) {
-        canvas->print(canvas->width() - 14, 1, "Tracker Domain");
+    int custom_width = render_columns(true, narrow, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
+    if (custom_width < 0) { // enter narrow mode
+        canvas->print(x_base, pos, "%s", std::string(canvas->width() - x_base, ' ').c_str()); // clean slate
+        narrow = true;
+        custom_width = render_columns(true, narrow, rpc::make_target(), 0, canvas, column, pos, 0, column_defs);
     }
-    canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
+    column += custom_width; canvas->print(column, pos, " Name   "); column += NAME_RESERVED_WIDTH;
+    if (int(canvas->width()) - 8 > column)
+        canvas->print(canvas->width() - 8, pos, " Tracker");
+    canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL); // header line unicolor
 
     // network traffic
     int network_history_lines = 0;
@@ -717,36 +744,33 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     pos = CANVAS_POS_1ST_ITEM;
     while (range.first != range.second) {
         core::Download* d = *range.first;
-        core::Download* item = d;
-        torrent::Tracker* tracker = get_active_tracker((*range.first)->download());
-        int ratio = rpc::call_command_value("d.ratio", rpc::make_target(d));
         int offset = row_offset(view, range);
         int col_active = ps::COL_INFO;
-        //int col_active = item->is_open() && item->is_active() ? ps::COL_INFO : d->is_done() ? ps::COL_STOPPED : ps::COL_QUEUED;
 
-        std::string displayname = get_custom_string(d, "displayname");
-        uint32_t down_rate = D_INFO(item)->down_rate()->rate();
-
+        // Render focus marker
         canvas->print(0, pos, range.first == view->focus() ? "> " : "  ");
 
         // Render custom columns
         canvas->set_attr(1, pos, -1, attr_map[col_active + offset], col_active + offset); // base color, whole line
-        column = 2;
-        int custom_len = render_columns(false, rpc::make_target(d), d, canvas, column, pos, offset, column_defs);
-        column += custom_len;
+        column = x_base;
+        render_columns(false, narrow, rpc::make_target(d), d, canvas, column, pos, offset, column_defs);
+        column += custom_width;
 
-        // Render name
-        canvas->print(column, pos, " %s", u8_chop(
-            displayname.empty() ? d->info()->name() : displayname.c_str(),
-            canvas->width() - x_name - 1).c_str());
+        // Render name + tracker
+        if (int(canvas->width()) > column) {
+            std::string displayname = get_custom_string(d, "displayname");
+            canvas->print(column, pos, " %s",
+                u8_chop(displayname.empty() ? d->info()->name() : displayname.c_str(),
+                        canvas->width() - column - 1).c_str());
+            decorate_download_title(window, canvas, view, pos, range, column + 1);
+        }
 
-        decorate_download_title(window, canvas, view, pos, range, x_name);
-
-        // is this the item in focus?
+        // Colorize focus marker
         if (range.first == view->focus()) {
             canvas->set_attr(0, pos, 1, attr_map[ps::COL_FOCUS], ps::COL_FOCUS);
         }
 
+        // Advance to next item
         ++pos;
         ++range.first;
     }
@@ -836,7 +860,7 @@ void network_history_format(std::string& buf, char kind, uint32_t* data) {
     if (max_rate > 102) {
         const char* meter[] = {"⠀", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"};
         uint32_t base = rpc::call_command_value("network.history.auto_scale") ? min_rate : 0;
-        for (int i = 1; i <= samples; ++i) {
+        for (uint32_t i = 1; i <= samples; ++i) {
             uint32_t idx = (network_history_count - i) % network_history_depth;
             if (max_rate > base)
                 buf += meter[std::min(8U, (data[idx] - base) * 9 / (max_rate - base))];
@@ -1059,18 +1083,18 @@ void initialize_command_ui_pyroscope() {
         "    ((array.at, {\"  \", \"♺ \", \"⚠ \", \"◔ \", \"⚡ \", \"↯ \", \"¿?\", \"⨂ \"}, ((d.message.alert)) ))\n"
         "method.set_key = ui.column.render, \"110:2C92/2:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
-        "method.set_key = ui.column.render, \"120:2:☍ \","
+        "method.set_key = ui.column.render, \"120:?2:☍ \","
         "    ((array.at, {\"⚯ \", \"  \"}, ((not, ((d.tied_to_file)) )) ))\n"
-        "method.set_key = ui.column.render, \"130:2:⌘ \","
+        "method.set_key = ui.column.render, \"130:?2:⌘ \","
         "    ((array.at, {\"⚒ \", \"◌ \"}, ((d.ignore_commands)) ))\n"
 
         // Scrape info (↺ ⤴ ⤵)
-        "method.set_key = ui.column.render, \"400:3C23/3: ↺ \", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
-        "method.set_key = ui.column.render, \"410:3C24/3: ⤴ \", ((convert.magnitude, ((d.tracker_scrape.complete)) ))\n"
-        "method.set_key = ui.column.render, \"420:3C14/3: ⤵ \", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
+        "method.set_key = ui.column.render, \"400:?3C23/3: ↺ \", ((convert.magnitude, ((d.tracker_scrape.downloaded)) ))\n"
+        "method.set_key = ui.column.render, \"410:?3C24/3: ⤴ \", ((convert.magnitude, ((d.tracker_scrape.complete)) ))\n"
+        "method.set_key = ui.column.render, \"420:?3C14/3: ⤵ \", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
 
         // Traffic indicator (⚡)
-        "method.set_key = ui.column.render, \"500:2:⚡ \","
+        "method.set_key = ui.column.render, \"500:?2:⚡ \","
         "    ((string.map, ((cat, ((not, ((d.up.rate)) )), ((not, ((d.down.rate)) )) )),"
         "                  {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
 
@@ -1093,7 +1117,7 @@ void initialize_command_ui_pyroscope() {
         "    ))\n"
 
         // Upload total, progress, ratio, and data size
-        "method.set_key = ui.column.render, \"900:5C24/3C21/2: Σ⇈ \","
+        "method.set_key = ui.column.render, \"900:?5C24/3C21/2: Σ⇈ \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
         "        ((cat, \"  ⋅ \"))"
