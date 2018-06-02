@@ -1,5 +1,21 @@
 # Test miscellaneous commands
 
+# d.custom.if_z
+$ rtxmlrpc --repr d.custom.set $(rtxmlrpc download_list | head -n1) test_value d_custom_if_z
+0
+$ rtxmlrpc --repr d.custom.if_z $(rtxmlrpc download_list | head -n1) test_value default
+'d_custom_if_z'
+$ rtxmlrpc --repr d.custom.if_z $(rtxmlrpc download_list | head -n1) not_a_test_value default
+'default'
+
+$ rtxmlrpc d.custom.if_z $(rtxmlrpc download_list | head -n1)
+ERROR … d.custom.if_z: Missing key argument
+$ rtxmlrpc d.custom.if_z $(rtxmlrpc download_list | head -n1) ''
+ERROR … d.custom.if_z: Empty key argument
+$ rtxmlrpc d.custom.if_z $(rtxmlrpc download_list | head -n1) test
+ERROR … d.custom.if_z: Missing default argument
+# END
+
 $ test "$(rtxmlrpc --repr ui.focus.page_size '')" -gt 0; echo $?
 0
 

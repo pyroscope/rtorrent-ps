@@ -506,6 +506,24 @@ torrent::Object cmd_import_return(rpc::target_type target, const torrent::Object
 }
 
 
+torrent::Object retrieve_d_custom_if_z(core::Download* download, const torrent::Object::list_type& args) {
+    torrent::Object::list_const_iterator itr = args.begin();
+    if (itr == args.end())
+        throw torrent::bencode_error("d.custom.if_z: Missing key argument.");
+    const std::string& key = (itr++)->as_string();
+    if (key.empty())
+        throw torrent::bencode_error("d.custom.if_z: Empty key argument.");
+    if (itr == args.end())
+        throw torrent::bencode_error("d.custom.if_z: Missing default argument.");
+
+    try {
+        return download->bencode()->get_key("rtorrent").get_key("custom").get_key_string(key);
+    } catch (torrent::bencode_error& e) {
+        return itr->as_string();
+    }
+}
+
+
 torrent::Object
 d_multicall_filtered(const torrent::Object::list_type& args) {
   if (args.size() < 2)
@@ -1047,6 +1065,8 @@ void initialize_command_pyroscope() {
 
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
     CMD2_ANY_P("import.return", &cmd_import_return);
+    CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,
+                                                 _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
 
     CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
     CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));
