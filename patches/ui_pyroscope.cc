@@ -592,7 +592,7 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
                 int attr_col = column;
                 for (const char* ptr = ui_canvas_color.c_str(); *ptr && *ptr++ == 'C'; ) {
                     char* next = 0;
-                    int attr_idx = (int)strtol(ptr, &next, 10); ptr = next;
+                    int attr_idx = (int)strtol(ptr, &next, 10); if (next == ptr) break; ptr = next;
                     if (*ptr != '/') continue;
 
                     // System colors – these are mapped to a 'normal' color index
@@ -632,7 +632,8 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
                         }
                     }
 
-                    int attr_len = (int)strtol(ptr + 1, &next, 10); ptr = next;
+                    // Get color area length, if both pos/len are ok, do it
+                    int attr_len = (int)strtol(ptr + 1, &next, 10); if (next == ptr) break; ptr = next;
                     if (attr_idx && attr_len) {
                         if (attr_idx >= ps::COL_MAX) attr_idx = ps::COL_ALARM;
                         canvas->set_attr(attr_col, pos, attr_len, attr_map[attr_idx + offset], attr_idx + offset);
@@ -642,7 +643,7 @@ int render_columns(bool headers, rpc::target_type target, core::Download* item,
             }
         }
 
-        // Advance position
+        // Advance canvas column position, and add to length
         column += header_len;
         total += header_len;
     }
