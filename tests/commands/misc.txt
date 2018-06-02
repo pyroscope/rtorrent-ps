@@ -80,6 +80,7 @@ $ rtxmlrpc d.multicall.filtered 'default' "equal=d.hash=,cat=$(rtxmlrpc download
 $ rtxmlrpc --repr throttle.names ''
 ['', 'NULL'…]
 
+# value
 $ rtxmlrpc --repr value '' -- 11
 11
 $ rtxmlrpc --repr value '' -- 11 8
@@ -88,8 +89,12 @@ $ rtxmlrpc --repr value '' -- 2a 16
 42
 $ rtxmlrpc --repr value '' -- 2A 16
 42
+$ rtxmlrpc --repr value '' -- ''
+0
+
 $ rtxmlrpc --repr value '' -- 8 8
 ERROR … Junk at end of number: 8
+# END
 
 $ rtxmlrpc --repr compare '' -- '' ''
 ERROR … Can only compare a target pair

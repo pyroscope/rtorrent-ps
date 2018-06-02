@@ -1072,16 +1072,17 @@ void initialize_command_ui_pyroscope() {
         // Number of connected peers (℞)
         "method.set_key = ui.column.render, \"510:3C28/3:℞  \", ((convert.magnitude, ((d.peers_connected)) ))\n"
 
-        // Up / Down|Time
-        "method.set_key = ui.column.render, \"520:6C96/6:∆≀⌚☑  \","
+        // Up|Leech Time / Down|Completion or Loaded Time
+        "method.set_key = ui.column.render, \"520:6C96/6:∆⋮ ⌛  \","
         "    ((if, ((d.up.rate)),"
-        "        ((convert.human_size, ((d.up.rate)), (value, 10))),"
-        "        ((convert.ui.elapsed_time, ((value, ((d.custom, tm_completed)) )) ))"
+        "        ((convert.human_size, ((d.up.rate)), ((value, 10)) )),"
+        "        ((convert.time_delta, ((value, ((d.custom, tm_completed)) )),"
+        "                              ((value, ((d.custom,    tm_loaded)) )) ))"
         "    ))\n"
-        "method.set_key = ui.column.render, \"530:6C90/6:∇≀⌚☐  \","
+        "method.set_key = ui.column.render, \"530:6C90/6:∇⋮ ⌚  \","
         "    ((if, ((d.down.rate)),"
-        "        ((convert.human_size, ((d.down.rate)), (value, 10))),"
-        "        ((convert.ui.elapsed_time, ((value, ((d.custom, tm_loaded)) )) ))"
+        "        ((convert.human_size, ((d.down.rate)), ((value, 10)) )),"
+        "        ((convert.time_delta, ((value, ((d.custom.if_z, tm_completed, ((d.custom, tm_loaded)) )) )) ))"
         "    ))\n"
 
         // Upload total, progress, ratio, and data size
