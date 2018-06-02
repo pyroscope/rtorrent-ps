@@ -952,9 +952,6 @@ void initialize_command_ui_pyroscope() {
 
     CMD2_DL("d.message.alert", _cxxstd_::bind(&display::cmd_d_message_alert, _cxxstd_::placeholders::_1));
 
-    CMD2_VAR_VALUE("ui.style.progress", 1);
-    CMD2_VAR_VALUE("ui.style.ratio", 1);
-
     CMD2_ANY        ("ui.canvas_color",         _cxxstd_::bind(&display::ui_canvas_color_get));
     CMD2_ANY_STRING ("ui.canvas_color.set",     _cxxstd_::bind(&display::ui_canvas_color_set, _cxxstd_::placeholders::_2));
 
@@ -996,6 +993,11 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY_LIST("convert.time_delta",         _cxxstd_::bind(&apply_time_delta, _cxxstd_::placeholders::_2));
     CMD2_ANY_LIST("convert.human_size",         _cxxstd_::bind(&apply_human_size, _cxxstd_::placeholders::_2));
     CMD2_ANY_LIST("convert.magnitude",          _cxxstd_::bind(&apply_magnitude, _cxxstd_::placeholders::_2));
+
+    // TODO: deprecated and useless, remove these in v1.2
+    CMD2_VAR_VALUE("ui.style.progress", 1);
+    CMD2_VAR_VALUE("ui.style.ratio", 1);
+
 
     // Set some defaults by executing an in-memory script
     std::string init_commands;
@@ -1090,7 +1092,6 @@ void initialize_command_ui_pyroscope() {
         "    ))\n"
 
         // Upload total, progress, ratio, and data size
-        // TODO: deprecate "ui.style.ratio" and "ui.style.progress"
         "method.set_key = ui.column.render, \"900:5C24/3C21/2: Σ⇈ \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
