@@ -1072,7 +1072,7 @@ void initialize_command_ui_pyroscope() {
         // Traffic indicator (⚡)
         "method.set_key = ui.column.render, \"500:2:⚡ \","
         "    ((string.map, ((cat, ((not, ((d.up.rate)) )), ((not, ((d.down.rate)) )) )),"
-        "    {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
+        "                  {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
 
         // Number of connected peers (℞)
         "method.set_key = ui.column.render, \"510:3C28/3:℞  \", ((convert.magnitude, ((d.peers_connected)) ))\n"
@@ -1101,7 +1101,7 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"910:2C94/2:⣿ \","
         "    ((string.substr, \"  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ❚ \", ((math.mul, 2, "
         "                     ((math.div, ((math.mul, ((d.completed_chunks)), 10)), ((d.size_chunks)) )) )), 2, \"✔ \"))\n"
-        // "  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ "
+        // "  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ❚ "
         //⠀"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ █ "
         "method.set_key = ui.column.render, \"920:3C93/3:☯ \","
         "    ((string.substr, \"☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ \", ((math.mul, 2, ((math.div, ((d.ratio)), 1000)) )), 2, \"⊛ \"))\n"
