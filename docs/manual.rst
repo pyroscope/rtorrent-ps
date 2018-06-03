@@ -233,16 +233,67 @@ To show the full column definitions with their code, call `pyroadmin`_:
         ((array.at, {"  ", "⚑ "}, ((d.views.has, tagged)) ))
 
 
-.. rubric:: Disabling columns
+.. rubric:: Disabling Columns
 
-**TODO**
+**TODO** Describe ``ui.column.disabled`` when it's done.
+
+
+.. rubric:: Column Layout Definitions
+
+**TODO** WTF is ``?3C93/3``, and other questions.
 
 
 .. rubric:: Defining Your Own Columns
 
-**TODO** (with 1 or 2 examples)
+.. image:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-canvas_v2-ascii-ratio.png
+    :align: right
+    :alt: Canvas v2 ASCII Ratio
 
-**TODO** Replacing ratio column with a pure ASCII version
+This example shows how to replace the ratio column (920)
+with a pure ASCII version. You can see the result on the right.
+
+Place this code in your custom configuration,
+e.g. in the ``_rtlocal.rc`` file (when using `pimp-my-box`_).
+
+.. code-block:: ini
+
+    # Remove default column
+    method.set_key = ui.column.render, "920:3C93/3:☯  "
+
+    # Add ASCII ratio in percent
+    # (1..99 for incomplete; 1c = 1.0; 1m = 10.0; …)
+    method.set_key = ui.column.render, "920:3C93/3:R% ", \
+        ((string.replace, ((convert.magnitude, ((math.div, ((d.ratio)), 10)) )), \
+                          {"⋅", "."} ))
+
+To construct a column definition like this,
+you need to understand `rTorrent Scripting`_ first
+– more so than what's sufficient for writing simple configurations.
+
+Looking at the original column definition often helps, e.g. to grab a few snippets for your own version:
+
+.. code-block:: ini
+
+    $ pyroadmin --dump-rc | grep -A1 920:3 | egrep '^(method.set_key|    )'
+    method.set_key = ui.column.render, "920:3C93/3:☯  ", \
+        ((string.substr, "☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ", \
+                         ((math.mul, 2, ((math.div, ((d.ratio)), 1000)) )), 2, "⊛ "))
+
+Also, try to understand how all the other column definitions work,
+you can learn a few tricks that are typical for column rendering.
+
+Especially if you want to display additional values in the same format as an existing column,
+you just have to swap the command accessing the displayed item's data.
+Here's a chunk size column, all you need to do is replace ``d.size_bytes`` with ``d.chunk_size``,
+and giving it a new index and heading.
+
+.. code-block:: ini
+
+    ui.color.custom9.set = "bright blue"
+    method.set_key = ui.column.render, "935:5C9/3C21/2: ≣   ", \
+        ((convert.human_size, ((d.chunk_size)) ))
+
+That example also shows how to use a custom color.
 
 
 Adding Traffic Graphs
@@ -709,3 +760,6 @@ See directly above for an example.
 .. _`pyroadmin`: https://pyrocore.readthedocs.io/en/latest/references.html#pyroadmin
 .. _`pimp-my-box`: https://github.com/pyroscope/pimp-my-box/
 .. _`~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns.rc#L1
+.. _`rTorrent Scripting`: https://rtorrent-docs.readthedocs.io/en/latest/scripting.html#
+
+.. end of "manual.rst"
