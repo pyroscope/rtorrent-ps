@@ -5,6 +5,66 @@ This chapter contains some explanations of the project structure and
 activities related to development of the project.
 
 
+.. _invoke-test:
+
+Running Integration Tests
+-------------------------
+
+The ``tasks.py`` script defines a ``test`` task for `invoke`,
+which runs tests located in the ``tests/commands/*.txt`` files.
+
+These test scripts are edited console logs of shell calls,
+and the test runner executes any line starting with a ``$``.
+It then checks that any line following the command is contained
+in its output. The return code is checked via a ``RC=n`` line.
+
+Any line starting with ``#`` is a comment.
+
+The lines asserting output can contain ``…`` to mark omissions
+– any whitespace around it is ignored.
+That means that ``foo … bar`` checks that *both* ``foo`` and ``bar``
+are contained somewhere in the command's output.
+
+Here's the sample output you want to have (no failures):
+
+.. code-block:: console
+
+    $ invoke test
+    --- Running tests in 'tests/commands/array.txt'...
+    .......
+
+    --- Running tests in 'tests/commands/misc.txt'...
+    ..................................................
+
+    --- Running tests in 'tests/commands/string.txt'...
+    ....................
+
+    --- Running tests in 'tests/commands/math.txt'...
+    .......................................
+
+    ☺ ☺ ☺  ALL OK. ☺ ☺ ☺
+
+
+And this is what a failure looks like:
+
+.. code-block:: console
+
+    $ invoke test -n misc
+    --- Running tests in 'tests/commands/misc.txt'...
+    .
+    FAIL: »!1’20”« not found in output of »rtxmlrpc convert.time_delta '' +1527903580 +1527903500«
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    1’20”
+    RC=0
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    ................................................
+
+    ☹ ☹ ☹  1 TEST(S) FAILED. ☹ ☹ ☹
+
+This also shows how you can run only one selected test suite, using the ``--name`` or ``-n`` option.
+
+
 .. _build-sh:
 
 The Build Script
