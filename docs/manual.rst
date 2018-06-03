@@ -245,9 +245,9 @@ To show the full column definitions with their code, call `pyroadmin`_:
 
 .. rubric:: Defining Your Own Columns
 
-.. image:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-canvas_v2-ascii-ratio.png
+.. image:: _static/img/rt-ps-canvas_v2-ascii-ratio.png
     :align: right
-    :alt: Canvas v2 ASCII Ratio
+    :alt: Canvas v2 ASCII Ratio Column
 
 This example shows how to replace the ratio column (920)
 with a pure ASCII version. You can see the result on the right.
@@ -281,6 +281,10 @@ Looking at the original column definition often helps, e.g. to grab a few snippe
 
 Also, try to understand how all the other column definitions work,
 you can learn a few tricks that are typical for column rendering.
+
+.. image:: _static/img/rt-ps-canvas_v2-chunk-size.png
+    :align: right
+    :alt: Canvas v2 Chunk Size Column
 
 Especially if you want to display additional values in the same format as an existing column,
 you just have to swap the command accessing the displayed item's data.
@@ -424,7 +428,7 @@ grey, and that is used here to set the even / odd backgrounds.
 .. _superuser Q&A: http://superuser.com/questions/393834/how-to-configure-putty-to-display-these-characters
 .. _as described here: http://superuser.com/a/764855
 
-.. |rt-ps-glyphs| image:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rt-ps-glyphs.png
+.. |rt-ps-glyphs| image:: _static/img/rt-ps-glyphs.png
 
 
 .. _commands:
