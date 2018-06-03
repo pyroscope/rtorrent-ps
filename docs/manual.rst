@@ -219,6 +219,19 @@ which is defined in `~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`_ of `pimp-my-box
     if you used that to set up your system.
     Otherwise you'll get duplicate columns.
 
+To show the full column definitions with their code, call `pyroadmin`_:
+
+.. code-block:: console
+
+    $ pyroadmin --dump-rc | grep -A1 ui.column.render | egrep '^(method.set_key|    )'
+    method.set_key = ui.column.render, "100:3C95/2:❢  ", \
+        ((array.at, {"  ", "♺ ", "⚠ ", "◔ ", "⚡ ", "↯ ", "¿?", "⨂ "}, ((d.message.alert)) ))
+    method.set_key = ui.column.render, "110:2C92/2:☢ ", \
+        ((string.map, ((cat, ((d.is_open)), ((d.is_active)) )), {00, "▪ "}, …, {11, "▹ "}))
+    …
+    method.set_key = ui.column.render, "980:2C16/2:⚑ ", \
+        ((array.at, {"  ", "⚑ "}, ((d.views.has, tagged)) ))
+
 
 .. rubric:: Disabling columns
 
@@ -228,6 +241,8 @@ which is defined in `~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`_ of `pimp-my-box
 .. rubric:: Defining Your Own Columns
 
 **TODO** (with 1 or 2 examples)
+
+**TODO** Replacing ratio column with a pure ASCII version
 
 
 Adding Traffic Graphs
@@ -691,5 +706,6 @@ See directly above for an example.
 .. _installation options: https://github.com/pyroscope/rtorrent-ps#installation
 .. _Arch Linux: http://www.archlinux.org/
 .. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
+.. _`pyroadmin`: https://pyrocore.readthedocs.io/en/latest/references.html#pyroadmin
 .. _`pimp-my-box`: https://github.com/pyroscope/pimp-my-box/
 .. _`~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns.rc#L1
