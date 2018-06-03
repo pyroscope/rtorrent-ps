@@ -49,12 +49,10 @@
 #include "control.h"
 #include "command_helpers.h"
 
-#if (RT_HEX_VERSION >= 0x000901)
-    #define _cxxstd_ tr1
-#else
-    #define _cxxstd_ std
-#endif
 
+// In 0.9.x this changed to 'tr1' (dropping sigc::bind), see https://stackoverflow.com/a/4682954/2748717
+// "C++ Technical Report 1" was later added to "C++11", using tr1 makes stuff compile on older GCC
+#define _cxxstd_ tr1
 
 // List of system capabilities for `system.has` command
 static std::set<std::string> system_capabilities;
@@ -384,12 +382,8 @@ torrent::Object apply_ui_bind_key(rpc::target_type target, const torrent::Object
     switch (displayType) {
         case ui::DownloadList::DISPLAY_DOWNLOAD_LIST:
             display->bindings()[key] =
-#if RT_HEX_VERSION < 0x000904
-                sigc::bind(sigc::mem_fun(*(ui::ElementDownloadList*)display, &ui::ElementDownloadList::receive_command),
-#else
                 _cxxstd_::bind(&ui::ElementDownloadList::receive_command, (ui::ElementDownloadList*)display,
-#endif
-                bound_commands[displayType][key].c_str());
+                               bound_commands[displayType][key].c_str());
             break;
         default:
             return torrent::Object();
@@ -856,38 +850,6 @@ torrent::Object cmd_value(rpc::target_type target, const torrent::Object::list_t
 }
 
 
-// Backports from 0.9.2
-#if (API_VERSION < 3)
-template <typename InputIterator, typename OutputIterator> OutputIterator
-pyro_transform_hex(InputIterator first, InputIterator last, OutputIterator dest) {
-  const char* hex = "0123456789abcdef";
-  while (first != last) {
-    *(dest++) = (*first >> 4)[hex];
-    *(dest++) = (*first & 15)[hex];
-
-    ++first;
-  }
-
-  return dest;
-}
-
-
-torrent::Object d_chunks_seen(core::Download* download) {
-    const uint8_t* seen = download->download()->chunks_seen();
-
-    if (seen == NULL)
-        return std::string();
-
-    uint32_t size = download->download()->file_list()->size_chunks();
-    std::string result;
-    result.resize(size * 2);
-    pyro_transform_hex((const char*)seen, (const char*)seen + size, result.begin());
-
-    return result;
-}
-#endif
-
-
 torrent::Object cmd_d_tracker_domain(core::Download* download) {
     return get_active_tracker_domain(download->download());
 }
@@ -1036,16 +998,14 @@ torrent::Object cmd_ui_current_view() {
 
 
 void initialize_command_pyroscope() {
-// Backports from 0.9.2
-#if (API_VERSION < 3)
-    // https://github.com/rakshasa/rtorrent/commit/b28f2ea8070
-    // https://github.com/rakshasa/rtorrent/commit/020de10f38210a07a567aeebbe385a4faaf4b517
-    CMD2_DL("d.chunks_seen", _cxxstd_::bind(&d_chunks_seen, _cxxstd_::placeholders::_1));
-
-    // https://github.com/rakshasa/rtorrent/commit/5bed4f01ad
-    CMD2_TRACKER("t.is_usable",          _cxxstd_::bind(&torrent::Tracker::is_usable, _cxxstd_::placeholders::_1));
-    CMD2_TRACKER("t.is_busy",            _cxxstd_::bind(&torrent::Tracker::is_busy, _cxxstd_::placeholders::_1));
-#endif
+    /*
+        *_ANY – no arguments (signature `cmd_*()`)
+        *_ANY_P – the 'P' means 'private'
+        *_STRING – takes (one?) string argument
+        *_LIST – takes any number of arguments
+        *_DL, *_DL_LIST – function gets a `core::Download*` as first parameter
+        *_VAR_VALUE – define a value, with getter and setter, and a default
+    */
 
 #if RT_HEX_VERSION <= 0x000906
     // these are merged into 0.9.7+ mainline! (well, maybe, PRs are ignored)
@@ -1055,6 +1015,7 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("d.multicall.filtered", _cxxstd_::bind(&d_multicall_filtered, _cxxstd_::placeholders::_2));
 #endif
 
+    // string.* group
     CMD2_ANY_LIST("string.len", &cmd_string_len);
     CMD2_ANY_LIST("string.substr", &cmd_string_substr);
     CMD2_ANY_LIST("string.contains", &cmd_string_contains);
@@ -1062,40 +1023,10 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("string.map", &cmd_string_map);
     CMD2_ANY_LIST("string.replace", &cmd_string_replace);
 
+    // array.* group
     CMD2_ANY_LIST("array.at", &cmd_array_at);
 
-    CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
-    CMD2_ANY_STRING("system.has", _cxxstd_::bind(&cmd_system_has, _cxxstd_::placeholders::_2));
-    CMD2_ANY("system.has.list", _cxxstd_::bind(&cmd_system_has_list));
-    CMD2_ANY("system.has.private_methods", _cxxstd_::bind(&cmd_system_has_methods, false));
-    CMD2_ANY("system.has.public_methods", _cxxstd_::bind(&cmd_system_has_methods, true));
-
-    CMD2_ANY_LIST("value", &cmd_value);
-    CMD2_ANY_LIST("compare", &apply_compare);
-    CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
-    CMD2_VAR_VALUE("ui.bind_key.verbose", 1);
-    CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
-    CMD2_DL("d.tracker_scrape.downloaded", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 1, _cxxstd_::placeholders::_1));
-    CMD2_DL("d.tracker_scrape.complete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 2, _cxxstd_::placeholders::_1));
-    CMD2_DL("d.tracker_scrape.incomplete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 3, _cxxstd_::placeholders::_1));
-
-    CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
-    CMD2_ANY_P("import.return", &cmd_import_return);
-    CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,
-                                                 _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
-    CMD2_DL_LIST("d.custom.keys", _cxxstd_::bind(&retrieve_d_custom_map,
-                                                 _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
-    CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
-                                                 _cxxstd_::placeholders::_1, false, _cxxstd_::placeholders::_2));
-    CMD2_DL("d.is_meta", _cxxstd_::bind(&torrent::DownloadInfo::is_meta_download,
-                                        _cxxstd_::bind(&core::Download::info, _cxxstd_::placeholders::_1)));
-
-    CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
-    CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));
-    CMD2_ANY("ui.focus.pgup", _cxxstd_::bind(&cmd_ui_focus_pgup));
-    CMD2_ANY("ui.focus.pgdn", _cxxstd_::bind(&cmd_ui_focus_pgdn));
-    CMD2_VAR_VALUE("ui.focus.page_size", 50);
-
+    // math.* group
     CMD2_ANY_LIST("math.add", std::bind(&apply_math_basic, "math.add", std::plus<int64_t>(), std::placeholders::_2));
     CMD2_ANY_LIST("math.sub", std::bind(&apply_math_basic, "math.sub", std::minus<int64_t>(), std::placeholders::_2));
     CMD2_ANY_LIST("math.mul", std::bind(&apply_math_basic, "math.mul", std::multiplies<int64_t>(), std::placeholders::_2));
@@ -1106,6 +1037,43 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("math.cnt", std::bind(&apply_arith_count, std::placeholders::_2));
     CMD2_ANY_LIST("math.avg", std::bind(&apply_arith_other, "average", std::placeholders::_2));
     CMD2_ANY_LIST("math.med", std::bind(&apply_arith_other, "median", std::placeholders::_2));
+
+    // ui.focus.* – quick paging
+    CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
+    CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));
+    CMD2_ANY("ui.focus.pgup", _cxxstd_::bind(&cmd_ui_focus_pgup));
+    CMD2_ANY("ui.focus.pgdn", _cxxstd_::bind(&cmd_ui_focus_pgdn));
+    CMD2_VAR_VALUE("ui.focus.page_size", 50);
+
+    // system.has.*
+    CMD2_ANY_STRING("system.has", _cxxstd_::bind(&cmd_system_has, _cxxstd_::placeholders::_2));
+    CMD2_ANY("system.has.list", _cxxstd_::bind(&cmd_system_has_list));
+    CMD2_ANY("system.has.private_methods", _cxxstd_::bind(&cmd_system_has_methods, false));
+    CMD2_ANY("system.has.public_methods", _cxxstd_::bind(&cmd_system_has_methods, true));
+
+    // d.custom.* extensions
+    CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,
+                                                 _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.keys", _cxxstd_::bind(&retrieve_d_custom_map,
+                                                 _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
+                                                 _cxxstd_::placeholders::_1, false, _cxxstd_::placeholders::_2));
+
+    // Misc commands
+    CMD2_ANY_LIST("value", &cmd_value);
+    CMD2_ANY_LIST("compare", &apply_compare);
+    CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
+    CMD2_VAR_VALUE("ui.bind_key.verbose", 1);
+    CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
+    CMD2_DL("d.tracker_domain", _cxxstd_::bind(&cmd_d_tracker_domain, _cxxstd_::placeholders::_1));
+    CMD2_DL("d.tracker_scrape.downloaded", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 1, _cxxstd_::placeholders::_1));
+    CMD2_DL("d.tracker_scrape.complete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 2, _cxxstd_::placeholders::_1));
+    CMD2_DL("d.tracker_scrape.incomplete", _cxxstd_::bind(&cmd_d_tracker_scrape_info, 3, _cxxstd_::placeholders::_1));
+
+    CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
+    CMD2_ANY_P("import.return", &cmd_import_return);
+    CMD2_DL("d.is_meta", _cxxstd_::bind(&torrent::DownloadInfo::is_meta_download,
+                                        _cxxstd_::bind(&core::Download::info, _cxxstd_::placeholders::_1)));
 
     // List capabilities of this build
     add_capability("system.has");         // self
