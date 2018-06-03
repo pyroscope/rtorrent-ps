@@ -76,7 +76,6 @@ docker_distros_all+=(
 
 # Debian-like deps, see below for other distros
 BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev zlib1g-dev libcppunit-dev locales )
-test "$RT_VERSION" != "0.9.2" || BUILD_PKG_DEPS+=( libsigc++-2.0-dev )
 
 # Fitting / tested dependency versions for major platforms
 #export CARES_VERSION=1.10.0
@@ -191,7 +190,8 @@ case "$(uname -s)" in
 esac
 
 # Keep rTorrent version, once it was built in this directory
-test -d rtorrent-0.9.2 && { export LT_VERSION=0.13.2; export RT_VERSION=0.9.2; }
+# (this list also can be considered 'supported' versions,
+# though only the last stable is regularly compiled)
 test -d rtorrent-0.9.4 && { export LT_VERSION=0.13.4; export RT_VERSION=0.9.4; }
 test -d rtorrent-0.9.5 && { export LT_VERSION=0.13.5; export RT_VERSION=0.9.5; }
 test -d rtorrent-0.9.6 && { export LT_VERSION=0.13.6; export RT_VERSION=0.9.6; }
