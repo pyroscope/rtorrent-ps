@@ -30,9 +30,6 @@
 #include <rak/algorithm.h>
 #include <rak/functional.h>
 #include <rak/functional_fun.h>
-#if RT_HEX_VERSION < 0x000904
-    #include <sigc++/adaptors/bind.h>
-#endif
 
 #include "core/download.h"
 #include "core/manager.h"
