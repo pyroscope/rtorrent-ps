@@ -1078,7 +1078,7 @@ void initialize_command_ui_pyroscope() {
         // 96:    COL_UP_TIME
 
         // Status flags (❢ ☢ ☍ ⌘)
-        "method.set_key = ui.column.render, \"100:3C95/2:❢ \","
+        "method.set_key = ui.column.render, \"100:3C95/2:❢  \","
         "    ((array.at, {\"  \", \"♺ \", \"⚠ \", \"◔ \", \"⚡ \", \"↯ \", \"¿?\", \"⨂ \"}, ((d.message.alert)) ))\n"
         "method.set_key = ui.column.render, \"110:2C92/2:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
@@ -1116,7 +1116,7 @@ void initialize_command_ui_pyroscope() {
         "    ))\n"
 
         // Upload total, progress, ratio, and data size
-        "method.set_key = ui.column.render, \"900:?5C24/3C21/2: Σ⇈ \","
+        "method.set_key = ui.column.render, \"900:?5C24/3C21/2: Σ⇈  \","
         "    ((if, ((d.up.total)),"
         "        ((convert.human_size, ((d.up.total)), (value, 10))),"
         "        ((cat, \"  ⋅ \"))"
@@ -1126,12 +1126,12 @@ void initialize_command_ui_pyroscope() {
         "                     ((math.div, ((math.mul, ((d.completed_chunks)), 10)), ((d.size_chunks)) )) )), 2, \"✔ \"))\n"
         // "  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ❚ "
         //⠀"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ █ "
-        "method.set_key = ui.column.render, \"920:3C93/3:☯ \","
+        "method.set_key = ui.column.render, \"920:3C93/3:☯  \","
         "    ((string.substr, \"☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ \", ((math.mul, 2, ((math.div, ((d.ratio)), 1000)) )), 2, \"⊛ \"))\n"
         // "☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ "
         // "☹ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ "
         // "☹ ➊ ➋ ➌ ➍ ➎ ➏ ➐ ➑ ➒ ➓ "
-        "method.set_key = ui.column.render, \"930:5C15/3C21/2: ✇  \","
+        "method.set_key = ui.column.render, \"930:5C15/3C21/2: ✇   \","
         "    ((convert.human_size, ((d.size_bytes)) ))\n"
 
         // Explicitly managed status (✰ = prio; ⚑ = tagged)
