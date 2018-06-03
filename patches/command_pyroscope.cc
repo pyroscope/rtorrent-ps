@@ -186,7 +186,7 @@ torrent::Tracker* get_active_tracker(torrent::Download* item) {
     torrent::TrackerList* tl = item->tracker_list();
     torrent::Tracker* tracker = 0;
 
-    for (int trkidx = 0; trkidx < tl->size(); trkidx++) {
+    for (size_t trkidx = 0; trkidx < tl->size(); trkidx++) {
         tracker = tl->at(trkidx);
         if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP
                 && tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
@@ -777,7 +777,7 @@ torrent::Object cmd_array_at(rpc::target_type target, const torrent::Object::lis
     if (array.empty()) {
         throw torrent::input_error("array.at: array is empty!");
     }
-    if (index < 0 || array.size() <= index) {
+    if (index < 0 || int(array.size()) <= index) {
         throw torrent::input_error("array.at: index out of bounds!");
     }
 
