@@ -154,6 +154,82 @@ For the completion time display to work, you need the following in your
         "d.set_custom=tm_completed,$cat=$system.time= ;d.save_session="
 
 
+Customizing the Display Layout
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. rubric:: Canvas v2 Overview
+
+The main display with the downloads list is flexible and
+can be configured to your will, in `rTorrent-PS 1.1` and up.
+This is also known as *canvas v2*.
+
+Use the following `rtxmlrpc`_ command to check if you have a version
+that can do this:
+
+.. code-block:: console
+
+    # The '1' means you have canvas v2 on board;
+    # a '0' or "Method 'system.has' not defined" means you don't.
+    $ rtxmlrpc system.has=,canvas_v2
+    1
+
+
+The only fixed parts are the position indicator at the very left of the display,
+and the combined name / tracker column on the right.
+The latter takes all the space left by other columns.
+
+
+.. rubric:: Inspecting Your Display Configuration
+
+To list the columns you have in your setup, call  `rtxmlrpc`_ like so:
+
+.. code-block:: console
+
+    $ rtxmlrpc method.get=,ui.column.render | sed -re 's/ /␣/' | sort
+    100:3C95/2:❢␣
+    110:2C92/2:☢␣
+    120:2:☍␣
+    130:2:⌘␣
+    400:3C23/3:␣↺
+    410:3C24/3:␣⤴
+    420:3C14/3:␣⤵
+    500:2:⚡␣
+    510:3C28/3:℞␣
+    520:6C96/6:∆⋮␣⌛
+    530:6C90/6:∇⋮␣⌚
+    800:3:⋉␣
+    900:5C24/3C21/2:␣Σ⇈
+    910:2C94/2:⣿␣
+    920:3C93/3:☯␣
+    930:5C15/3C21/2:␣✇
+    970:2C91/2:✰␣
+    980:2C16/2:⚑␣
+
+The important thing here are the numbers in front,
+which define the sort order of columns from left to right.
+They also allow to address a specific column,
+which becomes important in a moment.
+
+All these are built-in defaults, except the throttle indicator ``⋉`` with index 800,
+which is defined in `~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`_ of `pimp-my-box`_.
+
+.. important::
+
+    You **MUST** update your `pimp-my-box`_ configuration
+    if you used that to set up your system.
+    Otherwise you'll get duplicate columns.
+
+
+.. rubric:: Disabling columns
+
+**TODO**
+
+
+.. rubric:: Defining Your Own Columns
+
+**TODO** (with 1 or 2 examples)
+
+
 Adding Traffic Graphs
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -614,3 +690,6 @@ See directly above for an example.
 .. _Bintray: https://bintray.com/pkg/show/general/pyroscope/rtorrent-ps/rtorrent-ps
 .. _installation options: https://github.com/pyroscope/rtorrent-ps#installation
 .. _Arch Linux: http://www.archlinux.org/
+.. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
+.. _`pimp-my-box`: https://github.com/pyroscope/pimp-my-box/
+.. _`~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns.rc#L1
