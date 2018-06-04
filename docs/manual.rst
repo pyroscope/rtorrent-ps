@@ -274,7 +274,7 @@ Looking at the original column definition often helps, e.g. to grab a few snippe
 
 .. code-block:: ini
 
-    $ pyroadmin --dump-rc | grep -A1 920:3 | egrep '^(method.set_key|    )'
+    $ pyroadmin --dump-rc | egrep -A1 '"920:.+"'
     method.set_key = ui.column.render, "920:3C93/3:☯  ", \
         ((string.substr, "☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ", \
                          ((math.mul, 2, ((math.div, ((d.ratio)), 1000)) )), 2, "⊛ "))
