@@ -288,8 +288,9 @@ you can learn a few tricks that are typical for column rendering.
 
 Especially if you want to display additional values in the same format as an existing column,
 you just have to swap the command accessing the displayed item's data.
-Here's a chunk size column, all you need to do is replace ``d.size_bytes`` with ``d.chunk_size``,
-and giving it a new index and heading.
+Here's a chunk size column, all you need to do is
+replace ``d.size_bytes`` in the code of column 930 with ``d.chunk_size``,
+and give it a new index and heading.
 
 .. code-block:: ini
 
