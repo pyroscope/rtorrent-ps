@@ -235,7 +235,28 @@ To show the full column definitions with their code, call `pyroadmin`_:
 
 .. rubric:: Disabling Columns
 
-**TODO** Describe ``ui.column.disabled`` when it's done.
+The ``ui.column.show`` and ``ui.column.hide`` commands provide the means to
+easily change the visibility of columns, without touching their definition.
+They both take a list of column keys as their arguments, as either strings or values.
+
+The following example shows column ♯42 only on the *active* and *leeching* views,
+
+.. code-block:: ini
+
+    method.set_key = event.view.show, ~column_toggle, \
+        "branch = \"string.contains=$ui.current_view=, active, leeching\", \
+            ui.column.show=42, ui.column.hide=42"
+    ui.column.hide = 42
+
+The ``ui.column.is_hidden`` and ``ui.column.hidden.list`` commands can be used to query the visibility of columns,
+the first one takes a single column key as its argument.
+
+.. code-block:: console
+
+    $ rtxmlrpc --repr ui.column.is_hidden '' 42
+    1
+    $ rtxmlrpc --repr ui.column.hidden.list
+    [42]
 
 
 .. rubric:: Column Layout Definitions
