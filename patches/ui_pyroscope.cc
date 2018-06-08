@@ -625,10 +625,11 @@ int render_columns(bool headers, bool narrow, rpc::target_type target, core::Dow
     int total = 0;
 
     for (cols_itr = column_defs.begin(); cols_itr != last_col; ++cols_itr) {
-        // Skip sort key (format is "sort:len:title")
-        size_t header_colon = cols_itr->first.find(':');
-        if (header_colon == std::string::npos) continue;
-        const char* header_pos = cols_itr->first.c_str() + header_colon + 1;
+        // Handle index / sort key (format is "sort:len:title")
+        char* header_pos = 0;
+        int colidx = (int)strtol(cols_itr->first.c_str(), &header_pos, 10);
+        if (*header_pos++ != ':') continue;  // 2nd field is missing
+        if (column_hidden.count(colidx)) continue;  // column is hidden
 
         // Check for 'sacrificial' marker
         if (*header_pos == '?') {
