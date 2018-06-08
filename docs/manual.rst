@@ -291,12 +291,12 @@ e.g. in the ``_rtlocal.rc`` file (when using `pimp-my-box`_).
 
 .. code-block:: ini
 
-    # Remove default column
-    method.set_key = ui.column.render, "920:3C93/3:☯  "
+    # Hide default column
+    ui.column.hide = 920
 
     # Add ASCII ratio in percent
     # (1..99 for incomplete; 1c = 1.0; 1m = 10.0; …)
-    method.set_key = ui.column.render, "920:3C93/3:R% ", \
+    method.set_key = ui.column.render, "922:3C93/3:R% ", \
         ((string.replace, ((convert.magnitude, ((math.div, ((d.ratio)), 10)) )), \
                           {"⋅", "."} ))
 
