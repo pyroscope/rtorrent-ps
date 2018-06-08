@@ -122,3 +122,20 @@ ERROR … Junk at end of number: 8
 
 $ rtxmlrpc --repr compare '' -- '' ''
 ERROR … Can only compare a target pair
+
+# ui.colum.*
+$ rtxmlrpc --repr ui.column.hidden.list
+[]
+$ rtxmlrpc ui.column.is_hidden '' 666
+0
+$ rtxmlrpc ui.column.hide '' 666
+0
+$ rtxmlrpc ui.column.is_hidden '' +666
+1
+$ rtxmlrpc --repr ui.column.hidden.list
+[666]
+$ rtxmlrpc ui.column.show '' +666
+0
+$ rtxmlrpc --repr ui.column.hidden.list
+[]
+# END
