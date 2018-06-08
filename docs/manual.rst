@@ -258,6 +258,19 @@ the first one takes a single column key as its argument.
     $ rtxmlrpc --repr ui.column.hidden.list
     [42]
 
+A practical use of ``ui.column.is_hidden`` is to toggle a column.
+This code does so for ♯935, and binds the toggle to the ``_`` key.
+
+.. code-block:: ini
+
+    method.insert = pmb._toggle_chunk_size, simple|private, \
+        "branch = ui.column.is_hidden=935, ui.column.show=935, ui.column.hide=935 ; \
+         ui.current_view.set = (ui.current_view)"
+    pyro.bind_key = toggle_chunk_size, _, "pmb._toggle_chunk_size="
+
+The ``ui.current_view.set = (ui.current_view)`` part forces a redraw of the canvas,
+giving you instant feedback.
+
 
 .. rubric:: Column Layout Definitions
 
