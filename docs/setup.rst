@@ -19,7 +19,9 @@ provided everything looks ok to you when you first started *rTorrent-PS*
 .. _make-rtorrent-config.sh: https://github.com/pyroscope/pyrocore/blob/master/src/scripts/make-rtorrent-config.sh
 
 
-Setting up your Terminal Emulator
+.. _terminal-setup:
+
+Setting up Your Terminal Emulator
 ---------------------------------
 
 General Concerns
@@ -151,6 +153,8 @@ all the necessary characters and your terminal is configured correctly:
         u"\u21c5 \u21a1 \u219f \u229b \u267a ".encode("utf8")'
 
 
+.. _canvas-256-colors:
+
 Supporting 256 or more colors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -207,6 +211,82 @@ grey, and that is used here to set the even / odd backgrounds.
 .. |rt-ps-glyphs| image:: _static/img/rt-ps-glyphs.png
 
 
+.. _color-schemes:
+
+Color Scheme Configuration
+--------------------------
+
+Here's a configuration example showing all the commands and their
+defaults:
+
+.. code-block:: ini
+
+    # UI/VIEW: Colors
+    ui.color.alarm.set="bold white on red"
+    ui.color.complete.set="bright green"
+    ui.color.even.set=""
+    ui.color.focus.set="reverse"
+    ui.color.footer.set="bold bright cyan on blue"
+    ui.color.incomplete.set="yellow"
+    ui.color.info.set="white"
+    ui.color.label.set="gray"
+    ui.color.leeching.set="bold bright yellow"
+    ui.color.odd.set=""
+    ui.color.progress0.set="red"
+    ui.color.progress20.set="bold bright red"
+    ui.color.progress40.set="bold bright magenta"
+    ui.color.progress60.set="yellow"
+    ui.color.progress80.set="bold bright yellow"
+    ui.color.progress100.set="green"
+    ui.color.progress120.set="bold bright green"
+    ui.color.queued.set="magenta"
+    ui.color.seeding.set="bold bright green"
+    ui.color.stopped.set="blue"
+    ui.color.title.set="bold bright white on blue"
+
+See the `ui.color.* command reference`_ for details on these and related commands.
+
+Note that you might need to enable support for 256 colors in your
+terminal, see :ref:`canvas-256-colors` for a description. In a nutshell, you need to
+install the ``ncurses-term`` package if you don't have it already, and
+also add these commands to your `rTorrent` start script:
+
+.. code-block:: shell
+
+    if [ "$TERM" = "${TERM%-256color}" ]; then
+        export TERM="$TERM-256color"
+    fi
+
+If everything worked so far, and you now want to find you own coloring
+theme, the easiest way is to use a second shell and ``rtxmlrpc``. Try
+out some colors, and add the combinations you like to your
+``~/.rtorrent.rc``.
+
+.. code-block:: shell
+
+    # For people liking candy stores...
+    rtxmlrpc ui.color.title.set "bold magenta on bright cyan"
+
+You can use the following code in a terminal to dump a color scheme:
+
+.. code-block:: shell
+
+    for i in $(rtxmlrpc system.listMethods | grep ui.color. | grep -v '\.set$'); do
+        echo $i = $(rtxmlrpc -r $i | tr "'" '"') ;
+    done
+
+The ``term-256color.py`` script can help you with showing the colors your
+terminal supports, an example output using Gnome's terminal looks like
+the following...
+
+.. figure:: _static/img/xterm-256-color.png
+   :align: center
+   :alt: xterm-256-color
+
+   Output of **term-256-color.py**
+
+
+.. _`ui.color.* command reference`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-color-custom1-9
 
 
 Customizing the Display Layout
