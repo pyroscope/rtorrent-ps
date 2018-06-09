@@ -16,7 +16,7 @@ $ rtxmlrpc --repr math.add '' -- 1 -1
 $ rtxmlrpc --repr math.add '' -- [1,2 3
 6
 $ rtxmlrpc --repr math.add '' -- text
-ERROR … Could not convert string to value
+ERROR … Could not convert
 # END
 
 # math.sub
