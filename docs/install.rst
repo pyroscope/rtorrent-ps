@@ -4,7 +4,7 @@ Installation Guide
 Note that this cannot be a Linux shell 101, so if the terminology and commands that follow
 are new for you, refer to the usual sources like
 `The Debian Administrator's Handbook`_, `The Linux Command Line`_, and
-`The Art of Command Line`_.
+`The Art of Command Line`_ to get yourself acquainted.
 
 .. _The Debian Administrator's Handbook: http://debian-handbook.info/browse/stable/
 .. _The Linux Command Line: http://linuxcommand.org/tlcl.php
@@ -15,15 +15,15 @@ General Installation Options
 ----------------------------
 
 See :ref:`build-from-source` on using the provided ``build.sh`` script,
-which will install *rTorrent-PS* into ``~/.local/rtorrent/‹version›``.
+which will install `rTorrent-PS` into ``~/.local/rtorrent/‹version›``.
 
 The stable rTorrent version **0.9.6** is built by default, but 0.9.4
 is also supported (but not tested anymore). And not all patches are
 applied equally, depending on whether they're needed, or applicable at all.
 
 After installation, make sure to read through the :doc:`setup` chapter
-in order to get the visual changes set up correctly,
-since this requires some special setup of your terminal on many machines.
+in order to get the display-related changes set up correctly,
+since on many machines this requires some special configuration of your terminal.
 
 Also take note of the
 `pimp-my-box <https://github.com/pyroscope/pimp-my-box>`_ project that
@@ -39,6 +39,7 @@ changed again.
     activate the extended features available together with *rTorrent-PS*, as
     mentioned in the
     `Configuration Guide <https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc>`_.
+    Starting with *version 1.1*, that activation is automatic.
 
 
 OS-Specific Installation Options
@@ -54,13 +55,13 @@ available that contain pre-compiled binaries (and only those, no
 configuration or init scripts). You can download and install such a
 package from `Bintray`_ —
 assuming one is available for your platform. The packages install the
-*rTorrent-PS* binary including some libraries into ``/opt/rtorrent``.
+`rTorrent-PS` binary including some libraries into ``/opt/rtorrent``.
 
-Example on *Debian Stretch*:
+Example on `Debian Stretch`:
 
 .. code-block:: bash
 
-    version="0.9.6-PS-1.0-94-g5a987ef~stretch_amd64"
+    version="0.9.6-PS-1.0-272-g388cfab~stretch_amd64"
     bintray="https://bintray.com/artifact/download/pyroscope"
     cd /tmp
     curl -Lko rt-ps.deb "$bintray/rtorrent-ps/rtorrent-ps_$version.deb"
@@ -76,26 +77,27 @@ start it, or link it into ``/usr/local`` like this:
 
 .. note:: You can safely install the package and test it
     out in parallel to an existing installation, just use the absolute path
-    ``/opt/rtorrent/bin/rtorrent`` to start rTorrent. Your data is in no way
-    affected as long as you normally run a 0.9.x version.
+    ``/opt/rtorrent/bin/rtorrent`` to start `rTorrent`.
+    Your (session) data is in no way affected,
+    as long as you normally run a *0.9.x* version.
 
 
 Installation on Arch Linux
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There are now two options contributed by `xsmile <https://github.com/xsmile>`_
-for installing on *Arch* via ``pacman``.
+for installing on `Arch` via ``pacman``.
 
 #. The ``pkg2pacman`` command of ``build.sh`` creates a package similar to the
-   Debian one, embedding a tested version combination of dependencies.
+   `Debian` one, embedding a tested version combination of dependencies.
    See :ref:`build-pkg2deb` for general instructions on building that
    variant, and use ``pkg2pacman`` instead of ``pkg2deb``.
 #. The *“Arch User Repository”* (AUR) PKGBUILDs maintained by @xsmile.
-   These use a standard *Arch* build process, but include the usual *rTorrent-PS*
+   These use a standard `Arch` build process, but include the usual `rTorrent-PS`
    patches.
 
    There is one package for ``libtorrent-ps``, and one for ``rtorrent-ps``,
-   and both take their dependencies from the normal OS packages:
+   and both *take their dependencies from the normal OS packages*:
 
    - https://aur.archlinux.org/packages/libtorrent-ps/
    - https://aur.archlinux.org/packages/rtorrent-ps/
@@ -129,23 +131,23 @@ Manual Turn-Key System Setup
 Introduction
 ^^^^^^^^^^^^
 
-The following shows installation instructions for a working rTorrent
-instance in combination with PyroScope **from scratch**, on Debian and
+The following shows installation instructions for a working `rTorrent`
+instance in combination with `PyroScope` **from scratch**, on `Debian` and
 most Debian-derived distros. Note that the `pimp-my-box`_ project does
 all this automatically for you, and is the tested and maintained way of
 installation — this page is just a reference of the core installation steps
 (if you run into problems, join the ``freenode`` IRC channel for help).
 
 While the package names and the use of ``apt-get`` are somewhat
-dependent on Debian, the `Preparatory Steps`_ commands which are executed
+dependent on `Debian`, the `Preparatory Steps`_ commands which are executed
 under ``root`` are similar for other distributions, and the compilation
 instructions should work as-is on practically any Linux and (F)BSD.
-These instructions are explicitly known to work on *Debian Jessie + Stretch*, and
-*Ubuntu Trusty + Xenial*.
+These instructions are explicitly known to work on `Debian Jessie + Stretch`, and
+`Ubuntu Xenial + Bionic`.
 
 The whole procedure takes 15 – 20 minutes,
 including full compilation from source.
-Subtract about 5 minutes if you install rTorrent via a package.
+Subtract about 5 minutes if you install `rTorrent` via a package.
 This on a quad-core 3.3 GHz Xeon CPU with 32 GiB RAM,
 and assuming you are familiar with the procedure,
 or just blindly paste the command blocks that follow.
@@ -158,7 +160,7 @@ and it's still under an hour.
     hit |deb-adm|_ so then you do.
 
 Non-packaged software is installed exclusively into your normal user
-account, i.e. this description works OK for non-root users as long as
+account (home directory), i.e. this description works OK for non-root users as long as
 the required packages are installed before-hand. The default install
 location is ``~/.local/rtorrent/«version»``, which means you can easily
 delete any installed software, and also run several versions
@@ -172,7 +174,7 @@ they get their own instance.
 
 .. important::
 
-    Most of the command blocks further below can be cut &
+    Most of the command blocks further below can be copied &
     pasted wholesale into a terminal. Note that ``bash`` *here documents*
     (``... <<'EOF'``) **MUST** be pasted at once, up to and including the
     line having a single ``EOF`` on it.
@@ -180,7 +182,7 @@ they get their own instance.
 .. warning::
 
     If you have an existing ``/usr/local`` installation of
-    rTorrent, it is *very* prudent to ``make uninstall`` that before
+    `rTorrent` / `libtorrent`, it is *very* prudent to ``make uninstall`` that before
     compiling another version. Those *might* prevent successful compilation
     if your lookup paths somehow bring those versions to the front.
 
@@ -188,6 +190,7 @@ they get their own instance.
     ``libtorrent`` and ``rtorrent`` you have on your machine. The build
     instructions on this page then ensure that it is *no* problem to have
     several versions concurrently on your machine.
+    If anything goes wrong, you can easily reinstall the packages provided by your OS.
 
 .. _pimp-my-box: https://github.com/pyroscope/pimp-my-box
 .. _deb-adm: http://static.debian-handbook.info/browse/stable/short-remedial-course.html
@@ -225,7 +228,7 @@ rTorrent using this command:
     echo $(apt-cache showsrc rtorrent libtorrent-dev | \
         grep Build-Depends: | cut -f2 -d: | tr ",)" " \\n" | cut -f1 -d"(")
 
-On Fedora (26), use this (**list is work in progress**):
+On Fedora (26), use this (**list is user-provided, report any problems**):
 
 .. code-block:: shell
 
@@ -267,9 +270,9 @@ skip the next section and continue with `PyroScope Installation`_.
 
 .. note::
 
-    During rTorrent instance setup, do not forget to change the
-    value of ``pyro.extended`` to 1 so the extended features are actually
-    activated!
+    During `rTorrent` instance setup, do not forget to change the
+    value of ``pyro.extended`` to 1 so the extended features are actually accessible!
+    Starting with *version 1.1*, that activation is automatic.
 
 .. _Bintray: https://bintray.com/pkg/show/general/pyroscope/rtorrent-ps/rtorrent-ps
 .. _rTorrent-PS: https://github.com/pyroscope/rtorrent-ps
@@ -310,7 +313,7 @@ the same way.
     # and the amount of free memory you have available.
     export MAKE_OPTS="-j4"
 
-    # check the VERSION SELECTION at the top of the script, and edit as needed
+    # Check the VERSION SELECTION at the top of the script, and edit as needed
     nice time ./build.sh all  # build 'deps', 'vanilla', and then 'extended'
 
 Note that the unpatched version is still available as
@@ -323,6 +326,7 @@ See the :doc:`manual` for more details on the changes applied.
     If you use the configuration as outlined below, do not forget
     to change the value of ``pyro.extended`` to 1 in case you want to unlock
     the additional features of the extended version!
+    Starting with *version 1.1*, that activation is automatic.
 
 .. _build script: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/build.sh
 .. _RtorrentExtended: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md
@@ -349,13 +353,21 @@ for more details.
     exec $SHELL -l
     pyroadmin --version
 
+The last call's output should look similar to this:
+
+.. code-block:: console
+
+    $ pyroadmin --version
+    pyroadmin 0.6.1.dev20180601 on Python 2.7.13
+
+
 .. _manual: https://pyrocore.readthedocs.org/en/latest/installation.html
 
 
 rTorrent Instance Setup
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To be able to use several different instances of rTorrent (e.g. a second
+To be able to use several different instances of `rTorrent` (e.g. a second
 one for experimental configuration changes), this setup doesn't use
 ``~/.rtorrent.rc`` at all, but keeps everything in one place under the
 ``~/rtorrent`` directory. If you change the assignment to ``RT_HOME``,
@@ -382,6 +394,19 @@ installation layout allowing concurrent use of several versions
 will not work as expected.
 So always call that script, and not ``rtorrent`` directly.
 
+.. tip:: **Safely storing downloads on a mounted device**
+
+    In case your data resides on a mounted device (e.g. an external USB disk),
+    **add a check to the start script** that it is actually present.
+    To do that, create a ``.mounted`` file in the root of your device,
+    and ``exit`` the start script if not found.
+    For your convenience, the code for that is already there
+    at the top of ``start``, but commented out.
+
+    If you don't check, that might lead to rehashing several terabytes of data,
+    because `rTorrent` will mark the downloads stored on an absent device as broken
+    (which they are without their data).
+
 .. _start script: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh
 
 
@@ -389,12 +414,14 @@ rTorrent Configuration
 """"""""""""""""""""""
 
 Next, a not-so-simple `rtorrent.rc`_ is created. It already provides
-everything needed to use all features of the *PyroScope* tools.
+everything needed to use all features of the `PyroScope` tools.
 
-Note that built-in ``pyrocore`` settings are read from a `provided include file`_
+Note that built-in ``pyrocore`` settings are read from a `provided include file`_,
 that in turn loads snippets from the ``~/.pyroscope/rtorrent.d`` directory.
 The same mechanism is used in the main ``rtorrent.rc`` file,
 so you can easily add your own customizations in new ``rtorrent.d/*.rc`` files.
+
+To get all this set up for you, call this provided script:
 
 .. code-block:: shell
 
@@ -404,20 +431,38 @@ so you can easily add your own customizations in new ``rtorrent.d/*.rc`` files.
 After this, you should check at
 least the ``rtorrent.d/20-host-var-settings.rc`` file and adapt the
 values to your environment and preferences.
+The script can be called again to get updates from `GitHub`,
+**but will overwrite all standard configuration files** with their new version.
+To safely customize configuration, use the ``.rcignore`` file
+and then provide your own version, or read on about ``_rtlocal.rc``.
 
-Also check out the `_rtlocal.rc`_ file for some additional settings
-you might want to apply to your own config
-(the ``make-rtorrent-config.sh`` script does not copy that optional file).
+
+The `_rtlocal.rc`_ file is the place for some simple custom settings,
+like additional resource limits or changing default values.
+The ``make-rtorrent-config.sh`` script does not copy that optional file,
+so follow the link and pick what you like.
+
+Example for a ``~/rtorrent/_rtlocal.rc`` file:
+
+.. code-block:: ini
+
+    # Reduce retention period of uncompressed logs
+    pyro.log_archival.days.set = 1
+
+    # Enable XMLRPC logging, and open log file *now*
+    pyro.log.xmlrpc.enabled = 1
+    log.xmlrpc = (pyro.logfile_path, xmlrpc)
 
 
 .. note::
 
     In ``rtorrent.rc``, change the value of ``pyro.extended`` to 1
-    so the extended ``rTorrent-PS`` features are actually activated!
+    so the extended `rTorrent-PS` features are actually accessible!
+    Starting with *version 1.1*, that activation is automatic.
 
-.. _rtorrent.rc: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rtorrent.rc
-.. _provided include file: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-pyro.rc
-.. _`_rtlocal.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/_rtlocal.rc
+.. _rtorrent.rc: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rtorrent.rc#L1
+.. _provided include file: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-pyro.rc#L1-L2
+.. _`_rtlocal.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/_rtlocal.rc#L1-L2
 
 
 CLI Tools Configuration
@@ -441,6 +486,45 @@ the installed software, which makes later updates a lot easier.
     # Location of your rtorrent configuration
     rtorrent_rc = ~/rtorrent/rtorrent.rc
     scgi_url = scgi://$HOME/rtorrent/.scgi_local
+
+    [FORMATS]
+    filelist = {{py:from pyrobase.osutil import shell_escape as quote}}{{#
+        }}{{for i, x in looper(d.files)}}{{d.realpath}}/{{x.path}}{{#
+            }}{{if i.next is not None}}{{chr(10)}}{{endif}}{{#
+        }}{{endfor}}
+
+    movehere = {{py:from pyrobase.osutil import shell_escape as quote}}{{#
+        }}mv {{d.realpath | quote}} .
+
+    # Formats for UI commands feedback
+    tag_show = {{#}}Tags: {{ chr(32).join(d.tagged) }} [{{ d.name[:33] }}…]
+
+    [SWEEP]
+    # Settings for the "rtsweep" tool
+
+    # Use the rules from the named [SWEEP_RULES_‹name›] sections
+    default_rules = builtin, custom
+
+    # Minimum amount of space that must be kept free (adds to the space request)
+    space_min_free = 10g
+
+    [SWEEP_RULES_CUSTOM]
+    # Rules to manage disk space
+    #
+    # Rules are ordered by the given priority. You can disable built-in rules
+    # found in the [SWEEP_RULES_BUILTIN] section by changing "default_rules"
+    # in the [SWEEP] section. Use "rtsweep show" to list active rules.
+    #
+    # Default sort order for each rule is by "loaded" date (oldest first).
+    # Note that active, prio 3, and ignored items are protected!
+    #
+    # If the active rules fail to provide enough space, as much of the oldest
+    # items as needed are removed.
+
+    # Seeded and bigger than 500M after 7 days, inactive and big items first
+    seeded7d.prio   = 910
+    seeded7d.sort   = active,-size
+    seeded7d.filter = ratio=+1.2 size=+500m loaded=+5d
 
     [ANNOUNCE]
     # Add alias names for announce URLs to this section; those aliases are used
@@ -472,7 +556,7 @@ start it the first time. This also makes it more homey for long-time
 Starting a tmux Session
 """""""""""""""""""""""
 
-You're now ready to start your shiny new *rTorrent-PS*, so just do it:
+You're now ready to start your shiny new `rTorrent-PS`, so just do it:
 
 .. code-block:: shell
 
@@ -492,8 +576,10 @@ After that, test the XMLRPC connection by using this command in a new ``tmux`` w
     rtxmlrpc system.time_usec
 
 You can of course add more elaborate start scripts,
-like a cron watchdog, init.d scripts, or a systemd unit (use the above ``tmux`` call for ``ExecStart``)
-– see the `rTorrent wiki`_ for examples.
+like a cron watchdog, init.d scripts, or a systemd unit.
+Put the above ``tmux`` call into ``ExecStart``,
+and use ``… new -d …`` to run a detached session
+– see the `rTorrent wiki`_ for detailed examples.
 
 Continue with reading the `'pyrocore' manual`_ to get acquainted with that,
 and :doc:`setup` for providing the necessary configuration regarding your terminal.
