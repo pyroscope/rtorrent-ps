@@ -10,9 +10,8 @@ and other differences to a vanilla *rTorrent* build.
 Additional Features
 -------------------
 
-If you followed the instructions in the `Extending your ‘.rtorrent.rc’`_
-section of the ``pyrocore`` manual, you will get the following
-`additional features`_ in your ``rTorrent-PS`` installation:
+Using the right default configuration (more on that below),
+you will get the following additional features in your `rTorrent-PS` installation:
 
 #.  the ``t`` key is bound to a ``trackers`` view that shows all items
     sorted by tracker and then by name.
@@ -49,6 +48,10 @@ section of the ``pyrocore`` manual, you will get the following
     regardless of whether they have any traffic, and then groups the
     list into complete, incomplete, and queued items, in that order.
     Within each group, they're sorted by download and then upload speed.
+#.  Some `canvas v2` columns are added in the `pimp-my-box` configuration –
+    the selected throttle (⋉), a download's chunk size (≣),
+    and the expected time of arrival (⌛⚪≋⚫) on the *active* and *leeching* displays only.
+    The visibility of the chunk size column can be toggled using the ``_`` key.
 #.  The commands ``s=«keyword»``, ``t=«tracker_alias»``, and
     ``f=«filter_condition»`` are pre-defined for searching using a
     Ctrl-X prompt.
@@ -65,12 +68,31 @@ section of the ``pyrocore`` manual, you will get the following
 #.  ``Ctrl-g`` shows the tags of an item (as managed by ``rtcontrol``);
     ``tag.add=‹tag›`` and ``tag.rm=‹tag›`` can be used to change the set
     of tags, both also show the new set of tags after changing them.
+#.  Time-stamped log files with rotation, archival (compression), and pruning
+    – with a setting for the number of days to keep logs in uncompressed form, or at all.
 #.  Trackers are scraped regularly (active items relatively often,
     inactive items including closed ones seldomly), so that the display
     of downloads / seeders / leechers is not totally outdated.
+    The ``&`` key can be used to manually scrape the item in focus.
+#.  A watchdog for the ``pyrotorque`` daemon process (checks every 5 minutes,
+    and starts it when missing *if* the `~/.pyroscope/run/pyrotorque` file exists).
+
+With regards to using the ‘right’ configuration to get the above, you need
+the ``*.rc.default`` files in the ``~/.pyroscope/rtorrent.d`` directory
+provided by `pyrocore`.
+`Standard Configuration Explained`_ has details on these.
+Some more features are defined by the `pimp-my-box`_ configuration templates.
+
+To get there, perform the :ref:`DebianInstallFromSource` as described in this manual,
+or use the `pimp-my-box`_ project for an automatic remote installation.
+The instructions in the `Extending your ‘.rtorrent.rc’`_ section of the `pyrocore` manual
+only cover half of it, and you might miss some described features.
+
+
+
 
 .. _Extending your ‘.rtorrent.rc’: https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc
-.. _`additional features`: https://pyrocore.readthedocs.io/en/latest/usage.html#std-config
+.. _`Standard Configuration Explained`: https://pyrocore.readthedocs.io/en/latest/usage.html#std-config
 .. _`Category Views`: https://pyrocore.readthedocs.io/en/latest/usage.html#category-views
 .. _`Color Themes`: https://pyrocore.readthedocs.io/en/latest/usage.html#color-themes
 .. _`Additional Views`: https://pyrocore.readthedocs.io/en/latest/usage.html#additional-views
