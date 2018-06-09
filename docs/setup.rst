@@ -302,7 +302,7 @@ The parts in ``〈…〉`` are optional.
 
 The second field can start with a ``?`` to tag this column as ‘sacrificial’,
 i.e. optional in the face of too narrow terminals.
-``‹width›`` is the column's width in characters.
+``‹width›`` is a column's width in characters.
 The ``‹color definition›`` determines what terminal attributes are used to render these characters,
 and is a sequence of ``C‹color index›/‹length›`` elements.
 
