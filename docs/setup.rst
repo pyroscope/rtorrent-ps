@@ -297,6 +297,8 @@ Column Layout Definitions
 **TODO** WTF is ``?3C93/3``, and other questions.
 
 
+.. _add-custom-columns:
+
 Defining Your Own Columns
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 

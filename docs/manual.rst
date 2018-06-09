@@ -105,11 +105,8 @@ only cover half of it, and you might miss some described features.
 Extended Canvas Explained
 -------------------------
 
-Columns in the Collapsed Display
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The following is an explanation of the collapsed display of
-*rTorrent-PS* — remember that you need to bind a key to the
+The following is an explanation of the collapsed display (canvas v2) of
+`rTorrent-PS` — remember that you need to bind a key to the
 ``view.collapsed.toggle`` command, or set the default of a view by
 `calling that command in the configuration`_, else you won't ever see it.
 
@@ -120,60 +117,80 @@ The following is an explanation of the collapsed display of
    rTorrent-PS Trackers View
 
 The following is an overview of the column heading icons, and what the values and icons in it mean.
+A **⍰** after the column title indicates a ‘sacrificial’ column, which disappear when the display
+gets too narrow to display all the columns. When even that does not provide enough space,
+columns are omitted beginning on the right side (*Name* is always included).
 
+❢
+    Message or alert indicator (♺ = Tracker cycle complete,
+    i.e. "Tried all trackers"; ⚡ = establishing connection;
+    ↯ = data transfer problem; ◔ = timeout; ¿? = unknown torrent /
+    info hash; ⨂ = authorization problem (possibly temporary); ⚠ = other)
 ☢
     Item state (▹ = started, ╍ = paused, ▪ = stopped)
-☍
+☍    **⍰**
     Tied item? [⚯]
-⌘
+⌘    **⍰**
     Command lock-out? (⚒ = heed commands, ◌ = ignore commands)
-✰
-    Priority (✖ = off, ⇣ = low, nothing for normal, ⇡ = high)
-⣿
-    Completion status (✔ = done; else up to 8 dots [⣿], i.e. 9 levels of 11% each);
-    change to bar style using ``ui.style.progress.set=2``, ``0`` is a *mostly* ASCII one
-⚡
-    Transfer direction indicator [⇅ ↡ ↟]
-☯
-    Ratio (☹ plus color indication for < 1, ➀ — ➉ : >= the number, ⊛ : >= 11);
-    change to a different set of number glyphs using ``ui.style.ratio.set=2`` (or ``3``),
-    ``0`` is a *mostly* ASCII one
-⚑
-    Message (♺ = Tracker cycle complete, i.e. "Tried all trackers"; ⚡ = establishing connection;
-    ↯ = data transfer problem; ◔ = timeout; ¿? = unknown torrent / info hash;
-    ⨂ = authorization problem (possibly temporary); ⚠ = other; ⚑ = on the ``tagged`` view)
-↺
+↺   **⍰**
     Number of completions from last scrape info
-⤴
+⤴     **⍰**
     Number of seeds from last scrape info
-⤵
+⤵     **⍰**
     Number of leeches from last scrape info
-∆
-    Upload rate
-⌚ ≀∇
+⚡    **⍰**
+    Transfer direction indicator [⇅ ↡ ↟]
+℞
+    Number of connected peers
+∆⋮⌛
+    Upload rate, or when inactive, time the download took (only after completion).
+∇⋮⌚
     Approximate time since completion (units are «”’hdwmy» from seconds to years);
     for incomplete items the download rate or, if there's no traffic,
-    the time since the item was loaded
+    the time since the item was started or loaded
+⌛⚪≋⚫ **⍰**
+    Expected time of arrival – only shown on the *active* and *leeching* displays
+⋉   **⍰**
+    Throttle selected for this item (∞ is the special ``NULL`` throttle; ⓪…⑨ for
+    `ruTorrent`'s ``thr_0…9`` channels)
+Σ⇈  **⍰**
+    Total sum of uploaded data
+⣿
+    Completion status (✔ = done; else up to 8 dots [⣿] and ❚, i.e. progress in 10% steps);
+    the old ``ui.style.progress.set`` command is deprecated,
+    see :ref:`add-custom-columns` for the new way to get
+    a different set of glyphs or an ASCII version
+☯
+    Ratio (☹ plus color indication for < 1, ➀ — ➉ : >= the number, ⊛ : >= 11);
+    the old ``ui.style.ratio.set`` command is deprecated,
+    see :ref:`add-custom-columns` for the new way to get
+    a different set of number glyphs or an ASCII version
 ✇
     Data size
+≣   **⍰**
+    Chunk size - this column can be toggled on / off using the ``_`` key
+✰
+    Priority (✖ = off, ⇣ = low, nothing for normal, ⇡ = high)
+⚑
+    A ⚑ indicates this item is on the ``tagged`` view
 Name
-    Name of the download item
-Tracker Domain
+    Name of the download item – either the name contained in the metafile,
+    or else the value of the ``displayname`` custom field when set on an item
+Tracker
     Domain of the first HTTP tracker with seeds or leeches,
-    or else the first one altogether
+    or else the first one altogether – note that your can define nicer
+    aliases using the `trackers.alias.set_key`_ command in your configuration
 
-The scrape info numbers are exact only for values below 100, else they
+For the various time displays to work, you need
+the `pyrocore` `standard configuration for rtorrent.rc`_.
+
+The scrape info and peer numbers are exact only for values below 100, else they
 indicate the order of magnitude using roman numerals (c = 10², m = 10³,
 X = 10⁴, C = 10⁵, M = 10⁶).
+For up-to-date scrape info, you need the `Tracker Auto-Scraping`_ configuration from `pyrocore`.
 
-For the completion time display to work, you need the following in your
-``.rtorrent.rc``, which you already do if you installed the
-`PyroScope CLI Tools`_ correctly (i.e. using the standard ``.rtorrent.rc`` include):
-
-.. code-block:: ini
-
-    system.method.set_key = event.download.finished,time_stamp, \
-        "d.set_custom=tm_completed,$cat=$system.time= ;d.save_session="
+.. _`standard configuration for rtorrent.rc`: https://pyrocore.readthedocs.io/en/latest/setup.html#extending-your-rtorrent-rc
+.. _`Tracker Auto-Scraping`: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/auto-scrape.rc#L1
 
 
 .. _commands:
