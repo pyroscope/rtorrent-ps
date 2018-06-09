@@ -105,10 +105,7 @@ only cover half of it, and you might miss some described features.
 Extended Canvas Explained
 -------------------------
 
-The following is an explanation of the collapsed display (canvas v2) of
-`rTorrent-PS` — remember that you need to bind a key to the
-``view.collapsed.toggle`` command, or set the default of a view by
-`calling that command in the configuration`_, else you won't ever see it.
+The following is an explanation of the collapsed display of `rTorrent-PS` (*canvas v2*).
 
 .. figure:: _static/img/rt-ps-trackers-view.png
    :align: center
@@ -116,7 +113,11 @@ The following is an explanation of the collapsed display (canvas v2) of
 
    rTorrent-PS Trackers View
 
-The following is an overview of the column heading icons, and what the values and icons in it mean.
+In older builds, you need to remember to press the ``*`` key while showing a view,
+and change the state of new views after adding them (by calling the `view.collapsed.toggle`_ command),
+else you won't ever see it.
+
+The following is an overview of the default columns, and what the values and icons in them mean.
 A **⍰** after the column title indicates a ‘sacrificial’ column, which disappear when the display
 gets too narrow to display all the columns. When even that does not provide enough space,
 columns are omitted beginning on the right side (*Name* is always included).
@@ -189,7 +190,6 @@ indicate the order of magnitude using roman numerals (c = 10², m = 10³,
 X = 10⁴, C = 10⁵, M = 10⁶).
 For up-to-date scrape info, you need the `Tracker Auto-Scraping`_ configuration from `pyrocore`.
 
-.. _calling that command in the configuration: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/collapse-built-in-views.rc
 .. _`standard configuration for rtorrent.rc`: https://pyrocore.readthedocs.io/en/latest/setup.html#extending-your-rtorrent-rc
 .. _`Tracker Auto-Scraping`: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/auto-scrape.rc#L1
 

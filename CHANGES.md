@@ -14,6 +14,7 @@
   * Added `ui.color.custom1…9` and  `ui.color.*.index` commands
   * New default columns: ❢ ℞ ⋉ ≣
   * ‘Tagged’ indicator (⚑) now in its own column
+  * Built-in views are collapsed by default now
 * UI: `Info` details panel is now active by default (not `Peer list`)
 * UI: Made `*` key a built-in keyboard shortcut [@chros73]
 * Command: Added `string.*` command group (issue #59)

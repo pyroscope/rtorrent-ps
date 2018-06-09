@@ -1104,6 +1104,18 @@ void initialize_command_ui_pyroscope() {
         // Bind '*' to toggle between collapsed and expanded display
         "schedule2 = collapsed_view_toggle, 0, 0, ((ui.bind_key,download_list,*,view.collapsed.toggle=))\n"
 
+        // Collapse built-in views
+        "view.collapsed.toggle = main\n"
+        "view.collapsed.toggle = name\n"
+        "view.collapsed.toggle = started\n"
+        "view.collapsed.toggle = stopped\n"
+        "view.collapsed.toggle = complete\n"
+        "view.collapsed.toggle = incomplete\n"
+        "view.collapsed.toggle = hashing\n"
+        "view.collapsed.toggle = seeding\n"
+        "view.collapsed.toggle = leeching\n"
+        "view.collapsed.toggle = active\n"
+
         // TODO: copy (parts of) timestamp cfg here (~/.pyroscope/rtorrent.d/timestamps.rc)
         //       Do NOT move it, since then rT vanilla gets unusable with rtcontrol.
         //       'system.has' allows to have both.
