@@ -302,7 +302,7 @@ The parts in ``〈…〉`` are optional.
 
 The second field can start with a ``?`` to tag this column as ‘sacrificial’,
 i.e. optional in the face of too narrow terminals.
-``‹width›`` is the columns width in characters.
+``‹width›`` is the column's width in characters.
 The ``‹color definition›`` determines what terminal attributes are used to render these characters,
 and is a sequence of ``C‹color index›/‹length›`` elements.
 
@@ -446,7 +446,7 @@ The following example shows column ♯42 only on the *active* and *leeching* vie
 
 .. code-block:: ini
 
-    method.set_key = event.view.show, ~column_toggle, \
+    method.set_key = event.view.show, ~column_42_toggle, \
         "branch = \"string.contains=$ui.current_view=, active, leeching\", \
             ui.column.show=42, ui.column.hide=42"
     ui.column.hide = 42
