@@ -430,3 +430,9 @@ your configured time window, and each bar of the graph represents an
 interval determined by the sampling schedule. Pressing ``=`` toggles
 between a graph display with base line 0, and a zoomed view that scales
 it to the current bounds.
+
+
+.. _`rTorrent Scripting`: https://rtorrent-docs.readthedocs.io/en/latest/scripting.html#
+.. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
+.. _`pyroadmin`: https://pyrocore.readthedocs.io/en/latest/references.html#pyroadmin
+.. _`~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns.rc#L1

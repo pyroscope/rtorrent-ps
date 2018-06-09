@@ -529,10 +529,7 @@ See directly above for an example.
 .. _installation options: https://github.com/pyroscope/rtorrent-ps#installation
 .. _Arch Linux: http://www.archlinux.org/
 .. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
-.. _`pyroadmin`: https://pyrocore.readthedocs.io/en/latest/references.html#pyroadmin
 .. _`pimp-my-box`: https://github.com/pyroscope/pimp-my-box/
-.. _`~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns.rc#L1
-.. _`rTorrent Scripting`: https://rtorrent-docs.readthedocs.io/en/latest/scripting.html#
 
 
 .. end of "manual.rst"
