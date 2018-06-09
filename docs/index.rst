@@ -14,13 +14,15 @@ some added features, and a comprehensive standard configuration.
    :alt: Extended Canvas Screenshot
 
 See :doc:`overview` for a more detailed description and a feature overview,
-and the `rTorrent Handbook`_ for general information regarding *rTorrent*, its configuration and XMLRPC commands.
+and the `rTorrent Handbook`_ for general information regarding `rTorrent`,
+its configuration, and XMLRPC commands.
+The latter includes custom command extensions from `rTorrent-PS`.
 
 
 |issues|
 
 
-.. note::
+.. hint:: **Community Contacts and Solving Problems**
 
     .. include:: include-contacts.rst
 
