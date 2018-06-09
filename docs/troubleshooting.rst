@@ -46,7 +46,46 @@ Common Problems & Solutions
 
 Please `open an issue`_ on *GitHub* if you think that you have a problem that happens a lot,
 or you know several other people have the same problem,
-and it's not already mentioned below.
+and **it's not already mentioned below**.
+
+
+.. _columns-invalid-key:
+
+Error in option file: …/05-rt-ps-columns.rc:…: Invalid key
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You combined a brand-new `pimp-my-box` configuration with an older version of `rTorrent-PS`.
+
+
+.. rubric:: Solution ♯1 (preferred)
+
+Update to a recent build `rTorrent-PS`.
+
+Also make sure your ``~/rtorrent/rtorrent.rc`` is the `newest one`_ with the line…
+
+.. code-block:: ini
+
+    method.insert = pyro.extended, const|value, (system.has, rtorrent-ps)
+
+This auto-detects the presence of `rTorrent-PS`, but only works with builds from June 2018 onwards.
+
+
+.. rubric:: Solution ♯2
+
+Replace this line in ``~/rtorrent/rtorrent.rc``…
+
+.. code-block:: ini
+
+    method.insert = pyro.extended, const|value, (system.has, rtorrent-ps)
+
+with that one…
+
+.. code-block:: ini
+
+    method.insert = pyro.extended, const|value, 1
+
+
+.. _`newest one`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.rc#L1
 
 
 .. _term-8colors:
