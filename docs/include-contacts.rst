@@ -12,4 +12,4 @@ That guide also explains how to efficiently report your problem when you cannot 
 
 .. _`PyroScope`: https://github.com/pyroscope
 .. _`pyroscope-users`: http://groups.google.com/group/pyroscope-users
-.. _`rTorrent-PS`: https://github.com/pyroscope/rtorrent-ps
+.. _`rTorrent-PS`: https://github.com/pyroscope/rtorrent-ps#rtorrent-ps

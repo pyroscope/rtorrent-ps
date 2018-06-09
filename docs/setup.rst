@@ -200,7 +200,6 @@ grey, and that is used here to set the even / odd backgrounds.
 
 |rt-ps-glyphs|
 
-.. _calling that command in the configuration: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/collapse-built-in-views.rc
 .. _PyroScope CLI Tools: https://pyrocore.readthedocs.org/
 .. _superuser Q&A: http://superuser.com/questions/393834/how-to-configure-putty-to-display-these-characters
 .. _as described here: http://superuser.com/a/764855
@@ -225,10 +224,10 @@ that can do this:
 
 .. code-block:: console
 
+    $ rtxmlrpc "system.has=,canvas_v2"
+    1
     # The '1' means you have canvas v2 on board;
     # a '0' or "Method 'system.has' not defined" means you don't.
-    $ rtxmlrpc system.has=,canvas_v2
-    1
 
 
 The only fixed parts are the position indicator at the very left of the display,

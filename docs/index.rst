@@ -5,8 +5,7 @@
 Welcome to the “rtorrent-ps” Manual!
 ====================================
 
-`rTorrent-PS <https://github.com/pyroscope/rtorrent-ps#rtorrent-ps>`_
-is an extended `rTorrent`_ *distribution* with UI enhancements, colorization,
+`rTorrent-PS`_ is an extended `rTorrent`_ *distribution* with UI enhancements, colorization,
 some added features, and a comprehensive standard configuration.
 
 .. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png
