@@ -1,7 +1,7 @@
 Overview
 ========
 
-``rTorrent-PS`` is a `rTorrent`_ *distribution* (*not* a fork of it),
+`rTorrent-PS` is a `rTorrent`_ *distribution* (*not* a fork of it),
 in form of a set of patches that **improve the user experience and stability**
 of official ``rTorrent`` releases, and **releases new features more frequently**.
 The :ref:`feature-list` below lists the major improvements and extensions.
@@ -12,7 +12,7 @@ especially those since the last `official release`_.
    :align: center
    :alt: Extended Canvas Screenshot
 
-Note that ``rTorrent-PS`` is *not* the same as the ``PyroScope``
+Note that `rTorrent-PS` is *not* the same as the `PyroScope`
 `command line utilities <https://github.com/pyroscope/pyrocore#pyrocore>`_ (`pyrocore`),
 and doesn't depend on them; the same is true the other way 'round.
 It's just that both unsurprisingly have synergies if used together,
