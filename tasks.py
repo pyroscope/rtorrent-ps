@@ -5,6 +5,7 @@
 from __future__ import print_function, unicode_literals
 
 import os
+import re
 import time
 import glob
 import shutil
@@ -107,3 +108,49 @@ def test(ctx, name=''):
         print('\n')
 
     print('\n☹ ☹ ☹  {} TEST(S) FAILED. ☹ ☹ ☹ '.format(failures) if failures else '\n☺ ☺ ☺  ALL OK. ☺ ☺ ☺ ')
+
+
+@task
+def cmd_docs(ctx):
+    """Generated customc command docs – invoke cmd_docs >docs/include-commands.rst"""
+    output = subprocess.check_output(
+        "egrep -nH '^    CMD2?_' patches/ui_pyroscope.cc patches/command_pyroscope.cc"
+        " | cut -f2 -d'\"' | sort ; exit 0", shell=True, stderr=subprocess.STDOUT)
+
+    url = 'https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html'
+    commands = ['ui.color.alarm…title', 'ui.color.*.index',  'ui.color.*.set', 'ui.column.render']
+    commands.extend(output.decode('ascii').splitlines())
+    commands.sort()
+
+    print('.. ' + cmd_docs.__doc__)
+    print('')
+
+    for group in ('math.*', 'string.*', 'convert.*', 'system.*', 'd.*', 'network.*', 'ui.*', ''):
+        group_commands = []
+        for idx, name in reversed(list(enumerate(commands))):
+            if name.startswith(group.rstrip('*')):
+                group_commands.insert(0, name)
+                del commands[idx]
+
+        print('.. rubric:: `{}` Commands'.format(group or 'Other'))
+        print('')
+        print('.. hlist::')
+        print('   :columns: 3')
+        print('')
+        for name in group_commands:
+            print('   * `{}`_'.format(name))
+
+        print('')
+
+        for name in group_commands:
+            slug = re.sub(r'[^a-z0-9]+', '-', name)
+            print('.. _`{name}`: {url}#term-{slug}'.format(name=name, slug=slug, url=url)
+                  .replace('ui-color-alarm-title', 'ui-color-custom1-9')
+                  .replace('ui-color-index', 'ui-color-custom1-9')
+                  .replace('ui-color-set', 'ui-color-custom1-9')
+            )
+
+        print('')
+        print('')
+
+    assert not commands, "Not all commands added!"
