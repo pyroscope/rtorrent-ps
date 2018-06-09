@@ -268,7 +268,7 @@ They also allow to address a specific column,
 which becomes important in a moment.
 
 All these are built-in defaults, except the throttle indicator ``⋉`` with index 800,
-which is defined in `~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`_ of `pimp-my-box`_.
+which is defined in `~/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include`_ of `pimp-my-box`_.
 
 .. important::
 
@@ -512,4 +512,4 @@ it to the current bounds.
 .. _`rTorrent Scripting`: https://rtorrent-docs.readthedocs.io/en/latest/scripting.html#
 .. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
 .. _`pyroadmin`: https://pyrocore.readthedocs.io/en/latest/references.html#pyroadmin
-.. _`~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns.rc#L1
+.. _`~/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include#L5
