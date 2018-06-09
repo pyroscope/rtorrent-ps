@@ -199,6 +199,12 @@ Command Extensions
 ------------------
 
 The following new commands are available.
+Note that the links point to the `Commands Reference`_ chapter in the *rTorrent Handbook*.
+
+.. include:: include-commands.rst
+
+.. _`Commands Reference`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html
+
 
 .. contents:: List of Commands
    :local:
@@ -527,5 +533,6 @@ See directly above for an example.
 .. _`pimp-my-box`: https://github.com/pyroscope/pimp-my-box/
 .. _`~/rtorrent/rtorrent.d/05-rt-ps-columns.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns.rc#L1
 .. _`rTorrent Scripting`: https://rtorrent-docs.readthedocs.io/en/latest/scripting.html#
+
 
 .. end of "manual.rst"
