@@ -235,8 +235,8 @@ and the combined name / tracker column on the right.
 The latter takes all the space left by other columns.
 
 
-Inspecting Your Display Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Inspecting Your Display
+^^^^^^^^^^^^^^^^^^^^^^^
 
 To list the columns you have in your setup, call  `rtxmlrpc`_ like so:
 
@@ -293,7 +293,85 @@ To show the full column definitions with their code, call `pyroadmin`_:
 Column Layout Definitions
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**TODO** WTF is ``?3C93/3``, and other questions.
+The keys of the ``ui.column.render`` multi-command must follow a defined format,
+namely ``‹index›:〈?〉‹width›〈‹color definition›〉:‹title›``.
+There are three fields, separated by colons.
+The parts in ``〈…〉`` are optional.
+
+``‹index›`` was already mentioned, used for sorting and addressing columns.
+
+The second field can start with a ``?`` to tag this column as ‘sacrificial’,
+i.e. optional in the face of too narrow terminals.
+``‹width›`` is the columns width in characters.
+The ``‹color definition›`` determines what terminal attributes are used to render these characters,
+and is a sequence of ``C‹color index›/‹length›`` elements.
+
+Finally, ``‹title›`` is used for the column's heading.
+Make sure to end it with a space to leave room for wide Unicode glyphs,
+and always make it as long as the column width.
+
+
+To get a color index table, try this command:
+
+.. code-block:: shell
+
+    rtxmlrpc system.has.private_methods \
+        | egrep '^ui.color.*index$' \
+        | xargs -I+ rtxmlrpc -i 'print="+ = ",(+)'
+
+Since the ``ui.color.*index`` commands are private, the output must go to the `rTorrent` console.
+This is what you'll see (timestamps removed):
+
+.. code-block:: ini
+
+    ui.color.alarm.index = 22
+    ui.color.complete.index = 23
+    ui.color.custom1.index = 1
+    ui.color.custom2.index = 2
+    ui.color.custom3.index = 3
+    ui.color.custom4.index = 4
+    ui.color.custom5.index = 5
+    ui.color.custom6.index = 6
+    ui.color.custom7.index = 7
+    ui.color.custom8.index = 8
+    ui.color.custom9.index = 9
+    ui.color.even.index = 30
+    ui.color.focus.index = 19
+    ui.color.footer.index = 18
+    ui.color.incomplete.index = 27
+    ui.color.info.index = 21
+    ui.color.label.index = 20
+    ui.color.leeching.index = 28
+    ui.color.odd.index = 29
+    ui.color.progress0.index = 10
+    ui.color.progress20.index = 11
+    ui.color.progress40.index = 12
+    ui.color.progress60.index = 13
+    ui.color.progress80.index = 14
+    ui.color.progress100.index = 15
+    ui.color.progress120.index = 16
+    ui.color.queued.index = 26
+    ui.color.seeding.index = 24
+    ui.color.stopped.index = 25
+    ui.color.title.index = 17
+
+There are also columns with *dynamic* color schemes, using a color index ≥ 90,
+which map to a ‘normal’ color index depending on an item's attributes.
+An example is ``3C95/2`` for the alert column,
+which changes to red (``ui.color.alarm``) if there is an active alert.
+
+This is a list of the dynamic color schemes:
+
+    * 90: ``DOWN_TIME`` – Download (∇ *leeching*) or time display (⌚ *info* + *seeding*/*incomplete*)
+    * 91: ``PRIO`` – A color for ✰, depending on ``d.priority``: *progress0*, *progress60*, *info*, *progress120*
+    * 92: ``STATE`` – A color for ☢, depending on ``d.is_open`` (*progress0* if not) and ``d.is_active`` (*progress80* or *progress100*)
+    * 93: ``RATIO`` – A *progress* color for ☯ from 0 to 120
+    * 94: ``PROGRESS`` – A *progress* color from 0 to 100 for the ⣿ column
+    * 95: ``ALERT`` – For ❢, *info* or *alarm* depending on alert state
+    * 96: ``UP_TIME`` – Upload (∆ *seeding*) or time display (⌛ *info* + *seeding*/*incomplete*)
+
+The mixed ``DOWN_TIME`` and ``UP_TIME`` schemes must span the full width of the column,
+and can only be used with *one* color definition in the column key (anything after them is ignored).
 
 
 .. _add-custom-columns:
