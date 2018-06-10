@@ -350,6 +350,10 @@ also add these commands to your `rTorrent` start script:
 Customizing the Display Layout
 ------------------------------
 
+.. contents:: Canvas v2 Topics
+   :local:
+
+
 Canvas v2 Overview
 ^^^^^^^^^^^^^^^^^^
 
