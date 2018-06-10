@@ -11,6 +11,42 @@ $ rtxmlrpc --repr string.len '' --
 ERROR … <Fault -503: 'string.len needs a string argument.0!'>
 # END
 
+# string.compare
+$ rtxmlrpc --repr string.equals '' first 2nd | as_bool
+‹false›
+$ rtxmlrpc --repr string.equals '' foobar foobar | as_bool
+‹true›
+$ rtxmlrpc --repr string.equals '' foo bar foo | as_bool
+‹true›
+
+$ rtxmlrpc --repr string.startswith '' foobar '' | as_bool
+‹true›
+$ rtxmlrpc --repr string.startswith '' foobar foo | as_bool
+‹true›
+$ rtxmlrpc --repr string.startswith '' foobar baz foo 4th | as_bool
+‹true›
+$ rtxmlrpc --repr string.startswith '' foobar foe | as_bool
+‹false›
+
+$ rtxmlrpc --repr string.endswith '' foobar '' | as_bool
+‹true›
+$ rtxmlrpc --repr string.endswith '' foobar bar | as_bool
+‹true›
+$ rtxmlrpc --repr string.endswith '' foobar baz bar | as_bool
+‹true›
+$ rtxmlrpc --repr string.endswith '' foobar baz | as_bool
+‹false›
+
+$ rtxmlrpc --repr string.equals ''
+ERROR … string.equals takes at least two arguments
+$ rtxmlrpc --repr string.equals '' first
+ERROR … string.equals takes at least two arguments
+$ rtxmlrpc --repr string.equals '' first +2
+ERROR … Wrong object type
+$ rtxmlrpc --repr string.equals '' +1 2nd
+ERROR … string.equals needs a string argument.0
+# END
+
 # string.join
 $ rtxmlrpc --repr string.join '' ':'
 ''

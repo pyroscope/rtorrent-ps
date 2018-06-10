@@ -770,6 +770,36 @@ torrent::Object cmd_string_replace(rpc::target_type target, const torrent::Objec
 }
 
 
+torrent::Object cmd_string_compare(int mode, const torrent::Object::list_type& args) {
+    const char* opnames[] = {"equals", "startswith", "endswith"};
+    if (args.size() < 2) {
+        throw torrent::input_error("string." + std::string(opnames[mode]) + " takes at least two arguments!");
+    }
+
+    std::string value = string_get_first_arg(opnames[mode], args);
+    torrent::Object::list_const_iterator first = args.begin() + 1, last = args.end();
+
+    for (torrent::Object::list_const_iterator itr = first; itr != last; ++itr) {
+        const std::string& cmp = itr->as_string();
+        switch (mode) {
+        case 0:
+            if (value == cmp) return 1L;
+            break;
+        case 1:
+            if (value.substr(0, cmp.length()) == cmp) return 1L;
+            break;
+        case 2:
+            if (value.length() >= cmp.length() && value.substr(value.length() - cmp.length()) == cmp) return 1L;
+            break;
+        default:
+            throw torrent::input_error("string comparison: internal error (unknown mode)");
+        }
+    }
+
+    return 0L;
+}
+
+
 torrent::Object cmd_array_at(rpc::target_type target, const torrent::Object::list_type& args) {
     if (args.size() != 2) {
         throw torrent::input_error("array.at takes at exactly two arguments!");
@@ -1034,6 +1064,9 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
     CMD2_ANY_LIST("string.map", &cmd_string_map);
     CMD2_ANY_LIST("string.replace", &cmd_string_replace);
+    CMD2_ANY_LIST("string.equals",      std::bind(&cmd_string_compare, 0, std::placeholders::_2));
+    CMD2_ANY_LIST("string.startswith",  std::bind(&cmd_string_compare, 1, std::placeholders::_2));
+    CMD2_ANY_LIST("string.endswith",    std::bind(&cmd_string_compare, 2, std::placeholders::_2));
 
     // array.* group
     CMD2_ANY_LIST("array.at", &cmd_array_at);

@@ -95,7 +95,8 @@ def test(ctx, name=''):
                     continue
 
                 if line.startswith('$'):
-                    cmd = line[1:].strip()
+                    cmd = (line[1:].strip()
+                                   .replace('as_bool', "sed -e 's/^0$/‹false›/' -e 's/^1$/‹true›/'"))
                     output = subprocess.check_output(cmd + '; echo RC=$?; exit 0',
                                                      shell=True, stderr=subprocess.STDOUT)
                     output = output.decode('utf-8')
