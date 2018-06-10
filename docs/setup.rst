@@ -3,7 +3,7 @@ Setup & Configuration
 
 The main part of configuration regarding *rTorrent-PS* itself is already done,
 if you followed  :ref:`DebianInstallFromSource` or used `pimp-my-box`_ for it.
-If you used neither, look into what `make-rtorrent-config.sh`_ does,
+If you used neither, look into what `make-rtorrent-config.sh`_ does (see also :ref:`make-rtorrent-config`),
 in order to get all the features described in the :doc:`manual`.
 
 This chapter provides some background on the standard configuration and how you can tweak it,
@@ -11,9 +11,9 @@ and contains hints on what you might need to do regarding
 the runtime environment and your system setup.
 
 You can skip to the :doc:`next chapter <manual>` to learn about
-the special rTorrent-PS features and come back to this later,
-provided everything looks ok to you when you first started *rTorrent-PS*
-(especially if all special characters render correctly).
+the special `rTorrent-PS` features and come back to this later,
+provided everything looks ok to you when you first started `rTorrent-PS`
+(especially that all special characters render correctly).
 
 .. _pimp-my-box: https://github.com/pyroscope/pimp-my-box
 .. _make-rtorrent-config.sh: https://github.com/pyroscope/pyrocore/blob/master/src/scripts/make-rtorrent-config.sh
@@ -31,11 +31,40 @@ There are two major obstacles for a proper display of the extended canvas,
 and that is selecting the right font(s) and providing a terminal setup that
 supports 256 or more colors.
 
-Also consider these sources:
+Read the following sections on how to solve any problems you might encounter
+within your environment.
 
--  `color configuration <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md#uicolortypesetcolor-def>`_
--  `tmux and 256 colors <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#using-the-extended-canvas-with-tmux--screen-and-256-colors>`_
--  `(Windows) Terminal Setup <https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md#setting-up-your-terminal>`_
+
+Font Selection & Encoding Issues
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Whatever font you use in your terminal profile, it has to support the
+characters used in the column headers and some of the displayed values,
+else you're getting a degraded user experience.
+Also, your terminal **must** be set to use UTF-8, which nowadays usually is the default anyway.
+
+On `Linux`, that means ``LANG`` should be something like ``en_US.UTF-8``, and ``LC_ALL``
+and ``LC_CTYPE`` should **not** bet set at all! If you use a terminal
+multiplexer like most people do, and the display doesn't look right, try
+``tmux -u`` respectively ``screen -U`` to force UTF-8 mode.
+
+Also make sure you have the ``locales`` package installed on Debian-type systems,
+and the ``en_US.UTF-8`` locale actually created. See :ref:`install-locale` for that.
+
+The following command lets you easily check whether your font supports
+the most important characters and your terminal is configured correctly:
+
+.. code-block:: shell
+
+    PYTHONIOENCODING=utf-8 python -c 'print(u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 " \
+        u"\u260d \u2318 \u2730 \u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u2206 \u231a " \
+        u"\u2240\u2207 \u2707 \u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 \u21e1 " \
+        u"\u2801 \u2809 \u280b \u281b \u281f \u283f \u287f \u28ff \u2639 \u2780 \u2781 \u2782 " \
+        u"\u2783 \u2784 \u2785 \u2786 \u2787 \u2788 \u2789 \u25b9\xa0\u254d \u25aa \u26af \u2692 " \
+        u"\u25cc \u21c5 \u21a1 \u219f \u229b \u267a ")'
+
+In case you have unsolvable problems with only a few specifc glyphs,
+see :ref:`add-custom-columns` below on how to change them to ones working for you,
+or even switch to plain ASCII.
 
 
 .. _term-win:
@@ -67,10 +96,19 @@ when used in ``PuTTY`` version 0.70 or higher.
 #. Start ``PuTTY`` and select ``Change settings`` from the menu.
 
       * In ``Window › Appearance`` select ``DejaVu Sans Mono``.
+      * Set ``UTF-8`` in ``Window / Translation``
       * Under ``Terminal`` check ``Use background colour to erase screen``.
       * In ``SSH › Data``, make sure to use ``putty-256color`` for the ``terminal`` setting.
 
 #. Connect, and check the display.
+
+Other fonts that were suggested are ``Andale Mono``, and
+``GNU Unifont``. You have to try out yourself what looks good to you and
+works with your specific system and terminal emulator.
+Read `more about fallback fonts`_ on `superuser.com`.
+
+
+.. epigraph::
 
    -- based on `feedback by @NoSubstitute`_, with help from `superuser.com`_ and `MSDN`_
 
@@ -80,9 +118,11 @@ when used in ``PuTTY`` version 0.70 or higher.
     and `Using KiTTY instead of PuTTY <https://github.com/chros73/rtorrent-ps_setup/wiki/Windows-8.1#connect-via-ssh>`_
 
 
+.. _`more about fallback fonts`: http://superuser.com/a/764855
 .. _`Everson Mono`: http://www.evertype.com/emono/
 .. _`DejaVu Sans Mono`: https://dejavu-fonts.github.io/Download.html
 .. _superuser.com: http://superuser.com/questions/393834/how-to-configure-putty-to-display-these-characters/764855#764855
+.. _superuser Q&A: http://superuser.com/questions/393834/how-to-configure-putty-to-display-these-characters
 .. _MSDN: https://msdn.microsoft.com/en-us/goglobal/bb688134.aspx
 .. _`feedback by @NoSubstitute`: https://github.com/pyroscope/rtorrent-ps/issues/8
 
@@ -93,7 +133,7 @@ Terminal Setup on Linux
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 When you use ``gnome-terminal``, everything should work out of the box,
-given you use the ``start`` script, which sets ``TERM`` correctly.
+given you use the ``start`` script, which sets ``TERM`` and ``LANG`` correctly.
 Also always call ``tmux`` with the ``-2u`` options.
 
 If you use ``urxvt``, you have to provide fallback fonts as on *Windows*.
@@ -108,55 +148,56 @@ Generally, to cope with problems like this or find other fonts that suit you bet
 the ``ttfdump`` tool can help to check out fonts on the technical level.
 Another helper is the ``gucharmap`` GUI tool, that allows you to explore your installed fonts visually.
 
+.. epigraph::
+
     -- based on `feedback by @ymvunjq`_
 
 .. _`feedback by @ymvunjq`: https://github.com/pyroscope/rtorrent-ps/issues/44
 
 
-TODO: Setting Up Your Terminal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _color-schemes:
 
-The font used in the above example is ``Inconsolata``, and whatever font
-you use in your terminal profile, it of course has to support the
-characters used in the status columns. Also, your terminal **must** be
-set to use UTF-8 (which nowadays usually is the default anyway), that
-means ``LANG`` should be something like ``en_US.UTF-8``, and ``LC_ALL``
-and ``LC_CTYPE`` should **not** bet set at all! If you use a terminal
-multiplexer like most people do, and the display doesn't look right, try
-``tmux -u`` respectively ``screen -U`` to force UTF-8 mode. Also make
-sure you have the ``locales`` package installed on Debian-type systems.
+Color Scheme Configuration
+--------------------------
 
-On Windows using PuTTY (version 0.60), change the settings for font and
-character set as follows:
+This section describes how you can change all the colors in `rTorrent-PS` to your liking.
+Note that there are `existing color schemes`_ provided by the `pyrocore` configuration,
+and you can rotate through them using the ``~`` key thanks to `rtorrent.d/theming.rc`_.
 
--  ``DejaVu Sans Mono`` in ``Window / Appearance``
--  ``UTF-8`` in ``Window / Translation``
+You can copy one of the provided color scheme ``*.rc.default`` files in ``~/.pyroscope/color-schemes/``
+to a new ``‹mytheme›.rc`` file.
+Details about how to specify colors and so on are in the sub-sections that follow.
 
-Also see this `superuser Q&A`_ for additional tips, you especially
-should try to use ``Everson Mono`` as a fallback font `as described
-here`_.
+.. contents:: Color Configuration Details
+   :local:
 
-Other fonts that were suggested are ``Andale Mono``, and
-``GNU Unifont``. You have to try out yourself what looks good to you and
-works with your specific system and terminal emulator.
+And here are some visuals of the default schemes…
 
-The following command lets you easily check whether your font supports
-all the necessary characters and your terminal is configured correctly:
+|color-scheme-default|   |color-scheme-happy-pastel|
 
-.. code-block:: shell
+|color-scheme-solarized-blue|   |color-scheme-solarized-yellow|
 
-    python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318 \u2730 " \
-        u"\u28ff \u26a1 \u262f \u2691 \u21ba \u2934 \u2935 \u2206 \u231a \u2240\u2207 \u2707 " \
-        u"\u26a0\xa0\u25d4 \u26a1\xa0\u21af \xbf \u2a02 \u2716 \u21e3 \u21e1  \u2801 \u2809 " \
-        u"\u280b \u281b \u281f \u283f \u287f \u28ff \u2639 \u2780 \u2781 \u2782 \u2783 \u2784 " \
-        u"\u2785 \u2786 \u2787 \u2788 \u2789 \u25b9\xa0\u254d \u25aa \u26af \u2692 \u25cc " \
-        u"\u21c5 \u21a1 \u219f \u229b \u267a ".encode("utf8")'
+.. _`existing color schemes`: https://github.com/pyroscope/pyrocore/tree/master/src/pyrocore/data/config/color-schemes
+.. _`rtorrent.d/theming.rc`: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/theming.rc#L1
+
+.. |color-scheme-default| image:: _static/img/color-scheme-default.png
+    :width: 320px
+.. |color-scheme-happy-pastel| image:: _static/img/color-scheme-happy-pastel.png
+    :width: 320px
+.. |color-scheme-solarized-blue| image:: _static/img/color-scheme-solarized-blue.png
+    :width: 320px
+.. |color-scheme-solarized-yellow| image:: _static/img/color-scheme-solarized-yellow.png
+    :width: 320px
 
 
 .. _canvas-256-colors:
 
-Supporting 256 or more colors
+Supporting 256 or More Colors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Having 256 colors available means you can select very dark shades of
+grey, and that can be used for subtle even / odd line backgrounds
+in the collapsed canvas of `rTorrent-PS`.
 
 To enable 256 colors, your terminal must obviously be able to support
 them at all (i.e. have a ``xterm-256color`` terminfo entry, or similar).
@@ -174,50 +215,67 @@ terminal supports them, i.e. use this in your startup script:
     tmux ...
 
 Then, within the terminal multiplexer's environment, you must **again**
-ensure the ``TERM`` variable is set to a 256 color terminfo entry, i.e.
-repeat the above ``if`` construct in your ``rtorrent`` start script. The
-reward for jumping through all those hoops is that you can then use
+ensure the terminal is set to a 256 color terminfo entry.
+See the `.tmux.conf by @chros73`_ for possible solutions for any tmux-related problems.
+
+The reward for jumping through all those hoops is that you can then use
 color gradients for ratio coloring, and much more appropriate pallid
 color shades for backgrounds.
 
-The following color settings work better than the default ones in a 256
-color terminal (gnome-terminal), for me at least. Your mileage (color
-table) may vary. Having 256 colors means you have very dark shades of
-grey, and that is used here to set the even / odd backgrounds.
-
-.. code-block:: ini
-
-    ui.color.complete.set=41
-    ui.color.stopped.set=33
-
-    ui.color.footer.set="bright cyan on 20"
-    ui.color.even.set="on 234"
-    ui.color.odd.set="on 232"
-
-    ui.color.progress0.set=196
-    ui.color.progress20.set=202
-    ui.color.progress40.set=213
-    ui.color.progress60.set=214
-    ui.color.progress80.set=226
-    ui.color.progress100.set=41
-    ui.color.progress120.set="bold bright green"
-
-|rt-ps-glyphs|
 
 .. _PyroScope CLI Tools: https://pyrocore.readthedocs.org/
-.. _superuser Q&A: http://superuser.com/questions/393834/how-to-configure-putty-to-display-these-characters
-.. _as described here: http://superuser.com/a/764855
-
-.. |rt-ps-glyphs| image:: _static/img/rt-ps-glyphs.png
+.. _`.tmux.conf by @chros73`: https://github.com/chros73/rtorrent-ps-ch_setup/blob/master/ubuntu-14.04/home/chros73/.tmux.conf#L1
 
 
-.. _color-schemes:
+Showing a Terminal's Palette
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Color Scheme Configuration
---------------------------
+The ``term-256color.py`` script can help you with showing the colors your
+terminal supports, an example output using Gnome's terminal looks like
+the following...
 
-Here's a configuration example showing all the commands and their
-defaults:
+.. figure:: _static/img/xterm-256-color.png
+   :align: center
+   :alt: xterm-256-color
+
+   Output of **term-256-color.py**
+
+
+Working With Color Schemes
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If your terminal works as intended,
+you now might want to find you own coloring theme.
+The easiest way is to use a second shell and ``rtxmlrpc``. Try
+out some colors, and add the combinations you like to your
+``~/.rtorrent.rc``.
+
+.. code-block:: shell
+
+    # For people liking candy stores...
+    rtxmlrpc ui.color.title.set "bold magenta on bright cyan"
+
+You can use the following code in a terminal to dump a full color scheme from the running client:
+
+.. code-block:: shell
+
+    for i in $(rtxmlrpc system.listMethods | egrep '^ui.color.[^.]+$'); do
+        echo $i = $(rtxmlrpc -r $i | tr "'" '"') ;
+    done
+
+
+Adding Your Own Color Schemes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Color schemes are lists of ``ui.color.‹color name›.set`` commands in your configuration,
+or in a  ``*.rc[.default]`` file in the ``~/.pyroscope/color-schemes/`` directory.
+If you want to use scheme rotation at all (via the ``~`` key),
+put your own schemes into extra ``color-schemes/*.rc`` files and not the main configuration.
+
+The set of color names is predetermined and refers to the *meaning* of the color,
+i.e. where it is used on the canvas. ``footer`` and ``alarm`` are obvious examples.
+
+Here's a configuration example showing all the commands and their defaults:
 
 .. code-block:: ini
 
@@ -246,6 +304,34 @@ defaults:
 
 See the `ui.color.* command reference`_ for details on these and related commands.
 
+
+The following color settings work better than the default ones in a 256
+color terminal (gnome-terminal), for me at least. Your mileage (color
+table) may vary. Having 256 colors means you have very dark shades of
+grey, and that is used here to set the even / odd backgrounds.
+
+.. code-block:: ini
+
+    ui.color.complete.set=41
+    ui.color.stopped.set=33
+
+    ui.color.footer.set="bright cyan on 20"
+    ui.color.even.set="on 234"
+    ui.color.odd.set="on 232"
+
+    ui.color.progress0.set=196
+    ui.color.progress20.set=202
+    ui.color.progress40.set=213
+    ui.color.progress60.set=214
+    ui.color.progress80.set=226
+    ui.color.progress100.set=41
+    ui.color.progress120.set="bold bright green"
+
+|rt-ps-glyphs|
+
+.. |rt-ps-glyphs| image:: _static/img/rt-ps-glyphs.png
+
+
 Note that you might need to enable support for 256 colors in your
 terminal, see :ref:`canvas-256-colors` for a description. In a nutshell, you need to
 install the ``ncurses-term`` package if you don't have it already, and
@@ -256,34 +342,6 @@ also add these commands to your `rTorrent` start script:
     if [ "$TERM" = "${TERM%-256color}" ]; then
         export TERM="$TERM-256color"
     fi
-
-If everything worked so far, and you now want to find you own coloring
-theme, the easiest way is to use a second shell and ``rtxmlrpc``. Try
-out some colors, and add the combinations you like to your
-``~/.rtorrent.rc``.
-
-.. code-block:: shell
-
-    # For people liking candy stores...
-    rtxmlrpc ui.color.title.set "bold magenta on bright cyan"
-
-You can use the following code in a terminal to dump a color scheme:
-
-.. code-block:: shell
-
-    for i in $(rtxmlrpc system.listMethods | grep ui.color. | grep -v '\.set$'); do
-        echo $i = $(rtxmlrpc -r $i | tr "'" '"') ;
-    done
-
-The ``term-256color.py`` script can help you with showing the colors your
-terminal supports, an example output using Gnome's terminal looks like
-the following...
-
-.. figure:: _static/img/xterm-256-color.png
-   :align: center
-   :alt: xterm-256-color
-
-   Output of **term-256-color.py**
 
 
 .. _`ui.color.* command reference`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-color-custom1-9

@@ -200,25 +200,42 @@ they get their own instance.
 Preparatory Steps
 ^^^^^^^^^^^^^^^^^
 
+.. _install-locale:
+
+Setting Up Locales
+""""""""""""""""""
+
+Commonly locales are already set up for you,
+but bare-bones installs often come without locale support,
+which `rTorrent-PS` absolutely requires due to its use of `Unicode` characters.
+
+This ensures at least the common ``en_US.UTF-8`` one is available:
+
+.. code-block:: shell
+
+    apt-get install locales
+    test "$LANG" = "en_US.UTF-8" \
+        || { echo "en_US.UTF-8 UTF-8" >>/etc/locale.gen ; locale-gen --lang en_US.UTF-8; }
+
+
+.. _install-deps:
+
 Installing Build Dependencies
 """""""""""""""""""""""""""""
 
-First, you need to install a few **required** packages — **and no, this
+You need to install a few **required** packages — **and no, this
 is not optional in any way**. These are the only steps that must be
 performed by the ``root`` user (i.e. in a root shell, or by writing
 ``sudo`` before the actual command):
 
 .. code-block:: shell
 
-    apt-get install sudo locales lsb-release build-essential pkg-config \
+    apt-get install sudo lsb-release build-essential pkg-config \
         subversion git time lsof binutils tmux curl wget \
         python-setuptools python-virtualenv python-dev \
         libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
         libcppunit-dev autoconf automake libtool \
         libffi-dev libxml2-dev libxslt1-dev
-    test "$LANG" = "en_US.UTF-8" \
-        || echo "en_US.UTF-8 UTF-8" >>/etc/locale.gen \
-        && locale-gen --lang en_US.UTF-8
 
 Note that you can always show Debian's current build dependencies for
 rTorrent using this command:

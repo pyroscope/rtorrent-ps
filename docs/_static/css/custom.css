@@ -2,3 +2,6 @@
 body {
     color: #000;
 }
+blockquote.epigraph div:last-child {
+    font-style: italic;
+}
