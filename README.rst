@@ -4,7 +4,7 @@ rTorrent-PS
 Extended `rTorrent`_ *distribution* with UI enhancements, colorization,
 some added features, and a comprehensive standard configuration.
 
-.. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png
+.. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-1.0-301-g573a782-2018-06-10-small.png
    :align: center
    :alt: Extended Canvas Screenshot
 

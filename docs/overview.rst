@@ -8,7 +8,7 @@ The :ref:`feature-list` below lists the major improvements and extensions.
 Also see the `changelog`_ for a timeline of applied changes,
 especially those since the last `official release`_.
 
-.. figure:: https://raw.githubusercontent.com/pyroscope/rtorrent-ps/master/docs/_static/img/rT-PS-094-2014-05-24-shadow.png
+.. figure:: _static/img/rT-PS-1.0-301-g573a782-2018-06-10-shadow.png
    :align: center
    :alt: Extended Canvas Screenshot
 
