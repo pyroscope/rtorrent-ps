@@ -595,10 +595,10 @@ torrent::Object cmd_throttle_names() {
 
 
 static const std::string& string_get_first_arg(const char* name, const torrent::Object::list_type& args) {
-    if (args.size() < 1) {
-        throw torrent::input_error("string." + std::string(name) + " needs a string argument!");
-    }
     torrent::Object::list_const_iterator itr = args.begin();
+    if (args.size() < 1 || !itr->is_string()) {
+        throw torrent::input_error("string." + std::string(name) + " needs a string argument.0!");
+    }
     return itr->as_string();
 }
 
@@ -634,6 +634,20 @@ torrent::Object cmd_string_len(rpc::target_type target, const torrent::Object::l
     }
 
     return (int64_t) glyphs;
+}
+
+
+torrent::Object cmd_string_join(rpc::target_type target, const torrent::Object::list_type& args) {
+    std::string delim = string_get_first_arg("join", args);
+    std::string result;
+    torrent::Object::list_const_iterator first = args.begin() + 1, last = args.end();
+
+    for (torrent::Object::list_const_iterator itr = first; itr != last; ++itr) {
+        if (itr != first) result += delim;
+        rpc::print_object_std(&result, &*itr, 0);
+    }
+
+    return result;
 }
 
 
@@ -1014,6 +1028,7 @@ void initialize_command_pyroscope() {
 
     // string.* group
     CMD2_ANY_LIST("string.len", &cmd_string_len);
+    CMD2_ANY_LIST("string.join", &cmd_string_join);
     CMD2_ANY_LIST("string.substr", &cmd_string_substr);
     CMD2_ANY_LIST("string.contains", &cmd_string_contains);
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);

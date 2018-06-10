@@ -8,7 +8,20 @@ $ rtxmlrpc --repr string.len '' -- 'foo123bar'
 $ rtxmlrpc --repr string.len '' -- '♯'
 1
 $ rtxmlrpc --repr string.len '' --
-ERROR … <Fault -503: 'string.len needs a string argument!'>
+ERROR … <Fault -503: 'string.len needs a string argument.0!'>
+# END
+
+# string.join
+$ rtxmlrpc --repr string.join '' ':'
+''
+$ rtxmlrpc --repr string.join '' '' 1 2 3
+'123'
+$ rtxmlrpc --repr string.join '' ':' a +2 [3,4
+'a:2:34'
+$ rtxmlrpc --repr string.join ''
+ERROR … string.join needs a string argument.0
+$ rtxmlrpc --repr string.join '' +42
+ERROR … string.join needs a string argument.0
 # END
 
 # string.substr
