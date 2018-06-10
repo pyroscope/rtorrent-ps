@@ -410,6 +410,8 @@ So always call that script, and not ``rtorrent`` directly.
 .. _start script: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh
 
 
+.. _make-rtorrent-config:
+
 rTorrent Configuration
 """"""""""""""""""""""
 
@@ -430,17 +432,22 @@ To get all this set up for you, call this provided script:
 
 After this, you should check at
 least the ``rtorrent.d/20-host-var-settings.rc`` file and adapt the
-values to your environment and preferences.
+values to your environment and preferences. Consider copying the commands
+for the settings you want to adapt to the ``_rtlocal.rc`` file – read on as to why.
+
+The ``_rtlocal.rc`` file is the place for some simple custom settings,
+like additional resource limits or changing default values.
+The ``make-rtorrent-config.sh`` script does not copy that optional file.
+So create it yourself, and pick what you like from the `example _rtlocal.rc`_,
+e.g. the logging configuration.
+
 The script can be called again to get updates from `GitHub`,
 **but will overwrite all standard configuration files** with their new version.
-To safely customize configuration, use the ``.rcignore`` file
-and then provide your own version, or read on about ``_rtlocal.rc``.
+To safely customize configuration,
+provide your own version of standard files
+and list those in a ``.rcignore`` file,
+or as mentioned use the ``_rtlocal.rc`` file.
 
-
-The `_rtlocal.rc`_ file is the place for some simple custom settings,
-like additional resource limits or changing default values.
-The ``make-rtorrent-config.sh`` script does not copy that optional file,
-so follow the link and pick what you like.
 
 Example for a ``~/rtorrent/_rtlocal.rc`` file:
 
@@ -462,7 +469,7 @@ Example for a ``~/rtorrent/_rtlocal.rc`` file:
 
 .. _rtorrent.rc: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/rtorrent.rc#L1
 .. _provided include file: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent-pyro.rc#L1-L2
-.. _`_rtlocal.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/_rtlocal.rc#L1-L2
+.. _`example _rtlocal.rc`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/_rtlocal.rc#L1-L2
 
 
 CLI Tools Configuration
