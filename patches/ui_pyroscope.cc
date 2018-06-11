@@ -416,7 +416,7 @@ int64_t cmd_d_message_alert(core::Download* d) {
             alert = ps::ALERT_REQUEST;
         else if (d->message().find("not registered") != std::string::npos
                     || d->message().find("torrent cannot be found") != std::string::npos
-                    || d->message().find("unregistered") != std::string::npos)
+                    || d->message().find("nregistered") != std::string::npos)
             alert = ps::ALERT_GONE;
         else if (d->message().find("not authorized") != std::string::npos
                     || d->message().find("blocked from") != std::string::npos
