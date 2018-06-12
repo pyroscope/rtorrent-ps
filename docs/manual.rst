@@ -43,7 +43,7 @@ you will get the following additional features in your `rTorrent-PS` installatio
     console log.
 #.  ``*`` toggles between the collapsed (as described on `Extended
     Canvas Explained`_) and the expanded display of the current view.
-    |rt-ps-name-view|
+    |rt-ps-canvas-v2-small|
 #.  The ``active`` view is changed to include all incomplete items
     regardless of whether they have any traffic, and then groups the
     list into complete, incomplete, and queued items, in that order.
@@ -97,7 +97,7 @@ only cover half of it, and you might miss some described features.
 .. _`Color Themes`: https://pyrocore.readthedocs.io/en/latest/usage.html#color-themes
 .. _`Additional Views`: https://pyrocore.readthedocs.io/en/latest/usage.html#additional-views
 
-.. |rt-ps-name-view| image:: _static/img/rt-ps-name-view.png
+.. |rt-ps-canvas-v2-small| image:: _static/img/rT-PS-1.0-301-g573a782-2018-06-10-small.png
 
 
 .. _extended-canvas:
@@ -107,11 +107,11 @@ Extended Canvas Explained
 
 The following is an explanation of the collapsed display of `rTorrent-PS` (*canvas v2*).
 
-.. figure:: _static/img/rt-ps-trackers-view.png
+.. figure:: _static/img/rT-PS-1.0-301-g573a782-2018-06-10-shadow.png
    :align: center
-   :alt: rTorrent-PS Trackers View
+   :alt: Extended Canvas Screenshot
 
-   rTorrent-PS Trackers View
+   Extended Canvas Screenshot
 
 In case your screen looks broken compared to this,
 see :ref:`terminal-setup` for necessary pre-conditions and settings
