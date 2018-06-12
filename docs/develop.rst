@@ -141,19 +141,14 @@ the git HEAD code from the sibling folders:
 
 .. code-block:: bash
 
-    ./build.sh clean_all deps git
+    INSTALL_DIR=$HOME/.local/rtorrent-git ./build.sh clean_all deps git
 
 Just like with the vanilla and extended version, you'll get a ‘branded’ binary
 called ``rtorrent-git``, and a symlink at ``~/bin/rtorrent`` will point to it.
 
-Note however that the new ``libtorrent.so`` is unlikely to work with the
-vanilla and extended code, so they'll be rendered unusable until you rebuild them.
-Doing that will in turn render the git version broken.
-This could be easily avoided if the (ABI) versions were bumped in git
-directly after a release, but alas…
-
-So if you want to run git HEAD concurrently to release versions,
-use a dedicated user account to build, install, and run it.
+The ``INSTALL_DIR`` is set explicitly,
+so that a release version and git HEAD can be installed and used concurrently,
+without any conflicts.
 
 
 .. _build-docker_deb:
