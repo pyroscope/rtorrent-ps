@@ -60,6 +60,27 @@ $ rtxmlrpc --repr string.join '' +42
 ERROR … string.join needs a string argument.0
 # END
 
+# string.split
+$ rtxmlrpc --repr string.split '' '1·₂·³' '·'
+['1', u'\u2082', u'\xb3']
+$ rtxmlrpc --repr string.split '' 1..2. .
+['1', '', '2', '']
+$ rtxmlrpc --repr string.split '' .1 .
+['', '1']
+$ rtxmlrpc --repr string.split '' abc .
+['abc']
+$ rtxmlrpc --repr string.split '' '1²₃' ''
+['1', u'\xb2', u'\u2083']
+$ rtxmlrpc --repr string.split '' '' '.'
+['']
+$ rtxmlrpc --repr string.split '' '' ''
+[]
+$ rtxmlrpc --repr string.split '' ''
+ERROR … string.split needs a string argument.1
+$ rtxmlrpc --repr string.split '' '' +1
+ERROR … string.split needs a string argument.1
+# END
+
 # string.substr
 $ rtxmlrpc --repr string.substr '' -- 'foo123bar'
 'foo123bar'

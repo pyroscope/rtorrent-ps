@@ -651,6 +651,39 @@ torrent::Object cmd_string_join(rpc::target_type target, const torrent::Object::
 }
 
 
+torrent::Object cmd_string_split(rpc::target_type target, const torrent::Object::list_type& args) {
+    const std::string text = string_get_first_arg("split", args);
+    if (args.size() != 2 || !args.rbegin()->is_string()) {
+        throw torrent::input_error("string.split needs a string argument.1!");
+    }
+    const std::string delim = args.rbegin()->as_string();
+    torrent::Object result = torrent::Object::create_list();
+    torrent::Object::list_type& resultList = result.as_list();
+
+    if (delim.length()) {
+        size_t pos = 0, next = 0;
+
+        while ((next = text.find(delim, pos)) != std::string::npos) {
+            resultList.push_back(text.substr(pos, next - pos));
+            pos = next + delim.length();
+        }
+        resultList.push_back(text.substr(pos));
+    } else {
+        std::mbstate_t mbs = std::mbstate_t();
+        const char* cpos = text.c_str();
+        int bytes = 0, skip;
+
+        while (*cpos && (skip = std::mbrlen(cpos, text.length() - bytes, &mbs)) > 0) {
+            resultList.push_back(std::string(cpos, skip));
+            cpos += skip;
+            bytes += skip;
+        }
+    }
+
+    return result;
+}
+
+
 torrent::Object cmd_string_substr(rpc::target_type target, const torrent::Object::list_type& args) {
     const std::string text = string_get_first_arg("substr", args);
 
@@ -1059,6 +1092,7 @@ void initialize_command_pyroscope() {
     // string.* group
     CMD2_ANY_LIST("string.len", &cmd_string_len);
     CMD2_ANY_LIST("string.join", &cmd_string_join);
+    CMD2_ANY_LIST("string.split", &cmd_string_split);
     CMD2_ANY_LIST("string.substr", &cmd_string_substr);
     CMD2_ANY_LIST("string.contains", &cmd_string_contains);
     CMD2_ANY_LIST("string.contains_i", &cmd_string_contains_i);
