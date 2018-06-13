@@ -75,7 +75,7 @@ you will get the following additional features in your `rTorrent-PS` installatio
     of downloads / seeders / leechers is not totally outdated.
     The ``&`` key can be used to manually scrape the item in focus.
 #.  A watchdog for the ``pyrotorque`` daemon process (checks every 5 minutes,
-    and starts it when missing *if* the `~/.pyroscope/run/pyrotorque` file exists).
+    and starts it when not running *if* the `~/.pyroscope/run/pyrotorque` file exists).
 
 With regards to using the ‘right’ configuration to get the above, you need
 the ``*.rc.default`` files in the ``~/.pyroscope/rtorrent.d`` directory
@@ -183,7 +183,7 @@ Name
     or else the value of the ``displayname`` custom field when set on an item
 Tracker
     Domain of the first HTTP tracker with seeds or leeches,
-    or else the first one altogether – note that your can define nicer
+    or else the first one altogether – note that you can define nicer
     aliases using the `trackers.alias.set_key`_ command in your configuration
 
 For the various time displays to work, you need

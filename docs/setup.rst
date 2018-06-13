@@ -12,7 +12,7 @@ the runtime environment and your system setup.
 
 You can skip to the :doc:`next chapter <manual>` to learn about
 the special `rTorrent-PS` features and come back to this later,
-provided everything looks ok to you when you first started `rTorrent-PS`
+provided everything looks OK to you when you first started `rTorrent-PS`
 (especially that all special characters render correctly).
 
 .. _pimp-my-box: https://github.com/pyroscope/pimp-my-box
@@ -43,9 +43,9 @@ else you're getting a degraded user experience.
 Also, your terminal **must** be set to use UTF-8, which nowadays usually is the default anyway.
 
 On `Linux`, that means ``LANG`` should be something like ``en_US.UTF-8``, and ``LC_ALL``
-and ``LC_CTYPE`` should **not** bet set at all! If you use a terminal
+and ``LC_CTYPE`` should **not** be set at all! If you use a terminal
 multiplexer like most people do, and the display doesn't look right, try
-``tmux -u`` respectively ``screen -U`` to force UTF-8 mode.
+``tmux -u`` or ``screen -U`` to force UTF-8 mode.
 
 Also make sure you have the ``locales`` package installed on Debian-type systems,
 and the ``en_US.UTF-8`` locale actually created. See :ref:`install-locale` for that.
@@ -62,9 +62,9 @@ the most important characters and your terminal is configured correctly:
         u"\u2783 \u2784 \u2785 \u2786 \u2787 \u2788 \u2789 \u25b9\xa0\u254d \u25aa \u26af \u2692 " \
         u"\u25cc \u21c5 \u21a1 \u219f \u229b \u267a ")'
 
-In case you have unsolvable problems with only a few specifc glyphs,
+In case you have unsolvable problems with only a few specific glyphs,
 see :ref:`add-custom-columns` below on how to change them to ones working for you,
-or even switch to plain ASCII.
+or even switch them to plain ASCII.
 
 
 .. _term-win:
@@ -73,7 +73,7 @@ Terminal Setup on Windows
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To get full coverage of all Unicode glyphs used in the :ref:`extended canvas <extended-canvas>`,
-the steps below show you how to use font linking to make ``Everson Mono`` complement ``DevaVu Sans Mono``
+the steps below show you how to use font linking to make ``Everson Mono`` complement ``DejaVu Sans Mono``
 when used in ``PuTTY`` version 0.70 or higher.
 
 #. Download and install the `DejaVu Sans Mono`_ and `Everson Mono`_ fonts.
@@ -230,7 +230,7 @@ color shades for backgrounds.
 Showing a Terminal's Palette
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``term-256color.py`` script can help you with showing the colors your
+The `term-256color.py`_ script can help you with showing the colors your
 terminal supports, an example output using Gnome's terminal looks like
 the following...
 
@@ -240,12 +240,13 @@ the following...
 
    Output of **term-256-color.py**
 
+.. _`term-256color.py`: https://github.com/pyroscope/rtorrent-ps/blob/master/term-256color.py
 
 Working With Color Schemes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If your terminal works as intended,
-you now might want to find you own coloring theme.
+you now might want to find you own color theme.
 The easiest way is to use a second shell and ``rtxmlrpc``. Try
 out some colors, and add the combinations you like to your
 ``~/.rtorrent.rc``.
@@ -647,7 +648,7 @@ And you'll get this in your terminal:
 As you can see, you get the upper and lower bounds of traffic within
 your configured time window, and each bar of the graph represents an
 interval determined by the sampling schedule. Pressing ``=`` toggles
-between a graph display with base line 0, and a zoomed view that scales
+between a graph display with a baseline of 0, and a zoomed view that scales
 it to the current bounds.
 
 
