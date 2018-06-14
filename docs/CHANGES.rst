@@ -8,6 +8,16 @@ Change History
 2018-07-xx v1.1 “Design Your Canvas”
 ------------------------------------
 
+Read the related `pyrocore update to 0.6.x`_ instructions,
+which will update configuration snippets in the ``rtorrent.d`` directories.
+These are **required** to run the new version
+– else you'll get visual defects at the very minimum,
+but worse stuff might happen.
+
+If you do not have a ``~/rtorrent/rtorrent.d`` directory,
+then you just have to know yourself what to do
+– the helper scripts can only handle standard situations and setups.
+
 -  Docs: Much improved (moved to *Read the Docs* and using *Sphinx*)
 -  UI: Added responsive canvas v2 with full customization (issue #60)
 
@@ -64,6 +74,9 @@ Change History
 
 **NOTE:** Support for rTorrent versions before 0.9.6 and non-C++11
 compilers will end soon!
+
+
+.. _`pyrocore update to 0.6.x`: https://pyrocore.readthedocs.io/en/latest/updating.html#upgrade-to-0-6-x
 
 
 2017-03-12 v1.0 “First version-tagged release”
