@@ -462,7 +462,8 @@ The script can be called again to get updates from `GitHub`,
 **but will overwrite all standard configuration files** with their new version.
 To safely customize configuration,
 provide your own version of standard files
-and list those in a ``.rcignore`` file,
+and list the replaced files in the ``.rcignore`` file,
+add your own *additional* files,
 or as mentioned use the ``_rtlocal.rc`` file.
 
 
