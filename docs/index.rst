@@ -46,6 +46,7 @@ Full Contents
    howto
    develop
    troubleshooting
+   CHANGES
 
 
 Indices & Tables
