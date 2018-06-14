@@ -474,10 +474,6 @@ Example for a ``~/rtorrent/_rtlocal.rc`` file:
     # Reduce retention period of uncompressed logs
     pyro.log_archival.days.set = 1
 
-    # Enable XMLRPC logging, and open log file *now*
-    pyro.log.xmlrpc.enabled = 1
-    log.xmlrpc = (pyro.logfile_path, xmlrpc)
-
 
 .. note::
 
