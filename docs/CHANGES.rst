@@ -10,13 +10,15 @@ Change History
 
 -  Docs: Much improved (moved to *Read the Docs* and using *Sphinx*)
 -  UI: Added responsive canvas v2 with full customization (issue #60)
--  New ``ui.column.render`` multi-command
--  Added ``ui.column.hide`` and 3 related commands
--  Added 3 new ``convert.*`` commands
--  Added ``ui.color.custom1…9`` and ``ui.color.*.index`` commands
--  New default columns: ❢ ℞ ⋉ ≣
--  ‘Tagged’ indicator (⚑) now in its own column
--  Built-in views are collapsed by default now
+
+   - New ``ui.column.render`` multi-command
+   - Added ``ui.column.hide`` and 3 related commands
+   - Added 3 new ``convert.*`` commands
+   - Added ``ui.color.custom1…9`` and ``ui.color.*.index`` commands
+   - New default columns: ❢ ℞ ⋉ ≣
+   - ‘Tagged’ indicator (⚑) now in its own column
+   - Built-in views are collapsed by default now
+
 -  UI: ``Info`` details panel is now active by default (not
    ``Peer list``)
 -  UI: Made ``*`` key a built-in keyboard shortcut [@chros73]
@@ -70,8 +72,10 @@ compilers will end soon!
 -  Improved build script
 -  ``system.random = [[<lower>,] <upper>]`` command
 -  UI: tracker alias mappings
--  ``trackers.alias.set_key=«domain»,«alias»`` and
-   ``trackers.alias.items=`` commands
+
+   - ``trackers.alias.set_key=«domain»,«alias»`` and
+     ``trackers.alias.items=`` commands
+
 -  New Arch AUR PKGBUILDs, and ``pkg2pacman`` action by @xsmile (#48)
 -  More flexible installation options (#43)
 -  Easier manual setup with ``make-rtorrent-config.sh`` script
