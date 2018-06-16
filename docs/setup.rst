@@ -348,6 +348,8 @@ also add these commands to your `rTorrent` start script:
 .. _`ui.color.* command reference`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-color-custom1-9
 
 
+.. _custom-layout:
+
 Customizing the Display Layout
 ------------------------------
 
