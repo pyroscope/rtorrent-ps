@@ -430,6 +430,22 @@ int64_t cmd_d_message_alert(core::Download* d) {
 }
 
 
+std::string get_active_tracker_alias(torrent::Download* item) {
+    std::string url = get_active_tracker_domain(item);
+    if (!url.empty()) {
+        std::string alias = tracker_aliases[url];
+        if (!alias.empty()) url = alias;
+    }
+
+    return url;
+}
+
+
+torrent::Object cmd_d_tracker_alias(core::Download* download) {
+    return get_active_tracker_alias(download->download());
+}
+
+
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view,
                                     int pos, Range& range, int x_title) {
     int offset = row_offset(view, range);
@@ -451,10 +467,8 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
 
     // show label for active tracker (a/k/a in focus tracker)
     if (int(canvas->width()) <= x_title + NAME_RESERVED_WIDTH + 3) return;
-    std::string url = get_active_tracker_domain((*range.first)->download());
+    std::string url = get_active_tracker_alias((*range.first)->download());
     if (url.empty()) return;
-    std::string alias = tracker_aliases[url];
-    if (!alias.empty()) url = alias;
 
     // shorten label if too long
     int max_len = std::min(TRACKER_LABEL_WIDTH,
@@ -1050,6 +1064,7 @@ void initialize_command_ui_pyroscope() {
 
     CMD2_ANY_LIST("trackers.alias.set_key", &cmd_trackers_alias_set_key);
     CMD2_ANY("trackers.alias.items", _cxxstd_::bind(&cmd_trackers_alias_items, _cxxstd_::placeholders::_1));
+    CMD2_DL("d.tracker_alias", _cxxstd_::bind(&display::cmd_d_tracker_alias, _cxxstd_::placeholders::_1));
 
     CMD2_DL("d.message.alert", _cxxstd_::bind(&display::cmd_d_message_alert, _cxxstd_::placeholders::_1));
 

@@ -103,6 +103,7 @@
    * `d.is_meta`_
    * `d.message.alert`_
    * `d.multicall.filtered`_
+   * `d.tracker_alias`_
    * `d.tracker_domain`_
    * `d.tracker_scrape.complete`_
    * `d.tracker_scrape.downloaded`_
@@ -114,6 +115,7 @@
 .. _`d.is_meta`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-is-meta
 .. _`d.message.alert`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-message-alert
 .. _`d.multicall.filtered`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-multicall-filtered
+.. _`d.tracker_alias`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-tracker-alias
 .. _`d.tracker_domain`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-tracker-domain
 .. _`d.tracker_scrape.complete`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-tracker-scrape-complete
 .. _`d.tracker_scrape.downloaded`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-tracker-scrape-downloaded
@@ -154,6 +156,8 @@
    * `ui.column.hide`_
    * `ui.column.is_hidden`_
    * `ui.column.render`_
+   * `ui.column.sacrificed`_
+   * `ui.column.sacrificial.list`_
    * `ui.column.show`_
    * `ui.current_view`_
    * `ui.focus.end`_
@@ -175,6 +179,8 @@
 .. _`ui.column.hide`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-hide
 .. _`ui.column.is_hidden`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-is-hidden
 .. _`ui.column.render`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-render
+.. _`ui.column.sacrificed`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-sacrificed
+.. _`ui.column.sacrificial.list`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-sacrificial-list
 .. _`ui.column.show`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-show
 .. _`ui.current_view`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-current-view
 .. _`ui.focus.end`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-focus-end
