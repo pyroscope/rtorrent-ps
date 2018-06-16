@@ -26,6 +26,15 @@ you will get the following additional features in your `rTorrent-PS` installatio
 #.  The ``?`` key is bound to the ``indemand`` view, which sorts all
     open items by their activity, with the most recently active on top.
     See `Additional Views`_ for details.
+#.  The ``%`` key is bound to the ``ratio`` view, which sorts all
+    open items by their ratio (descending).
+    See `Additional Views`_ for details.
+#.  The ``°`` key is bound to the ``uploaded`` view, which sorts all
+    open items by their total upload amount (descending).
+    See `Additional Views`_ for details.
+#.  The ``"`` key is bound to the ``datasize`` view, which sorts all
+    open items by the size of their content data (descending).
+    See `Additional Views`_ for details.
 #.  ``Page ↑`` and ``Page ↓`` scroll by 50 items at a time (or whatever
     other value ``ui.focus.page_size`` has).
 #.  ``Home`` / ``End`` jump to the first / last item in the current
