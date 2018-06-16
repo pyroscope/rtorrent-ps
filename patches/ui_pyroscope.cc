@@ -1131,7 +1131,8 @@ void initialize_command_ui_pyroscope() {
         "schedule2 = column_sacrificed_toggle, 0, 0, ((ui.bind_key,download_list,/,ui.column.sacrificed.toggle=))\n"
 
         // Bind '*' to toggle between collapsed and expanded display
-        "schedule2 = collapsed_view_toggle, 0, 0, ((ui.bind_key,download_list,*,view.collapsed.toggle=))\n"
+        "schedule2 = collapsed_view_toggle, 0, 0, ((ui.bind_key, download_list, *, \""
+            "view.collapsed.toggle= ; ui.current_view.set = (ui.current_view)\"))\n"
 
         // Collapse built-in views
         "view.collapsed.toggle = main\n"
