@@ -617,6 +617,24 @@ torrent::Object ui_column_hidden_list() {
 }
 
 
+torrent::Object ui_column_sacrificial_list() {
+    torrent::Object result = torrent::Object::create_list();
+    torrent::Object::list_type& resultList = result.as_list();
+
+    const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
+    torrent::Object::map_const_iterator cols_itr, last_col = column_defs.end();
+
+    for (cols_itr = column_defs.begin(); cols_itr != last_col; ++cols_itr) {
+        char* header_pos = 0;
+        int64_t colidx = strtol(cols_itr->first.c_str(), &header_pos, 10);
+        if (header_pos[0] == ':' && header_pos[1] == '?')
+            resultList.push_back(colidx);
+    }
+
+    return result;
+}
+
+
 // Render columns from `column_defs`, return total length
 int render_columns(bool headers, bool narrow, rpc::target_type target, core::Download* item,
                    display::Canvas* canvas, int column, int pos, int offset,
@@ -1042,6 +1060,7 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY_LIST("ui.column.show", &display::ui_column_show);
     CMD2_ANY_LIST("ui.column.is_hidden", &display::ui_column_is_hidden);
     CMD2_ANY("ui.column.hidden.list", _cxxstd_::bind(&display::ui_column_hidden_list));
+    CMD2_ANY("ui.column.sacrificial.list", _cxxstd_::bind(&display::ui_column_sacrificial_list));
 
     PS_VARIABLE_COLOR("ui.color.progress0",     "red");
     PS_VARIABLE_COLOR("ui.color.progress20",    "bold bright red");
