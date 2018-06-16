@@ -35,16 +35,26 @@
 
    * `string.contains`_
    * `string.contains_i`_
+   * `string.endswith`_
+   * `string.equals`_
+   * `string.join`_
    * `string.len`_
    * `string.map`_
    * `string.replace`_
+   * `string.split`_
+   * `string.startswith`_
    * `string.substr`_
 
 .. _`string.contains`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-contains
 .. _`string.contains_i`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-contains-i
+.. _`string.endswith`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-endswith
+.. _`string.equals`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-equals
+.. _`string.join`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-join
 .. _`string.len`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-len
 .. _`string.map`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-map
 .. _`string.replace`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-replace
+.. _`string.split`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-split
+.. _`string.startswith`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-startswith
 .. _`string.substr`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-substr
 
 
