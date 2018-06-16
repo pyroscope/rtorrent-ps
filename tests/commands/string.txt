@@ -94,6 +94,10 @@ $ rtxmlrpc --repr string.substr '' -- '➀ ♯'
 u'\u2780 \u266f'
 $ rtxmlrpc --repr string.substr '' -- '' 42
 ''
+$ rtxmlrpc --repr string.substr '' -- 'foo' 3 +3 'bar'
+'bar'
+$ rtxmlrpc --repr string.substr '' -- '' 0 1 'foobar'
+'foobar'
 $ rtxmlrpc --repr string.substr '' -- '' 42 1 'Life, universe, everything'
 'Life, universe, everything'
 $ rtxmlrpc --repr string.substr '' -- 'foobar' 5
