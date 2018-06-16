@@ -504,13 +504,15 @@ the installed software, which makes later updates a lot easier.
     #
 
     [GLOBAL]
-    # Location of your rtorrent configuration
+    # Location of your rTorrent configuration
     rtorrent_rc = ~/rtorrent/rtorrent.rc
+
+    # XMLRPC connection to rTorrent
     scgi_url = scgi://$HOME/rtorrent/.scgi_local
 
     [FORMATS]
     filelist = {{py:from pyrobase.osutil import shell_escape as quote}}{{#
-        }}{{for i, x in looper(d.files)}}{{d.realpath}}/{{x.path}}{{#
+        }}{{for i, x in looper(d.files)}}{{d.realpath | quote}}/{{x.path | quote}}{{#
             }}{{if i.next is not None}}{{chr(10)}}{{endif}}{{#
         }}{{endfor}}
 
@@ -550,6 +552,17 @@ the installed software, which makes later updates a lot easier.
     [ANNOUNCE]
     # Add alias names for announce URLs to this section; those aliases are used
     # at many places, e.g. by the "mktor" tool and to shorten URLs to these aliases
+
+    # Public / open trackers
+    PBT     = http://tracker.publicbt.com:80/announce
+              udp://tracker.publicbt.com:80/announce
+    PDT     = http://files2.publicdomaintorrents.com/bt/announce.php
+    ArchOrg = http://bt1.archive.org:6969/announce
+              http://bt2.archive.org:6969/announce
+    OBT     = http://tracker.openbittorrent.com:80/announce
+              udp://tracker.openbittorrent.com:80/announce
+    Debian  = http://bttracker.debian.org:6969/announce
+    Linux   = http://linuxtracker.org:2710/
     EOF
 
 Read the `pyrocore Configuration Guide`_ for more information regarding this file.
