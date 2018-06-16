@@ -539,12 +539,7 @@ d_multicall_filtered(const torrent::Object::list_type& args) {
 
   // Find the given view
   core::ViewManager* viewManager = control->view_manager();
-  core::ViewManager::iterator viewItr;
-
-  if (!arg->as_string().empty())
-    viewItr = viewManager->find(arg->as_string());
-  else
-    viewItr = viewManager->find("default");
+  core::ViewManager::iterator viewItr = viewManager->find(arg->as_string().empty() ? "default" : arg->as_string());
 
   if (viewItr == viewManager->end())
     throw torrent::input_error("Could not find view '" + arg->as_string() + "'.");
@@ -1082,9 +1077,13 @@ void initialize_command_pyroscope() {
     */
 
 #if RT_HEX_VERSION <= 0x000906
-    // these are merged into 0.9.7+ mainline! (well, maybe, PRs are ignored)
+    // these are merged into 0.9.7+ mainline!
     CMD2_ANY_STRING("system.env", _cxxstd_::bind(&cmd_system_env, _cxxstd_::placeholders::_2));
     CMD2_ANY("ui.current_view", _cxxstd_::bind(&cmd_ui_current_view));
+#endif
+
+#if RT_HEX_VERSION <= 0x000907
+    // these are merged into 0.9.8+ mainline! (well, maybe, PRs are mostly ignored)
     CMD2_ANY_LIST("system.random", &apply_random);
     CMD2_ANY_LIST("d.multicall.filtered", _cxxstd_::bind(&d_multicall_filtered, _cxxstd_::placeholders::_2));
 #endif
