@@ -1061,6 +1061,7 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY_LIST("ui.column.is_hidden", &display::ui_column_is_hidden);
     CMD2_ANY("ui.column.hidden.list", _cxxstd_::bind(&display::ui_column_hidden_list));
     CMD2_ANY("ui.column.sacrificial.list", _cxxstd_::bind(&display::ui_column_sacrificial_list));
+    CMD2_VAR_VALUE("ui.column.sacrificed", 0);
 
     PS_VARIABLE_COLOR("ui.color.progress0",     "red");
     PS_VARIABLE_COLOR("ui.color.progress20",    "bold bright red");
@@ -1119,6 +1120,15 @@ void initialize_command_ui_pyroscope() {
     init_commands.append(
         // Multi-method to store column definitions
         "method.insert = ui.column.render, multi|rlookup|static\n"
+
+        // Toggle sacrificial columns manually (bound to '/' key)
+        "method.insert = ui.column.sacrificed.toggle, simple, \""
+            "branch = (ui.column.sacrificed), ((ui.column.sacrificed.set, 0)), ((ui.column.sacrificed.set, 1)) ; "
+            "branch = (ui.column.sacrificed),"
+            "   \\\"ui.column.show = (ui.column.sacrificial.list)\\\","
+            "   \\\"ui.column.hide = (ui.column.sacrificial.list)\\\" ; "
+            "ui.current_view.set = (ui.current_view)\"\n"
+        "schedule2 = column_sacrificed_toggle, 0, 0, ((ui.bind_key,download_list,/,ui.column.sacrificed.toggle=))\n"
 
         // Bind '*' to toggle between collapsed and expanded display
         "schedule2 = collapsed_view_toggle, 0, 0, ((ui.bind_key,download_list,*,view.collapsed.toggle=))\n"

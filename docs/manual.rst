@@ -13,37 +13,39 @@ Additional Features
 Using the right default configuration (more on that below),
 you will get the following additional features in your `rTorrent-PS` installation:
 
-#.  the ``t`` key is bound to a ``trackers`` view that shows all items
+#.  The ``t`` key is bound to a ``trackers`` view that shows all items
     sorted by tracker and then by name.
     See `Additional Views`_ for details.
-#.  the ``!`` key is bound to a ``messages`` view, listing all items
+#.  The ``!`` key is bound to a ``messages`` view, listing all items
     that currently have a non-empty message, sorted in order of the
     message text.
     See `Additional Views`_ for details.
-#.  the ``^`` key is bound to the ``rtcontrol`` search result view, so
+#.  The ``^`` key is bound to the ``rtcontrol`` search result view, so
     you can easily return to your last search.
     See `Additional Views`_ for details.
-#.  the ``?`` key is bound to the ``indemand`` view, which sorts all
+#.  The ``?`` key is bound to the ``indemand`` view, which sorts all
     open items by their activity, with the most recently active on top.
     See `Additional Views`_ for details.
 #.  ``Page ↑`` and ``Page ↓`` scroll by 50 items at a time (or whatever
     other value ``ui.focus.page_size`` has).
 #.  ``Home`` / ``End`` jump to the first / last item in the current
     view.
-#.  the ``~`` key rotates through all available color themes, or a
+#.  The ``~`` key rotates through all available color themes, or a
     user-selected subset. See `Color Themes`_ for details.
-#.  the ``<`` and ``>`` keys rotate through all added category views
+#.  The ``<`` and ``>`` keys rotate through all added category views
     (``pyro.category.add=‹name›``), with filtering based on the
     ruTorrent label (``custom_1=‹name›``). See `Category Views`_ for details.
 #.  ``|`` reapplies the category filter and thus updates the current
     category view.
-#.  the ``u`` key shows the uptime and some other essential data of your
+#.  The ``u`` key shows the uptime and some other essential data of your
     rTorrent instance.
 #.  ``F2`` shows some important help resources (web links) in the
     console log.
 #.  ``*`` toggles between the collapsed (as described on `Extended
     Canvas Explained`_) and the expanded display of the current view.
     |rt-ps-canvas-v2-small|
+#.  ``/`` toggles the visibility of ‘sacrificial’ columns – normally,
+    they're only hidden when the terminal width gets too small.
 #.  The ``active`` view is changed to include all incomplete items
     regardless of whether they have any traffic, and then groups the
     list into complete, incomplete, and queued items, in that order.
@@ -122,9 +124,13 @@ or change the state of new views after adding them (by calling the `view.collaps
 else you won't ever see it.
 
 The following is an overview of the default columns, and what the values and icons in them mean.
+
 A **⍰** after the column title indicates a ‘sacrificial’ column, which disappear when the display
 gets too narrow to display all the columns. When even that does not provide enough space,
 columns are omitted beginning on the right side (*Name* is always included).
+Sacrificial columns can also be toggled using the ``/`` key
+– note they're toggled as a whole group,
+so other dynamic states like the ``≣`` column toggle are ignored.
 
 ❢
     Message or alert indicator (♺ = Tracker cycle complete,
