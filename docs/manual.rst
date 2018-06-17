@@ -15,26 +15,20 @@ you will get the following additional features in your `rTorrent-PS` installatio
 
 #.  The ``t`` key is bound to a ``trackers`` view that shows all items
     sorted by tracker and then by name.
-    See `Additional Views`_ for details.
 #.  The ``!`` key is bound to a ``messages`` view, listing all items
     that currently have a non-empty message, sorted in order of the
     message text.
-    See `Additional Views`_ for details.
 #.  The ``^`` key is bound to the ``rtcontrol`` search result view, so
     you can easily return to your last search.
-    See `Additional Views`_ for details.
 #.  The ``?`` key is bound to the ``indemand`` view, which sorts all
     open items by their activity, with the most recently active on top.
-    See `Additional Views`_ for details.
 #.  The ``%`` key is bound to the ``ratio`` view, which sorts all
     open items by their ratio (descending).
-    See `Additional Views`_ for details.
 #.  The ``°`` key is bound to the ``uploaded`` view, which sorts all
     open items by their total upload amount (descending).
-    See `Additional Views`_ for details.
 #.  The ``"`` key is bound to the ``datasize`` view, which sorts all
     open items by the size of their content data (descending).
-    See `Additional Views`_ for details.
+#.  Add even more views, see `Additional Views`_ for details.
 #.  ``Page ↑`` and ``Page ↓`` scroll by 50 items at a time (or whatever
     other value ``ui.focus.page_size`` has).
 #.  ``Home`` / ``End`` jump to the first / last item in the current
