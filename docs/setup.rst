@@ -536,8 +536,8 @@ e.g. in the ``_rtlocal.rc`` file (when using `pimp-my-box`_).
 
 .. code-block:: ini
 
-    # Hide default column
-    ui.column.hide = 920
+    # Remove the default column
+    method.set_key = ui.column.render, (ui.column.spec, 920)
 
     # Add ASCII ratio in percent
     # (1..99 for incomplete; 1c = 1.0; 1m = 10.0; …)
