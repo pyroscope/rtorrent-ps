@@ -497,6 +497,11 @@ torrent::Object cmd_import_return(rpc::target_type target, const torrent::Object
 }
 
 
+torrent::Object cmd_do(rpc::target_type target, const torrent::Object& args) {
+    return rpc::call_object(args, target);
+}
+
+
 torrent::Object retrieve_d_custom_if_z(core::Download* download, const torrent::Object::list_type& args) {
     torrent::Object::list_const_iterator itr = args.begin();
     if (itr == args.end())
@@ -1150,6 +1155,7 @@ void initialize_command_pyroscope() {
 
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
     CMD2_ANY_P("import.return", &cmd_import_return);
+    CMD2_ANY("do", _cxxstd_::bind(&cmd_do, _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
     CMD2_DL("d.is_meta", _cxxstd_::bind(&torrent::DownloadInfo::is_meta_download,
                                         _cxxstd_::bind(&core::Download::info, _cxxstd_::placeholders::_1)));
 

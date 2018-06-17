@@ -199,6 +199,7 @@
 
    * `array.at`_
    * `compare`_
+   * `do`_
    * `import.return`_
    * `log.messages`_
    * `throttle.names`_
@@ -209,6 +210,7 @@
 
 .. _`array.at`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-array-at
 .. _`compare`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-compare
+.. _`do`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-do
 .. _`import.return`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-import-return
 .. _`log.messages`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-log-messages
 .. _`throttle.names`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-throttle-names

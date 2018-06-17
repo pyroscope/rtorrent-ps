@@ -1,5 +1,14 @@
 # Test miscellaneous commands
 
+# do
+$ rtxmlrpc do '' "false=" "foobar="
+ERROR … Command "foobar" does not exist
+RC=65
+$ rtxmlrpc catch '' "false=" "foobar="
+0
+RC=0
+# END
+
 # convert.time_delta
 $ rtxmlrpc --repr convert.time_delta '' +"$(echo $(( $(date +'%s') + 86400 + 40000)) )"
 '1d1…h'
