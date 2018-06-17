@@ -6,6 +6,15 @@ $ test "$(rtxmlrpc --repr ui.focus.page_size '')" -gt 0; echo $?
 $ rtcontrol // -/1 -qV && rtxmlrpc --repr ui.current_view ''
 'rtcontrol'
 
+# ui.column.spec
+$ rtxmlrpc --repr ui.column.spec '' 100
+u'100:3C…/2:… '
+$ rtxmlrpc --repr ui.column.spec '' 000
+''
+$ rtxmlrpc ui.column.spec
+ERROR … ui.column.spec takes exactly one argument
+# END
+
 # ui.colum.*
 $ rtxmlrpc --repr ui.column.hidden.list
 […]

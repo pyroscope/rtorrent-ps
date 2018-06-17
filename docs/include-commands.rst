@@ -159,6 +159,7 @@
    * `ui.column.sacrificed`_
    * `ui.column.sacrificial.list`_
    * `ui.column.show`_
+   * `ui.column.spec`_
    * `ui.current_view`_
    * `ui.focus.end`_
    * `ui.focus.home`_
@@ -182,6 +183,7 @@
 .. _`ui.column.sacrificed`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-sacrificed
 .. _`ui.column.sacrificial.list`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-sacrificial-list
 .. _`ui.column.show`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-show
+.. _`ui.column.spec`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-spec
 .. _`ui.current_view`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-current-view
 .. _`ui.focus.end`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-focus-end
 .. _`ui.focus.home`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-focus-home

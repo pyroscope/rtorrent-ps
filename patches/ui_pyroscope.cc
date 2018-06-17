@@ -589,6 +589,27 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 }
 
 
+torrent::Object ui_column_spec(rpc::target_type target, const torrent::Object::list_type& args) {
+    if (args.size() != 1) {
+        throw torrent::input_error("ui.column.spec takes exactly one argument!");
+    }
+    int64_t colidx_wanted = parse_value_arg(*args.begin());
+    std::string spec;
+
+    const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
+    torrent::Object::map_const_iterator cols_itr, last_col = column_defs.end();
+
+    for (cols_itr = column_defs.begin(); cols_itr != last_col; ++cols_itr) {
+        char* header_pos = 0;
+        int64_t colidx = strtol(cols_itr->first.c_str(), &header_pos, 10);
+        if (header_pos[0] == ':' && colidx == colidx_wanted)
+            spec = cols_itr->first;
+    }
+
+    return spec;
+}
+
+
 torrent::Object ui_column_hide(rpc::target_type target, const torrent::Object::list_type& args) {
     for(torrent::Object::list_const_iterator itr = args.begin(), last = args.end(); itr != last; ++itr) {
         int64_t colidx = parse_value_arg(*itr);
@@ -1071,6 +1092,7 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY        ("ui.canvas_color",         _cxxstd_::bind(&display::ui_canvas_color_get));
     CMD2_ANY_STRING ("ui.canvas_color.set",     _cxxstd_::bind(&display::ui_canvas_color_set, _cxxstd_::placeholders::_2));
 
+    CMD2_ANY_LIST("ui.column.spec", &display::ui_column_spec);
     CMD2_ANY_LIST("ui.column.hide", &display::ui_column_hide);
     CMD2_ANY_LIST("ui.column.show", &display::ui_column_show);
     CMD2_ANY_LIST("ui.column.is_hidden", &display::ui_column_is_hidden);
