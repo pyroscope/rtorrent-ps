@@ -1,0 +1,24 @@
+# Test user interface commands
+
+$ test "$(rtxmlrpc --repr ui.focus.page_size '')" -gt 0; echo $?
+0
+
+$ rtcontrol // -/1 -qV && rtxmlrpc --repr ui.current_view ''
+'rtcontrol'
+
+# ui.colum.*
+$ rtxmlrpc --repr ui.column.hidden.list
+[…]
+$ rtxmlrpc ui.column.is_hidden '' 666
+0
+$ rtxmlrpc ui.column.hide '' 666
+0
+$ rtxmlrpc ui.column.is_hidden '' +666
+1
+$ rtxmlrpc --repr ui.column.hidden.list
+[…666…]
+$ rtxmlrpc ui.column.show '' +666
+0
+$ rtxmlrpc --repr ui.column.hidden.list | grep -v 666
+[…]
+# END

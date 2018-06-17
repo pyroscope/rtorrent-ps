@@ -69,9 +69,6 @@ $ rtxmlrpc d.custom.items $(rtxmlrpc download_list | head -n1) unexpected
 ERROR … d.custom.… takes no arguments
 # END
 
-$ test "$(rtxmlrpc --repr ui.focus.page_size '')" -gt 0; echo $?
-0
-
 $ test "$(rtxmlrpc --repr system.env '' HOME)" = "'$HOME'"; echo $?
 0
 $ rtxmlrpc --repr system.env ''
@@ -102,9 +99,6 @@ system.methodSignature
 system.multicall
 system.shutdown
 
-$ rtcontrol // -/1 -qV && rtxmlrpc --repr ui.current_view ''
-'rtcontrol'
-
 $ rtxmlrpc --repr d.multicall.filtered 'default' "false="
 []
 $ rtxmlrpc d.multicall.filtered 'default' "equal=d.hash=,cat=$(rtxmlrpc download_list | head -n1)" d.hash= | wc -l
@@ -131,20 +125,3 @@ ERROR … Junk at end of number: 8
 
 $ rtxmlrpc --repr compare '' -- '' ''
 ERROR … Can only compare a target pair
-
-# ui.colum.*
-$ rtxmlrpc --repr ui.column.hidden.list
-[…]
-$ rtxmlrpc ui.column.is_hidden '' 666
-0
-$ rtxmlrpc ui.column.hide '' 666
-0
-$ rtxmlrpc ui.column.is_hidden '' +666
-1
-$ rtxmlrpc --repr ui.column.hidden.list
-[…666…]
-$ rtxmlrpc ui.column.show '' +666
-0
-$ rtxmlrpc --repr ui.column.hidden.list | grep -v 666
-[…]
-# END
