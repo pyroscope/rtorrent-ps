@@ -54,10 +54,41 @@ $ rtxmlrpc --repr string.strip '' '   both ends '
 'both ends'
 $ rtxmlrpc --repr string.rstrip '' ' right only '
 ' right only'
+$ rtxmlrpc --repr string.lstrip '' '.left.only.' .
+'left.only.'
+$ rtxmlrpc --repr string.strip '' '...both.ends.' .
+'both.ends'
+$ rtxmlrpc --repr string.rstrip '' '.right.only.' .
+'.right.only'
 $ rtxmlrpc --repr string.strip '' ' abc ' ' '
 'abc'
+$ rtxmlrpc --repr string.strip '' ' abc ' ''
+' abc '
+$ rtxmlrpc --repr string.strip '' ' abc ' ''
+' abc '
+$ rtxmlrpc --repr string.strip '' ' 21x9yxy1 ' 1 2 xy ' '
+'x9y'
+$ rtxmlrpc --repr string.strip '' ''
+''
+$ rtxmlrpc --repr string.strip '' '' ''
+''
+$ rtxmlrpc --repr string.strip '' '' 'x'
+''
+$ rtxmlrpc --repr string.strip '' '  '
+''
+$ rtxmlrpc --repr string.strip '' '  ' ' '
+''
+$ rtxmlrpc --repr string.lstrip '' '⍽left only⍽' '⍽'
+'left only\u237d'
+$ rtxmlrpc --repr string.strip '' '⍽⍽⍽both ends⍽' '⍽'
+'both ends'
+$ rtxmlrpc --repr string.rstrip '' '⍽right only⍽' '⍽'
+'\u237dright only'
+
 $ rtxmlrpc --repr string.strip '' +42
 ERROR … string.[lr]strip needs a string argument.0
+$ rtxmlrpc --repr string.strip '' 'foo' +42
+ERROR … Wrong object type
 # END
 
 # string.join

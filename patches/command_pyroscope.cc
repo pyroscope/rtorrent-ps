@@ -669,15 +669,34 @@ torrent::Object cmd_string_strip(int where, const torrent::Object::list_type& ar
                        text.end());
         }
     } else {
-        for (torrent::Object::list_const_iterator itr = first; itr != last; ++itr) {
-            bool changed;
-            do {
-                changed = false;
+        size_t lpos = 0, rpos = text.length();
+        bool changed;
+        do {
+            changed = false;
+            for (torrent::Object::list_const_iterator itr = first; itr != last; ++itr) {
                 const std::string& strippable = itr->as_string();
+                if (strippable.empty()) continue;
 
-                // TODO
-            } while (changed);
-        }
+                bool found;
+                do {
+                    found = false;
+
+                    if (where <= 0) {
+                        if (0 == strncmp(text.c_str() + lpos, strippable.c_str(), strippable.length())) {
+                            lpos += strippable.length();
+                            changed = found = true;
+                        }
+                    }
+                    if (where >= 0 && lpos <= rpos - strippable.length()) {
+                        if (0 == strncmp(text.c_str() + rpos - strippable.length(), strippable.c_str(), strippable.length())) {
+                            rpos -= strippable.length();
+                            changed = found = true;
+                        }
+                    }
+                } while (found && lpos < rpos);
+            }
+        } while (changed && lpos < rpos);
+        text = lpos < rpos ? text.substr(lpos, rpos - lpos) : "";
     }
 
     return text;
