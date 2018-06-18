@@ -652,6 +652,38 @@ torrent::Object cmd_string_join(rpc::target_type target, const torrent::Object::
 }
 
 
+torrent::Object cmd_string_strip(int where, const torrent::Object::list_type& args) {
+    std::string text = string_get_first_arg("[lr]strip", args);
+    torrent::Object::list_const_iterator first = args.begin() + 1, last = args.end();
+
+    if (args.size() == 1) {
+        // Strip whitespace
+        if (where <= 0) {
+            text.erase(text.begin(),
+                       std::find_if(text.begin(), text.end(),
+                                    std::not1(std::ptr_fun<int, int>(std::isspace))));
+        }
+        if (where >= 0) {
+            text.erase(std::find_if(text.rbegin(), text.rend(),
+                                    std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+                       text.end());
+        }
+    } else {
+        for (torrent::Object::list_const_iterator itr = first; itr != last; ++itr) {
+            bool changed;
+            do {
+                changed = false;
+                const std::string& strippable = itr->as_string();
+
+                // TODO
+            } while (changed);
+        }
+    }
+
+    return text;
+}
+
+
 torrent::Object cmd_string_split(rpc::target_type target, const torrent::Object::list_type& args) {
     const std::string text = string_get_first_arg("split", args);
     if (args.size() != 2 || !args.rbegin()->is_string()) {
@@ -1106,6 +1138,9 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("string.equals",      std::bind(&cmd_string_compare, 0, std::placeholders::_2));
     CMD2_ANY_LIST("string.startswith",  std::bind(&cmd_string_compare, 1, std::placeholders::_2));
     CMD2_ANY_LIST("string.endswith",    std::bind(&cmd_string_compare, 2, std::placeholders::_2));
+    CMD2_ANY_LIST("string.strip",       std::bind(&cmd_string_strip,  0, std::placeholders::_2));
+    CMD2_ANY_LIST("string.lstrip",      std::bind(&cmd_string_strip, -1, std::placeholders::_2));
+    CMD2_ANY_LIST("string.rstrip",      std::bind(&cmd_string_strip,  1, std::placeholders::_2));
 
     // array.* group
     CMD2_ANY_LIST("array.at", &cmd_array_at);

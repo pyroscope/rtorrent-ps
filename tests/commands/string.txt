@@ -47,6 +47,19 @@ $ rtxmlrpc --repr string.equals '' +1 2nd
 ERROR … string.equals needs a string argument.0
 # END
 
+# string.strip
+$ rtxmlrpc --repr string.lstrip '' ' left only '
+'left only '
+$ rtxmlrpc --repr string.strip '' '   both ends '
+'both ends'
+$ rtxmlrpc --repr string.rstrip '' ' right only '
+' right only'
+$ rtxmlrpc --repr string.strip '' ' abc ' ' '
+'abc'
+$ rtxmlrpc --repr string.strip '' +42
+ERROR … string.[lr]strip needs a string argument.0
+# END
+
 # string.join
 $ rtxmlrpc --repr string.join '' ':'
 ''
