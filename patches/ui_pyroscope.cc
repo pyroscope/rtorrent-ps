@@ -141,21 +141,6 @@ static std::string network_history_up_str;
 static std::string network_history_down_str;
 
 
-// Chop off an UTF-8 string
-std::string u8_chop(const std::string& text, size_t glyphs) {
-    std::mbstate_t mbs = std::mbstate_t();
-    size_t bytes = 0, skip;
-    const char* pos = text.c_str();
-
-    while (*pos && glyphs-- > 0 && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
-        pos += skip;
-        bytes += skip;
-    }
-
-    return bytes < text.length() ? text.substr(0, bytes) : text;
-}
-
-
 // get custom field contaioning a long (time_t)
 unsigned long get_custom_long(core::Download* d, const char* name) {
     try {

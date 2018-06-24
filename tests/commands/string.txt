@@ -47,6 +47,38 @@ $ rtxmlrpc --repr string.equals '' +1 2nd
 ERROR … string.equals needs a string argument.0
 # END
 
+# string.[lr]pad
+$ rtxmlrpc --repr string.lpad '' 'foo' 5
+'  foo'
+$ rtxmlrpc --repr string.rpad '' 'foo' 5
+'foo  '
+$ rtxmlrpc --repr string.lpad '' 'foo' 5 ''
+'  foo'
+$ rtxmlrpc --repr string.rpad '' 'foo' 5 ''
+'foo  '
+
+$ rtxmlrpc --repr string.lpad '' '123' 5 '0'
+'00123'
+$ rtxmlrpc --repr string.lpad '' +123 5 '0'
+'00123'
+$ rtxmlrpc --repr string.lpad '' 123 3 '0'
+'123'
+
+$ rtxmlrpc --repr string.rpad '' '123' 5 '¹²³'
+u'123\xb9\xb2'
+$ rtxmlrpc --repr string.rpad '' '123' 6 '¹²³'
+u'123\xb9\xb2\xb3'
+$ rtxmlrpc --repr string.rpad '' '123' 7 '¹²³'
+u'123\xb9\xb2\xb3\xb9'
+
+$ rtxmlrpc --repr string.lpad -- '' 'foo' 1 +1
+ERROR … Wrong object type
+$ rtxmlrpc --repr string.lpad -- '' 'foo' -1
+ERROR … string.[lr]pad: Invalid negative padding length
+$ rtxmlrpc --repr string.lpad -- '' 'foo' [1,2
+ERROR … Wrong object type
+# END
+
 # string.strip
 $ rtxmlrpc --repr string.lstrip '' ' left only '
 'left only '

@@ -595,6 +595,29 @@ torrent::Object cmd_throttle_names() {
 }
 
 
+// Get length of an UTF8-encoded std::string
+size_t u8_length(const std::string& text) {
+    // Take total length and subtract number of non-leading multi-bytes
+    return text.length() - count_if(text.begin(), text.end(),
+                                    [](char c)->bool { return (c & 0xC0) == 0x80; });
+}
+
+
+// Chop off an UTF-8 string
+std::string u8_chop(const std::string& text, size_t glyphs) {
+    std::mbstate_t mbs = std::mbstate_t();
+    size_t bytes = 0, skip;
+    const char* pos = text.c_str();
+
+    while (*pos && glyphs-- > 0 && (skip = std::mbrlen(pos, text.length() - bytes, &mbs)) > 0) {
+        pos += skip;
+        bytes += skip;
+    }
+
+    return bytes < text.length() ? text.substr(0, bytes) : text;
+}
+
+
 static const std::string& string_get_first_arg(const char* name, const torrent::Object::list_type& args) {
     torrent::Object::list_const_iterator itr = args.begin();
     if (args.size() < 1 || !itr->is_string()) {
@@ -604,6 +627,7 @@ static const std::string& string_get_first_arg(const char* name, const torrent::
 }
 
 
+// get a numeric arg from a string or value, advancing the passed iterator
 static int64_t string_get_value_arg(const char* name, torrent::Object::list_const_iterator& itr) {
     int64_t result = 0;
     if (itr->is_string()) {
@@ -697,6 +721,49 @@ torrent::Object cmd_string_strip(int where, const torrent::Object::list_type& ar
             }
         } while (changed && lpos < rpos);
         text = lpos < rpos ? text.substr(lpos, rpos - lpos) : "";
+    }
+
+    return text;
+}
+
+
+torrent::Object cmd_string_pad(bool at_end, const torrent::Object::list_type& args) {
+    std::string text;
+    if (args.size() > 0 && args.begin()->is_value()) {
+        char buf[65];
+        snprintf(buf, sizeof(buf), "%ld", (long)args.begin()->as_value());
+        text = buf;
+    } else {
+        text = string_get_first_arg("[lr]pad", args);
+    }
+
+    torrent::Object::list_const_iterator itr = args.begin() + 1;
+    int64_t pad_len = 0;
+    std::string filler;
+    if (itr != args.end()) pad_len = string_get_value_arg("[lr]pad(pad_len)", itr);
+    if (itr != args.end()) filler = (itr++)->as_string();
+    if (pad_len < 0)
+       throw torrent::input_error("string.[lr]pad: Invalid negative padding length!");
+    if (filler.empty()) filler = " ";
+    size_t text_len = u8_length(text), filler_len = u8_length(filler);
+
+    if (size_t(pad_len) > text_len) {
+        std::string pad;
+        size_t count = size_t(pad_len) - text_len;
+
+        if (filler.length() == 1) { // optimize the common case
+            pad.insert(0, count, filler.at(0));
+        } else while (count > 0) {
+            if (count >= filler_len) {
+                pad += filler;
+                count -= filler_len;
+            } else {
+                pad += u8_chop(filler, count);
+                count = 0;
+            }
+        }
+
+        return at_end ? text + pad : pad + text;
     }
 
     return text;
@@ -1160,6 +1227,8 @@ void initialize_command_pyroscope() {
     CMD2_ANY_LIST("string.strip",       std::bind(&cmd_string_strip,  0, std::placeholders::_2));
     CMD2_ANY_LIST("string.lstrip",      std::bind(&cmd_string_strip, -1, std::placeholders::_2));
     CMD2_ANY_LIST("string.rstrip",      std::bind(&cmd_string_strip,  1, std::placeholders::_2));
+    CMD2_ANY_LIST("string.lpad",        std::bind(&cmd_string_pad, false, std::placeholders::_2));
+    CMD2_ANY_LIST("string.rpad",        std::bind(&cmd_string_pad, true,  std::placeholders::_2));
 
     // array.* group
     CMD2_ANY_LIST("array.at", &cmd_array_at);
