@@ -521,6 +521,45 @@ torrent::Object retrieve_d_custom_if_z(core::Download* download, const torrent::
 }
 
 
+torrent::Object cmd_d_custom_set_if_z(core::Download* download, const torrent::Object::list_type& args) {
+    torrent::Object::list_const_iterator itr = args.begin();
+    if (itr == args.end())
+        throw torrent::bencode_error("d.custom.set_if_z: Missing key argument.");
+    const std::string& key = (itr++)->as_string();
+    if (key.empty())
+        throw torrent::bencode_error("d.custom.set_if_z: Empty key argument.");
+    if (itr == args.end())
+        throw torrent::bencode_error("d.custom.set_if_z: Missing value argument.");
+
+    bool set_it = false;
+    try {
+        const std::string& val = download->bencode()->get_key("rtorrent").get_key("custom").get_key_string(key);
+        set_it = val.empty();
+    } catch (torrent::bencode_error& e) {
+        set_it = true;
+    }
+    if (set_it)
+        download->bencode()->get_key("rtorrent").
+            insert_preserve_copy("custom", torrent::Object::create_map()).first->second.
+            insert_key(key, itr->as_string());
+
+    return torrent::Object();
+}
+
+
+torrent::Object cmd_d_custom_erase(core::Download* download, const torrent::Object::list_type& args) {
+    for (torrent::Object::list_type::const_iterator itr = args.begin(), last = args.end(); itr != last; itr++) {
+        const std::string& key = itr->as_string();
+        if (key.empty())
+            throw torrent::bencode_error("d.custom.erase: Empty key argument.");
+
+        download->bencode()->get_key("rtorrent").get_key("custom").erase_key(key);
+    }
+
+    return torrent::Object();
+}
+
+
 torrent::Object retrieve_d_custom_map(core::Download* download, bool keys_only, const torrent::Object::list_type& args) {
     if (args.begin() != args.end())
         throw torrent::bencode_error("d.custom.keys/items takes no arguments.");
@@ -1261,6 +1300,10 @@ void initialize_command_pyroscope() {
     // d.custom.* extensions
     CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,
                                                  _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.set_if_z", _cxxstd_::bind(&cmd_d_custom_set_if_z,
+                                                     _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.erase", _cxxstd_::bind(&cmd_d_custom_erase,
+                                                  _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
     CMD2_DL_LIST("d.custom.keys", _cxxstd_::bind(&retrieve_d_custom_map,
                                                  _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
     CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
