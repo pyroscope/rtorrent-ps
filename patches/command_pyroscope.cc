@@ -576,6 +576,23 @@ torrent::Object retrieve_d_custom_map(core::Download* download, bool keys_only, 
 }
 
 
+torrent::Object retrieve_d_custom_as_value(core::Download* download, const std::string& key) {
+    try {
+        const std::string& strval = download->bencode()->get_key("rtorrent").get_key("custom").get_key_string(key);
+        if (strval.empty())
+            return (int64_t) 0;
+
+        char* junk = 0;
+        long result = strtol(strval.c_str(), &junk, 10);
+        if (*junk)
+            throw torrent::input_error("d.custom.as_value(" + key + "): junk at end of '" + strval + "'!");
+        return (int64_t) result;
+    } catch (torrent::bencode_error& e) {
+        return (int64_t) 0;
+    }
+}
+
+
 torrent::Object
 d_multicall_filtered(const torrent::Object::list_type& args) {
   if (args.size() < 2)
@@ -1308,6 +1325,8 @@ void initialize_command_pyroscope() {
                                                  _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
     CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
                                                  _cxxstd_::placeholders::_1, false, _cxxstd_::placeholders::_2));
+    CMD2_DL_STRING("d.custom.as_value",  _cxxstd_::bind(&retrieve_d_custom_as_value,
+                                                        _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
 
     // Misc commands
     CMD2_ANY_LIST("value", &cmd_value);

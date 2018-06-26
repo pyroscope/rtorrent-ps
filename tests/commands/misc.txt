@@ -33,6 +33,29 @@ $ rtxmlrpc convert.time_delta '' +0 123
 ERROR … convert.time_delta: … must be a value
 # END
 
+# d.custom.as_value
+$ rtxmlrpc d.custom.erase $(rtxmlrpc download_list | head -n1) test_value
+RC=0
+$ rtxmlrpc --repr d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+0
+RC=0
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value '042'
+RC=0
+$ rtxmlrpc --repr d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+42
+RC=0
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value ''
+RC=0
+$ rtxmlrpc --repr d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+0
+RC=0
+
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value '0foo'
+RC=0
+$ rtxmlrpc d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+ERROR … d.custom.as_value(test_value): junk at end of '0foo'
+# END
+
 # d.custom.if_z
 $ rtxmlrpc --repr d.custom.set $(rtxmlrpc download_list | head -n1) test_value ''
 0
