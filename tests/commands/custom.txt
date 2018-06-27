@@ -1,5 +1,25 @@
 # Test "custom.*" commands
 
+# d.custom.toggle
+$ rtxmlrpc d.custom.erase $(rtxmlrpc download_list | head -n1) test_value
+$ rtxmlrpc --repr d.custom.toggle $(rtxmlrpc download_list | head -n1) test_value
+1
+$ rtxmlrpc --repr d.custom $(rtxmlrpc download_list | head -n1) test_value
+'1'
+$ rtxmlrpc --repr d.custom.toggle $(rtxmlrpc download_list | head -n1) test_value
+0
+$ rtxmlrpc --repr d.custom $(rtxmlrpc download_list | head -n1) test_value
+'0'
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value '0???'
+$ rtxmlrpc --repr d.custom.toggle $(rtxmlrpc download_list | head -n1) test_value
+0
+RC=0
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value ''
+$ rtxmlrpc --repr d.custom.toggle $(rtxmlrpc download_list | head -n1) test_value
+1
+RC=0
+# END
+
 # d.custom.as_value
 $ rtxmlrpc d.custom.erase $(rtxmlrpc download_list | head -n1) test_value
 RC=0

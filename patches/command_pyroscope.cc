@@ -576,6 +576,27 @@ torrent::Object retrieve_d_custom_map(core::Download* download, bool keys_only, 
 }
 
 
+torrent::Object cmd_d_custom_toggle(core::Download* download, const std::string& key) {
+    bool result = true;
+    try {
+        const std::string& strval = download->bencode()->get_key("rtorrent").get_key("custom").get_key_string(key);
+        if (!strval.empty()) {
+            char* junk = 0;
+            long number = strtol(strval.c_str(), &junk, 10);
+            while (std::isspace(*junk)) ++junk;
+            result = !*junk && number == 0;
+        }
+    } catch (torrent::bencode_error& e) {
+        // true
+    }
+
+    download->bencode()->get_key("rtorrent").
+        insert_preserve_copy("custom", torrent::Object::create_map()).first->second.
+        insert_key(key, result ? "1" : "0");
+    return (int64_t) (result ? 1 : 0);
+}
+
+
 torrent::Object retrieve_d_custom_as_value(core::Download* download, const std::string& key) {
     try {
         const std::string& strval = download->bencode()->get_key("rtorrent").get_key("custom").get_key_string(key);
@@ -1325,6 +1346,8 @@ void initialize_command_pyroscope() {
                                                  _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
     CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
                                                  _cxxstd_::placeholders::_1, false, _cxxstd_::placeholders::_2));
+    CMD2_DL_STRING("d.custom.toggle",  _cxxstd_::bind(&cmd_d_custom_toggle,
+                                                      _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
     CMD2_DL_STRING("d.custom.as_value",  _cxxstd_::bind(&retrieve_d_custom_as_value,
                                                         _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
 
