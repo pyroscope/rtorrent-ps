@@ -1,0 +1,106 @@
+# Test "custom.*" commands
+
+# d.custom.as_value
+$ rtxmlrpc d.custom.erase $(rtxmlrpc download_list | head -n1) test_value
+RC=0
+$ rtxmlrpc --repr d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+0
+RC=0
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value '042'
+RC=0
+$ rtxmlrpc --repr d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+42
+RC=0
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value ''
+RC=0
+$ rtxmlrpc --repr d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+0
+RC=0
+
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) test_value '0foo'
+RC=0
+$ rtxmlrpc d.custom.as_value $(rtxmlrpc download_list | head -n1) test_value
+ERROR … d.custom.as_value(test_value): junk at end of '0foo'
+# END
+
+# d.custom.if_z
+$ rtxmlrpc --repr d.custom.set $(rtxmlrpc download_list | head -n1) test_value ''
+0
+$ rtxmlrpc --repr d.custom $(rtxmlrpc download_list | head -n1) test_value
+''
+$ rtxmlrpc --repr d.custom.if_z $(rtxmlrpc download_list | head -n1) test_value is_empty
+'is_empty'
+$ rtxmlrpc --repr d.custom.set $(rtxmlrpc download_list | head -n1) test_value d_custom_if_z
+0
+$ rtxmlrpc --repr d.custom.if_z $(rtxmlrpc download_list | head -n1) test_value default
+'d_custom_if_z'
+$ rtxmlrpc --repr d.custom.if_z $(rtxmlrpc download_list | head -n1) not_a_test_value default
+'default'
+
+$ rtxmlrpc d.custom.if_z $(rtxmlrpc download_list | head -n1)
+ERROR … d.custom.if_z: Missing key argument
+$ rtxmlrpc d.custom.if_z $(rtxmlrpc download_list | head -n1) ''
+ERROR … d.custom.if_z: Empty key argument
+$ rtxmlrpc d.custom.if_z $(rtxmlrpc download_list | head -n1) test
+ERROR … d.custom.if_z: Missing default argument
+# END
+
+# d.custom.erase
+$ rtxmlrpc d.custom.set $(rtxmlrpc download_list | head -n1) another_test_value 'foo'
+RC=0
+$ rtxmlrpc --repr d.custom $(rtxmlrpc download_list | head -n1) another_test_value
+'foo'
+$ rtxmlrpc d.custom.erase $(rtxmlrpc download_list | head -n1) another_test_value
+RC=0
+$ rtxmlrpc --repr d.custom.if_z $(rtxmlrpc download_list | head -n1) another_test_value 'deleted'
+'deleted'
+
+$ rtxmlrpc d.custom.erase $(rtxmlrpc download_list | head -n1) ''
+ERROR … d.custom.erase: Empty key argument
+# END
+
+# d.custom.set_if_z
+$ rtxmlrpc --repr d.custom.set_if_z $(rtxmlrpc download_list | head -n1) test_value 'set_if_z'
+RC=0
+$ rtxmlrpc --repr d.custom.items $(rtxmlrpc download_list | head -n1)
+'test_value': 'd_custom_if_z'
+$ rtxmlrpc --repr d.custom.set_if_z $(rtxmlrpc download_list | head -n1) another_test_value ''
+RC=0
+$ rtxmlrpc --repr d.custom.items $(rtxmlrpc download_list | head -n1)
+'another_test_value': ''
+$ rtxmlrpc --repr d.custom.set_if_z $(rtxmlrpc download_list | head -n1) another_test_value 'non-empty'
+RC=0
+$ rtxmlrpc --repr d.custom.items $(rtxmlrpc download_list | head -n1)
+'another_test_value': 'non-empty'
+$ rtxmlrpc --repr d.custom.set_if_z $(rtxmlrpc download_list | head -n1) another_test_value 'already-set'
+RC=0
+$ rtxmlrpc --repr d.custom.items $(rtxmlrpc download_list | head -n1)
+'another_test_value': 'non-empty'
+
+$ rtxmlrpc d.custom.set_if_z $(rtxmlrpc download_list | head -n1)
+ERROR … d.custom.set_if_z: Missing key argument
+$ rtxmlrpc d.custom.set_if_z $(rtxmlrpc download_list | head -n1) ''
+ERROR … d.custom.set_if_z: Empty key argument
+$ rtxmlrpc d.custom.set_if_z $(rtxmlrpc download_list | head -n1) 'foo'
+ERROR … d.custom.set_if_z: Missing value argument
+# END
+
+# d.custom.keys
+# relies on d.custom.if_z test above
+$ rtxmlrpc --repr d.custom.keys $(rtxmlrpc download_list | head -n1)
+[…'test_value'…]
+
+$ rtxmlrpc d.custom.keys $(rtxmlrpc download_list | head -n1) unexpected
+ERROR … d.custom.… takes no arguments
+# END
+
+# d.custom.items
+# relies on d.custom.if_z test above
+$ rtxmlrpc --repr d.custom.items $(rtxmlrpc download_list | head -n1)
+{…
+ 'test_value': 'd_custom_if_z',
+…}
+
+$ rtxmlrpc d.custom.items $(rtxmlrpc download_list | head -n1) unexpected
+ERROR … d.custom.… takes no arguments
+# END
