@@ -1,6 +1,8 @@
 /*
  ⋅ ⋅⋅ ” ’ ♯ ☢ ☍ ⌘ ✰ ⣿ ⚡ ☯ ⚑ ↺ ⤴ ⤵ ∆ ⌚ ≀∇ ✇ ⚠ ◔ ⚡ ↯ ¿ ⨂ ✖ ⇣ ⇡  ⠁ ⠉ ⠋ ⠛ ⠟ ⠿ ⡿ ⣿ ☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ ▹ ╍ ▪ ⚯ ⚒ ◌ ⇅ ↡ ↟ ⊛ ♺
 
+⎆  ㋛ ㋡
+
  ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳
 
 
@@ -409,6 +411,10 @@ int64_t cmd_d_message_alert(core::Download* d) {
                     || d->message().find("limit exceeded") != std::string::npos
                     || d->message().find("active torrents are enough") != std::string::npos)
             alert = ps::ALERT_PERMS;
+        else if (d->message().find("tracker is down") != std::string::npos)
+            alert = ps::ALERT_DOWN;
+        else if (d->message().find("n't resolve host name") != std::string::npos)
+            alert = ps::ALERT_DNS;
     }
 
     return alert;
@@ -1207,7 +1213,8 @@ void initialize_command_ui_pyroscope() {
 
         // Status flags (❢ ☢ ☍ ⌘)
         "method.set_key = ui.column.render, \"100:3C95/2:❢  \","
-        "    ((array.at, {\"  \", \"♺ \", \"⚠ \", \"◔ \", \"⚡ \", \"↯ \", \"¿?\", \"⨂ \"}, ((d.message.alert)) ))\n"
+        "    ((array.at, {\"  \", \"♺ \", \"⚠ \", \"◔ \", \"⚡ \", \"↯ \", \"¿?\","
+                        " \"⨂ \", \"⋫ \", \"☡ \"}, ((d.message.alert)) ))\n"
         "method.set_key = ui.column.render, \"110:2C92/2:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
         "method.set_key = ui.column.render, \"120:?2:☍ \","
@@ -1259,7 +1266,7 @@ void initialize_command_ui_pyroscope() {
         // "☹ ➀ ➁ ➂ ➃ ➄ ➅ ➆ ➇ ➈ ➉ " "😇 "
         // "☹ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ "
         // "☹ ➊ ➋ ➌ ➍ ➎ ➏ ➐ ➑ ➒ ➓ "
-        "method.set_key = ui.column.render, \"930:5C15/3C21/2: ✇   \","
+        "method.set_key = ui.column.render, \"930:5C15/3C21/2: ⛁   \","
         "    ((convert.human_size, ((d.size_bytes)) ))\n"
 
         // Explicitly managed status (✰ = prio; ⚑ = tagged)

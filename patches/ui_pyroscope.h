@@ -17,6 +17,8 @@ enum AlertKind {
     ALERT_REQUEST,
     ALERT_GONE,
     ALERT_PERMS,
+    ALERT_DOWN,
+    ALERT_DNS,
     ALERT_MAX
 };
 

@@ -139,7 +139,8 @@ so other dynamic states like the ``≣`` column toggle are ignored.
     Message or alert indicator (♺ = Tracker cycle complete,
     i.e. "Tried all trackers"; ⚡ = establishing connection;
     ↯ = data transfer problem; ◔ = timeout; ¿? = unknown torrent /
-    info hash; ⨂ = authorization problem (possibly temporary); ⚠ = other)
+    info hash; ⨂ = authorization problem (possibly temporary); ⋫ = tracker
+    downtime; ☡ = DNS problems; ⚠ = other)
 ☢
     Item state (▹ = started, ╍ = paused, ▪ = stopped)
 ☍    **⍰**
@@ -179,7 +180,7 @@ so other dynamic states like the ``≣`` column toggle are ignored.
     the old ``ui.style.ratio.set`` command is deprecated,
     see :ref:`add-custom-columns` for the new way to get
     a different set of number glyphs or an ASCII version
-✇
+⛁
     Data size
 ≣   **⍰**
     Chunk size - this column can be toggled on / off using the ``_`` key
