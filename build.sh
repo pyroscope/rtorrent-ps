@@ -199,7 +199,8 @@ BUILD_GIT=false
 
 
 set_build_env() {
-    export CPPFLAGS="-std=c++0x -I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
+    cpp_std="-std=c++0x "
+    export CPPFLAGS="${cpp_std}-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
     export CXXFLAGS="$CFLAGS"
     export LDFLAGS="-L$INSTALL_RELEASE_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
     export LDFLAGS="-Wl,-rpath,$INSTALL_RELEASE_DIR/lib ${LDFLAGS}"
@@ -210,7 +211,7 @@ set_build_env() {
     if $BUILD_GIT; then
         git_tag=' [GIT]'
 
-        CPPFLAGS="-I $INSTALL_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
+        CPPFLAGS="${cpp_std}-I $INSTALL_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
         LDFLAGS="-L$INSTALL_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
         PKG_CONFIG_PATH="$INSTALL_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
     fi
@@ -360,7 +361,7 @@ prep() {
     mkdir -p tarballs
 }
 
-download() { # Download and unpack sources
+download() { ## Download and unpack sources
     if test ! -d .git -a ! -d patches; then
         git clone $SELF_URL tarballs/self
         rm tarballs/self/build.sh
@@ -441,7 +442,7 @@ core_unpack() { # Unpack original LT/RT source
     popd
 }
 
-build() { # Build and install all components
+build() { ## Build and install all components
     test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
 
     ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd libtorrent-$LT_VERSION && automagic && \
@@ -452,7 +453,7 @@ build() { # Build and install all components
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
 }
 
-build_git() { # Build and install libtorrent and rtorrent from git checkouts
+build_git() { ## a/k/a ‹git› – Build and install libtorrent and rtorrent from git checkouts
     # Start script should contain:
     #
     #   BIN="$HOME/src/rakshasa-rtorrent/src/"; LD_PRELOAD=$HOME/lib/rtorrent/0.9.7-PS-1.0-dev/lib/libtorrent.so.19 \
@@ -478,7 +479,7 @@ build_git() { # Build and install libtorrent and rtorrent from git checkouts
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
 }
 
-extend() { # Rebuild and install libtorrent and rTorrent with patches applied
+extend() { ## Rebuild and install libtorrent and rTorrent with patches applied
     test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
     core_unpack
 
@@ -530,20 +531,20 @@ extend() { # Rebuild and install libtorrent and rTorrent with patches applied
     build
 }
 
-clean() { # Clean up generated files
+clean() { ## Clean up generated files
     for i in $SUBDIRS; do
         ( cd $i && $MAKE clean )
     done
 }
 
-clean_all() { # Remove all downloads and created files
+clean_all() { ## Remove all downloads and created files
     rm tarballs/*{.tar.gz,.tgz} tarballs/DONE >/dev/null 2>&1 || :
     for i in $SUBDIRS; do
         test ! -d $i || rm -rf $i >/dev/null
     done
 }
 
-check() { # Print some diagnostic success indicators
+check() { ## Print some diagnostic success indicators
     for i in "$BIN_DIR"/rtorrent{,-*}; do
         echo $i "->" $(readlink $i) | sed -e "s:$HOME:~:g"
     done
@@ -564,7 +565,7 @@ check() { # Print some diagnostic success indicators
     echo "$libs" | sed -e "s:$HOME:~:g"
 }
 
-install() { # Install to $PACKAGE_ROOT
+install() { ## Install to $PACKAGE_ROOT
     export INSTALL_DIR="$PACKAGE_ROOT"
     test -d "$INSTALL_DIR"/. || mkdir -p "$INSTALL_DIR"/
     rm -rf "$INSTALL_DIR"/* || :
@@ -612,7 +613,7 @@ call_fpm() {
     chmod a+r  *".$fpm_pkg_ext"
 }
 
-pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
+pkg2deb() { ## Package current $PACKAGE_ROOT installation for APT [needs fpm]
     # You need to:
     #   aptitude install ruby ruby-dev
     #   gem install fpm
@@ -634,7 +635,7 @@ pkg2deb() { # Package current $PACKAGE_ROOT installation for APT [needs fpm]
     dpkg-deb -I       "$DIST_DIR"/*".$fpm_pkg_ext"
 }
 
-pkg2pacman() { # Package current $PACKAGE_ROOT installation for PACMAN [needs fpm]
+pkg2pacman() { ## Package current $PACKAGE_ROOT installation for PACMAN [needs fpm]
     # You need to install fpm from the AUR
     package_prep
 
@@ -649,7 +650,7 @@ pkg2pacman() { # Package current $PACKAGE_ROOT installation for PACMAN [needs fp
     pacman -Qp --list "$DIST_DIR"/*".$fpm_pkg_ext"
 }
 
-build_everything() {
+build_all() { ## a/k/a ‹all› – Download and build and install all deps + vanilla + extended
     # Go through all build steps
     set_build_env
     ${NODEPS:-false} || build_deps
@@ -667,7 +668,7 @@ build_everything() {
     check
 }
 
-docker_deb() { # Build Debian packages via Docker
+docker_deb() { ## Build Debian packages via Docker
     local distros distro_code DISTRO_NAME DISTRO_CODENAME DOCKER_TAG
 
     distro_code="${1:-${docker_distros_stable[0]}}"; test "$#" -eq 0 || shift
@@ -707,45 +708,49 @@ cd "$SRC_DIR"
 while test -n "$1"; do
     action="$1"; shift
     case "$action" in
-        all)        prep; download; build_everything ;;
-        clean)      clean ;;
-        clean_all)  clean_all ;;
-        download)   prep; download ;;
-        env)        prep; set +x; set_build_env echo '"' ;;
-        build)      prep; build_everything ;;
-        deps)       prep; set_build_env; build_deps ;;
+        all|build_all)
+                    prep; download; build_all ;;
+        build)      prep; build_all ;;
         git|build_git)
-                    BUILD_GIT=true
+                    export BUILD_GIT=true
                     prep
                     set_build_env
                     build_git
                     symlink_binary -git
                     check
                     ;;
-        vanilla)    prep
-                    set_build_env
-                    core_unpack
-                    build
-                    symlink_binary -vanilla
-                    check
+        check)      check ;;
+        clean_all)  clean_all ;;
+        clean)      clean ;;
+        deps)       ## Build all dependencies
+                    prep; set_build_env; build_deps ;;
+        deps_git)   ## Build all dependencies [GIT HEAD MODE]
+                    export BUILD_GIT=true
+                    prep; set_build_env; build_deps ;;
+        docker_deb) docker_deb "$@"
+                    break  # takes args, so must be the last action on a call
                     ;;
+        download)   prep; download ;;
+        env)        ## Show build environement
+                    prep; set +x; set_build_env echo '"' ;;
         extend)     prep
                     set_build_env
                     extend
                     symlink_binary -extended
                     check
                     ;;
-        check)      check
+        install)    install ;;
+        pkg2deb)    pkg2deb ;;
+        pkg2pacman) pkg2pacman ;;
+        vanilla)    ## Build vanilla rTorrent [also un-patches src dirs]
+                    prep
+                    set_build_env
+                    core_unpack
+                    build
+                    symlink_binary -vanilla
+                    check
                     ;;
-        install)    install
-                    ;;
-        pkg2deb)    pkg2deb
-                    ;;
-        pkg2pacman) pkg2pacman
-                    ;;
-        docker_deb) docker_deb "$@"
-                    break
-                    ;;
+
         *)
             echo >&2 "${BOLD}Usage: $0 (all | clean | clean_all | download | build | check | extend)$OFF"
             echo >&2 "Build rTorrent$VERSION_EXTRAS $RT_VERSION/$LT_VERSION into $(sed -e s:$HOME/:~/: <<<$INSTALL_DIR)"
@@ -759,8 +764,11 @@ while test -n "$1"; do
             echo >&2 "    CFG_OPTS_RT=\"${CFG_OPTS_RT}\""
             echo >&2
             echo >&2 "Build actions:"
-            grep "() { #" $0 | grep -v grep | sort | sed -e "s:^:  :" -e "s:() { #:  @:" | while read i; do
-                echo "   " $(eval "echo $i") | tr @ \\t
+            egrep "(\(\) {|\) +) ##" $0 | grep -v grep | sort \
+                                     | sed -r -e "s:^:  :" -e 's:\(\) \{ #:  :' -e 's:\)[^#]+#:  :' \
+                                     | sed -r -e "s/#/@/" -e "s/^\s+/  /" | \
+            while read i; do
+                echo "   " $(eval "echo $i") | sed -e "s/@/\t/"
             done
             exit 1
             ;;

@@ -141,7 +141,7 @@ the git HEAD code from the sibling folders:
 
 .. code-block:: bash
 
-    INSTALL_DIR=$HOME/.local/rtorrent-git ./build.sh clean_all deps git
+    INSTALL_DIR=$HOME/.local/rtorrent-git ./build.sh clean_all deps_git build_git
 
 Just like with the vanilla and extended version, you'll get a ‘branded’ binary
 called ``rtorrent-git``, and a symlink at ``~/bin/rtorrent`` will point to it.
