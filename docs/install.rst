@@ -90,7 +90,7 @@ Installation on Arch Linux
 There are now two options contributed by `xsmile <https://github.com/xsmile>`_
 for installing on `Arch` via ``pacman``.
 
-#. The ``pkg2pacman`` command of ``build.sh`` creates a package similar to the
+#. The ``pkg2pacman`` command of :ref:`build-sh` creates a package similar to the
    `Debian` one, embedding a tested version combination of dependencies.
    See :ref:`build-pkg2deb` for general instructions on building that
    variant, and use ``pkg2pacman`` instead of ``pkg2deb``.
@@ -315,8 +315,9 @@ skip the next section and continue with `PyroScope Installation`_.
 Build from Source
 """""""""""""""""
 
-Get the `build script`_ and call it with the ``all`` parameter as shown
-below; the script will then download, build, and install all necessary
+Get the `build script`_ via direct download or a ``git clone``,
+and call it with the ``all`` parameter as shown below;
+the script will then download, build, and install all necessary
 components, storing temporary files in the current directory. You can
 pass the ``clean_all`` parameter to remove those temporary files later
 on, after everything works. Make sure you followed the
@@ -336,7 +337,7 @@ the same way.
 
 .. code-block:: shell
 
-    # Run this in your NORMAL user account!
+    # Run this in your NORMAL user account, or as ‘rtorrent’!
     mkdir -p ~/src/; cd $_
     git clone https://github.com/pyroscope/rtorrent-ps.git
     cd rtorrent-ps
@@ -352,6 +353,9 @@ Note that the unpatched version is still available as
 ``rtorrent-vanilla``, and you can simply switch by changing the symlink
 in ``~/bin``, or by calling either version with its full path.
 See the :doc:`manual` for more details on the changes applied.
+
+:ref:`build-sh` describes more use-cases like building in `Docker`,
+or an incremental update after a ``git fetch`` with new `rTorrent-PS` changes.
 
 .. note::
 
@@ -372,7 +376,7 @@ for more details.
 
 .. code-block:: shell
 
-    # Run this in your NORMAL user account!
+    # Run this in your NORMAL user account, or as ‘rtorrent’!
     mkdir -p ~/bin ~/.local
     git clone "https://github.com/pyroscope/pyrocore.git" ~/.local/pyroscope
 
@@ -414,7 +418,7 @@ First, create the instance's directories and a `start script`_:
 
 .. code-block:: shell
 
-    # Run this in your NORMAL user account!
+    # Run this in your NORMAL user account, or as ‘rtorrent’!
     export RT_HOME="${RT_HOME:-$HOME/rtorrent}"
     mkdir -p $RT_HOME; cd $_
     mkdir -p .session log work done watch/{start,load,hdtv,cleaned}
@@ -459,7 +463,7 @@ To get all this set up for you, call this provided script:
 
 .. code-block:: shell
 
-    # Run this in your NORMAL user account!
+    # Run this in your NORMAL user account, or as ‘rtorrent’!
     ~/.local/pyroscope/src/scripts/make-rtorrent-config.sh
 
 After this, you should check at
@@ -509,7 +513,7 @@ the installed software, which makes later updates a lot easier.
 
 .. code-block:: shell
 
-    # Run this in your NORMAL user account!
+    # Run this in your NORMAL user account, or as ‘rtorrent’!
     pyroadmin --create-config
 
     cat >~/.pyroscope/config.ini <<EOF
@@ -598,7 +602,7 @@ start it the first time. This also makes it more homey for long-time
 
 .. code-block:: shell
 
-    # Run this in your NORMAL user account!
+    # Run this in your NORMAL user account, or as ‘rtorrent’!
     cp --no-clobber ~/.local/pyroscope/docs/examples/tmux.conf ~/.tmux.conf
 
 
@@ -609,7 +613,7 @@ You're now ready to start your shiny new `rTorrent-PS`, so just do it:
 
 .. code-block:: shell
 
-    # Run this in your NORMAL user account!
+    # Run this in your NORMAL user account, or as ‘rtorrent’!
     tmux -2u new -n rT-PS -s rtorrent "~/rtorrent/start; exec bash"
 
 The ``exec bash`` keeps your ``tmux`` window open if ``rtorrent`` exits,

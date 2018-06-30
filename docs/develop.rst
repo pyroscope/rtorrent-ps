@@ -70,7 +70,63 @@ This also shows how you can run only one selected test suite, using the ``--name
 The Build Script
 ----------------
 
-**TODO**
+The `build.sh`_ script contains all the minute details and settings to successfully
+build selected dependencies and the `libtorrent` / `rtorrent` source on many platforms.
+
+And no, it is not a `Makefile`, since there's no benefit in that, for the things the script does.
+``[g]make`` is used *within* the contributing projects.
+
+See :ref:`build-from-source` on the ‘normal’ use of the script for building a binary.
+Other uses like building packages (with or without `Docker`) or the most recent upstream source
+are described in the following sections.
+
+To **build a new extended binary after you downloaded updates** via a ``git pull --ff-only``,
+just call ``./build.sh extend`` – this will apply any new patches included in that update,
+but not re-build all the dependencies.
+
+If you're sure that the diff only contains source code changes (in ``patches/*.cc``),
+only calling ``make`` in the `rTorrent` source directory is *way faster*.
+In case dependency versions changed in ``build.sh``, you have to go the slowest route with
+``./build.sh clean_all all`` to get them onto your machine.
+
+
+For everything else, call ``./build.sh help`` to get a usage summary similar to this:
+
+.. code-block:: console
+
+    $ ./build.sh help
+    Environment for building rTorrent PS-1.0-349-g12ccbe8-2018-06-30-1143 0.9.6/0.13.6
+    export PACKAGE_ROOT=/opt/rtorrent
+    export INSTALL_ROOT=/home/pyroscope
+    …
+
+    Usage: ./build.sh (all | clean | clean_all | download | build | check | extend)
+    Build rTorrent PS-1.0-… 0.9.6/0.13.6 into ~/.local/rtorrent/0.9.6-PS-1.1-dev
+
+    Custom environment variables:
+        CURL_OPTS="-sLS" (e.g. --insecure)
+        MAKE_OPTS="-j4"
+        CFG_OPTS="" (e.g. --enable-debug --enable-extra-debug)
+        CFG_OPTS_LT="" (e.g. --disable-instrumentation for MIPS, PowerPC, ARM)
+        CFG_OPTS_RT=""
+
+    Build actions:
+        build_all   a/k/a ‹all› – Download and build and install all deps + vanilla + extended
+        build       Build and install all components
+        build_git   a/k/a ‹git› – Build and install libtorrent and rtorrent from git checkouts
+        check       Print some diagnostic success indicators
+        clean_all   Remove all downloads and created files
+        clean       Clean up generated files
+        deps        Build all dependencies
+        deps_git    Build all dependencies [GIT HEAD MODE]
+        docker_deb  Build Debian packages via Docker
+        download    Download and unpack sources
+        env         Show build environement
+        extend      Rebuild and install libtorrent and rTorrent with patches applied
+        install     Install to /opt/rtorrent
+        pkg2deb     Package current /opt/rtorrent installation for APT [needs fpm]
+        pkg2pacman  Package current /opt/rtorrent installation for PACMAN [needs fpm]
+        vanilla     Build vanilla rTorrent [also un-patches src dirs]
 
 
 .. _build-pkg2deb:
@@ -111,8 +167,6 @@ pre-built ones at `Bintray`_.
 .. seealso::
 
     :ref:`build-docker_deb`
-
-.. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
 
 
 Building git HEAD of rTorrent
@@ -175,5 +229,7 @@ in the same ``build.sh`` call.
 
     You need Docker version ``17.06`` or higher to use this.
 
-.. _build.sh: https://github.com/pyroscope/rtorrent-ps/blob/master/build.sh
+
+.. _`build.sh`: https://github.com/pyroscope/rtorrent-ps/blob/master/build.sh#L1-L3
+.. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
 .. _`docker_distros`: https://github.com/pyroscope/rtorrent-ps/search?type=Code&utf8=%E2%9C%93&q="platforms+to+build"+with+docker_all
