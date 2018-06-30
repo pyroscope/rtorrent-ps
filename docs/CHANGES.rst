@@ -46,6 +46,7 @@ then you just have to know yourself what to do (i.e. browse through ``git`` diff
 -  Command: Added ``d.multicall.filtered``
 -  Command: Added ``system.has`` and 3 other related commands (issue
    #82)
+-  Command: Added ``system.client_version.as_value`` command
 -  Command: Added ``do`` command (issue #98)
 -  Command: Added ``import.return`` private command
 -  Command: Added ``throttle.names`` (issue #65)

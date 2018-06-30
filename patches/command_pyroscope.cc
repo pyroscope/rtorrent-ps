@@ -1093,6 +1093,20 @@ torrent::Object cmd_system_has_methods(bool filter_public) {
 }
 
 
+torrent::Object cmd_system_client_version_as_value() {
+    int64_t result = 0;
+    const char* pos = PACKAGE_VERSION;
+
+    while (*pos) {
+        result = 100 * result + strtol(pos, (char**)&pos, 10);
+        if (*pos && *pos != '.')
+            throw torrent::input_error("INTERNAL ERROR: Bad version " PACKAGE_VERSION);
+        if (*pos) ++pos;
+    }
+    return result;
+}
+
+
 torrent::Object cmd_value(rpc::target_type target, const torrent::Object::list_type& args) {
     if (args.size() < 1) {
         throw torrent::input_error("'value' takes at least a number argument!");
@@ -1334,6 +1348,7 @@ void initialize_command_pyroscope() {
     CMD2_ANY("system.has.list", _cxxstd_::bind(&cmd_system_has_list));
     CMD2_ANY("system.has.private_methods", _cxxstd_::bind(&cmd_system_has_methods, false));
     CMD2_ANY("system.has.public_methods", _cxxstd_::bind(&cmd_system_has_methods, true));
+    CMD2_ANY("system.client_version.as_value", _cxxstd_::bind(&cmd_system_client_version_as_value));
 
     // d.custom.* extensions
     CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,

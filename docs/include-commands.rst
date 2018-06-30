@@ -87,6 +87,7 @@
 .. hlist::
    :columns: 3
 
+   * `system.client_version.as_value`_
    * `system.env`_
    * `system.has`_
    * `system.has.list`_
@@ -94,6 +95,7 @@
    * `system.has.public_methods`_
    * `system.random`_
 
+.. _`system.client_version.as_value`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-system-client-version-as-value
 .. _`system.env`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-system-env
 .. _`system.has`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-system-has
 .. _`system.has.list`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-system-has-list
