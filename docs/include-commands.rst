@@ -39,10 +39,15 @@
    * `string.equals`_
    * `string.join`_
    * `string.len`_
+   * `string.lpad`_
+   * `string.lstrip`_
    * `string.map`_
    * `string.replace`_
+   * `string.rpad`_
+   * `string.rstrip`_
    * `string.split`_
    * `string.startswith`_
+   * `string.strip`_
    * `string.substr`_
 
 .. _`string.contains`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-contains
@@ -51,10 +56,15 @@
 .. _`string.equals`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-equals
 .. _`string.join`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-join
 .. _`string.len`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-len
+.. _`string.lpad`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-lpad
+.. _`string.lstrip`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-lstrip
 .. _`string.map`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-map
 .. _`string.replace`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-replace
+.. _`string.rpad`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-rpad
+.. _`string.rstrip`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-rstrip
 .. _`string.split`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-split
 .. _`string.startswith`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-startswith
+.. _`string.strip`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-strip
 .. _`string.substr`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-substr
 
 
@@ -97,9 +107,13 @@
 .. hlist::
    :columns: 3
 
+   * `d.custom.as_value`_
+   * `d.custom.erase`_
    * `d.custom.if_z`_
    * `d.custom.items`_
    * `d.custom.keys`_
+   * `d.custom.set_if_z`_
+   * `d.custom.toggle`_
    * `d.is_meta`_
    * `d.message.alert`_
    * `d.multicall.filtered`_
@@ -109,9 +123,13 @@
    * `d.tracker_scrape.downloaded`_
    * `d.tracker_scrape.incomplete`_
 
+.. _`d.custom.as_value`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-custom-as-value
+.. _`d.custom.erase`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-custom-erase
 .. _`d.custom.if_z`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-custom-if-z
 .. _`d.custom.items`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-custom-items
 .. _`d.custom.keys`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-custom-keys
+.. _`d.custom.set_if_z`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-custom-set-if-z
+.. _`d.custom.toggle`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-custom-toggle
 .. _`d.is_meta`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-is-meta
 .. _`d.message.alert`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-message-alert
 .. _`d.multicall.filtered`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-d-multicall-filtered
