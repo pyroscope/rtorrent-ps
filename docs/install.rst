@@ -82,6 +82,8 @@ start it, or link it into ``/usr/local`` like this:
     as long as you normally run a *0.9.x* version.
 
 
+.. _install-arch:
+
 Installation on Arch Linux
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -101,6 +103,17 @@ for installing on `Arch` via ``pacman``.
 
    - https://aur.archlinux.org/packages/libtorrent-ps/
    - https://aur.archlinux.org/packages/rtorrent-ps/
+
+Before building binaries or packages yourself,
+install these packages on top of the ``base`` and ``base-devel`` groups
+(**list is user-provided, report any problems**):
+
+.. code-block:: shell
+
+    pacman -S \
+        lsb-release subversion git time lsof tmux wget \
+        python2-setuptools python2-virtualenv python2 python2-cffi \
+        cppunit libxml2 libxslt
 
 There is also the
 `rtorrent-pyro-git <https://aur.archlinux.org/packages/rtorrent-pyro-git/>`_
@@ -245,7 +258,7 @@ rTorrent using this command:
     echo $(apt-cache showsrc rtorrent libtorrent-dev | \
         grep Build-Depends: | cut -f2 -d: | tr ",)" " \\n" | cut -f1 -d"(")
 
-On Fedora (26), use this (**list is user-provided, report any problems**):
+On `Fedora` (26), use this (**list is user-provided, report any problems**):
 
 .. code-block:: shell
 
@@ -254,6 +267,8 @@ On Fedora (26), use this (**list is user-provided, report any problems**):
         subversion git time lsof binutils tmux curl wget which \
         python-setuptools python-virtualenv python-devel python2-cffi \
         openssl-devel zlib-devel ncurses-devel cppunit-devel libxml2-devel libxslt-devel
+
+For `Arch`, see the ``pacman`` command in :ref:`install-arch`.
 
 
 Optional ``root`` Setup Steps
