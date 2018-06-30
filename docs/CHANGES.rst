@@ -10,38 +10,43 @@ Change History
 
 Read the related `pyrocore update to 0.6.x`_ instructions,
 which will update configuration snippets in the ``rtorrent.d`` directories.
-These are **required** to run the new version
+If you used those snippets before, their update is **required** to run the new version
 – else you'll get visual defects at the very minimum,
 but worse stuff might happen.
 
-If you do not have a ``~/rtorrent/rtorrent.d`` directory,
-then you just have to know yourself what to do
-– the helper scripts can only handle standard situations and setups.
+If you do not have a ``~/rtorrent/rtorrent.d`` directory created by the helper scripts,
+then you just have to know yourself what to do (i.e. browse through ``git`` diffs)
+– those scripts can only handle standard situations and setups.
+
 
 -  Docs: Much improved (moved to *Read the Docs* and using *Sphinx*)
--  UI: Added responsive canvas v2 with full customization (issue #60)
+-  UI: Added responsive *canvas v2* with full customization (issue #60)
 
    - New ``ui.column.render`` multi-command
-   - Added ``ui.column.hide`` and 3 related commands
+   - Added ``ui.column.hide`` and related commands
    - Added 3 new ``convert.*`` commands
    - Added ``ui.color.custom1…9`` and ``ui.color.*.index`` commands
    - New default columns: ❢ ℞ ⋉ ≣
+   - New alert indicators for “tracker down” and “DNS problems”
    - ‘Tagged’ indicator (⚑) now in its own column
    - Built-in views are collapsed by default now
 
 -  UI: ``Info`` details panel is now active by default (not
    ``Peer list``)
 -  UI: Made ``*`` key a built-in keyboard shortcut [@chros73]
+-  UI: Key to toggle sacrificial columns manually (bound to ``/``)
 -  Command: Added ``string.*`` command group (issue #59)
 -  Command: Added ``math.*`` command group [@chros73] (issue #65)
 -  Command: Added ``value`` conversion command
 -  Command: Added ``array.at`` command (issue #60)
--  Command: Added ``d.custom.if_z`` and 2 other new ``d.custom.*``
-   commands
+-  Command: Added ``d.custom.if_z`` and more ``d.custom.*``
+   commands (issue #101)
 -  Command: Added ``d.is_meta`` command [@chros73]
+-  Command: Added ``d.tracker_alias`` command (issue #97)
+-  Command: Added ``d.multicall.filtered``
 -  Command: Added ``system.has`` and 3 other related commands (issue
    #82)
--  Command: Added ``d.multicall.filtered``
+-  Command: Added ``do`` command (issue #98)
 -  Command: Added ``import.return`` private command
 -  Command: Added ``throttle.names`` (issue #65)
 -  Command: Added ``ui.bind_key.verbose`` flag (issue #55)
@@ -52,7 +57,8 @@ then you just have to know yourself what to do
    #41)
 -  Fix: ``log.messages`` – restored lost patch for message writing
    (issue #78)
--  Fix: ``start`` handles platforms using ``RUNPATH`` instead of
+-  Fix: Properly close XMLRPC log, i.e. only *once* (issue #94)
+-  Fix: ``start`` handles platforms that use ``RUNPATH`` instead of
    ``RPATH``
 -  Patch: ``catch`` command is silent when first command is ``false=``
 -  Build: ``bootstrap`` script – switch to Python3 (issue #84)
@@ -70,9 +76,9 @@ then you just have to know yourself what to do
    ``invoke test [-n ‹name›]`` (issue #84)
 -  Tasks: New ``cmd_docs`` task to generate extension command index
 -  Docker: Run ``pkg2deb`` for several Debian / Ubuntu LTS versions
--  Docker: Run an EMPHEMERAL rTorrent-PS instance in a Stretch container
+-  Docker: Run an *EMPHEMERAL* rTorrent-PS instance in a `Debian Stretch` container
 
-**NOTE:** Support for rTorrent versions before 0.9.6 and non-C++11
+**NOTE:** Support for `rTorrent` versions before 0.9.6 and non-C++11
 compilers will end soon!
 
 
