@@ -4,7 +4,8 @@ Setup & Configuration
 The main part of configuration regarding *rTorrent-PS* itself is already done,
 if you followed  :ref:`DebianInstallFromSource` or used `pimp-my-box`_ for it.
 If you used neither, look into what `make-rtorrent-config.sh`_ does (see also :ref:`make-rtorrent-config`),
-in order to get all the features described in the :doc:`manual`.
+in order to get all the features described in the :doc:`manual`,
+which in large part rely on those standard configuration snippets.
 
 This chapter provides some background on the standard configuration and how you can tweak it,
 and contains hints on what you might need to do regarding
