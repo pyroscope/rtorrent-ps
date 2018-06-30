@@ -215,14 +215,14 @@ Using Docker for Building Packages
 
 The ``docker_deb`` build action uses ``Dockerfile.Debian`` to compile and package
 *rTorrent-PS* on a given *Debian* or *Ubuntu* release.
-The ``docker_all`` action does so for the major releases
-– see the `docker_distros`_ list at the start of `build.sh`_ which ones exactly.
 
 ``docker_deb`` takes an optional ``‹distro›:‹codename›`` argument,
 and defaults to ``debian:stretch``.
-Any additional arguments are passed on to ``docker build``,
-and ``docker_all`` does the same.
-Since those actions take arguments, you cannot call any further actions after them,
+You can also use ``all``, ``stable``, or ``oldstable`` to name classes of distributions,
+defined in the related `docker_distros_*`_ lists at the start of `build.sh`_.
+
+Any additional arguments are passed on to the underlying ``docker build`` command.
+Since ``docker_deb`` takes arguments, you cannot call any further actions after it,
 in the same ``build.sh`` call.
 
 .. note::
@@ -232,4 +232,4 @@ in the same ``build.sh`` call.
 
 .. _`build.sh`: https://github.com/pyroscope/rtorrent-ps/blob/master/build.sh#L1-L3
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
-.. _`docker_distros`: https://github.com/pyroscope/rtorrent-ps/search?type=Code&utf8=%E2%9C%93&q="platforms+to+build"+with+docker_all
+.. _`docker_distros_*`: https://github.com/pyroscope/rtorrent-ps/search?type=Code&utf8=%E2%9C%93&q=docker_distros_stable
