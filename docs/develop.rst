@@ -119,7 +119,10 @@ Building git HEAD of rTorrent
 -----------------------------
 
 You can also build the latest source of the main rTorrent project (including its ``libtorrent``),
-with all the settings and rpath linking of the ``rtorrent-ps`` builds.
+with all the settings and rpath linking of the ``rtorrent-ps`` builds,
+but just like *vanilla* when it comes to applying patches
+(only *essential* ones are applied, like the `OpenSSL` one).
+
 This is intended to be used for checking compatibility of patches with the head of the core project,
 and preparing PRs for it.
 You will *not get a stable system* and these builds are in no way recommended for production use.
