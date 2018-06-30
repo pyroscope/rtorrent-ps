@@ -135,20 +135,44 @@ case $(openssl version 2> /dev/null | egrep -o "1.[0-9].[0-9]+") in
         ;;
 esac
 
+# GCC and C++ standards:
+#   -std=c++17 / gnu++17    EXPERIMENTAL in GCC 5 and later
+#   -std=c++14 / gnu++14    Default in GCC 6.1+
+#   -std=c++11 / gnu++11    GCC 4.8.1+ supports all MAJOR features
+#   -std=c++0x              Older name for C++11
+#   -std=c++98              Default before GCC 6.1
+#   [https://gcc.gnu.org/projects/cxx-status.html]
+#
+# Ubuntu versions:
+#   precise (12.04) 4.6.3
+#   trusty  (14.04) 4.8.2
+#   xenial  (16.04) 5.3.1
+#   bionic  (18.04) 7.3.0
+#
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
 #export CFLAGS="$CFLAGS -march=i586"
 export USE_CXXFLAGS=true
+GCC_DOT_VER=$(gcc --version 2>/dev/null | head -n1 | cut -d' ' -f4)
+GCC_INT_VER=$(printf "%d%02d%02d" $(tr . ' ' <<<$GCC_DOT_VER))
+
 if command which dpkg-architecture >/dev/null && dpkg-architecture -earmhf; then
     GCC_TYPE="Raspbian"
 elif command which gcc >/dev/null; then
     GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
-    # Fix libtorrent bug with gcc version >= 6 and non-empty CXXFLAGS env var
-    GCC_MAIN_VER=$(gcc --version | head -n1 | cut -d' ' -f4 | cut -d'.' -f1)
-    test "${GCC_MAIN_VER:-0}" -ge 6 && export USE_CXXFLAGS=false || :
 else
     GCC_TYPE=none
 fi
+
+# Fix libtorrent bug with gcc version >= 6 and non-empty CXXFLAGS env var
+test "${GCC_INT_VER:-0}" -ge 60000 && export USE_CXXFLAGS=false || :
+
+# Set C++ standard support
+cpp_std=""
+test "${GCC_INT_VER:-0}" -ge 40300 && cpp_std="-std=c++0x" || :
+test "${GCC_INT_VER:-0}" -ge 40801 && cpp_std="-std=c++11" || :
+grep -- '-std=' <<<"$CPPFLAGS" >/dev/null || export CPPFLAGS="${CPPFLAGS}${cpp_std:+ }${cpp_std}"
+
 case "$GCC_TYPE" in
     # Raspberry Pi 2 with one of
     #   gcc (Debian 4.6.3-14+rpi1) 4.6.3
@@ -199,8 +223,7 @@ BUILD_GIT=false
 
 
 set_build_env() {
-    cpp_std="-std=c++0x "
-    export CPPFLAGS="${cpp_std}-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
+    export CPPFLAGS="-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
     export CXXFLAGS="$CFLAGS"
     export LDFLAGS="-L$INSTALL_RELEASE_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
     export LDFLAGS="-Wl,-rpath,$INSTALL_RELEASE_DIR/lib ${LDFLAGS}"
@@ -211,7 +234,7 @@ set_build_env() {
     if $BUILD_GIT; then
         git_tag=' [GIT]'
 
-        CPPFLAGS="${cpp_std}-I $INSTALL_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
+        CPPFLAGS="-I $INSTALL_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
         LDFLAGS="-L$INSTALL_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
         PKG_CONFIG_PATH="$INSTALL_DIR/lib/pkgconfig${PKG_CONFIG_PATH:+:}${PKG_CONFIG_PATH}"
     fi
