@@ -129,6 +129,21 @@ For everything else, call ``./build.sh help`` to get a usage summary similar to 
         vanilla     Build vanilla rTorrent [also un-patches src dirs]
 
 
+.. _do-release:
+
+Creating a Release
+------------------
+
+*  Finish ``docs/CHANGES.md`` and set the release date
+*  Run ``invoke cmd_docs >docs/include-commands.rst``, and commit any additions
+*  Make sure every command has docs in the manual (``invoke undoc``)
+*  Tag the release, push tags, put changelog up on GitHub
+*  Build packages and upload to Bintray (using ``bintray.sh``)
+*  Make a stable snapshot of docs under the new version
+*  Bump version to next release in ``docs/conf.py``
+*  Announce to `reddit` etc.
+
+
 .. _build-pkg2deb:
 
 Building the Debian Package

@@ -67,7 +67,7 @@ then you just have to know yourself what to do (i.e. browse through ``git`` diff
 -  Build: ``all`` now really does it all, and added a few more actions
 -  Build: Allow installation of several concurrent patch versions
 -  Build: Apply patches for OpenSSL 1.1 (on platforms using it)
--  Build: Added ``-std=c++0x`` option (needed for ``algorithm::median``
+-  Build: Added ``-std=c++11|0x`` option (needed for ``algorithm::median``
    patch)
 -  Build: Fixed ``CXXFLAGS`` for GCC 6+
 -  Build: Dropped *rTorrent* 0.8.x/0.9.2 support (issue #26)
