@@ -1228,7 +1228,7 @@ void initialize_command_ui_pyroscope() {
         "method.set_key = ui.column.render, \"420:?3C14/3: ⤵ \", ((convert.magnitude, ((d.tracker_scrape.incomplete)) ))\n"
 
         // Traffic indicator (⚡)
-        "method.set_key = ui.column.render, \"500:?2:⚡ \","
+        "method.set_key = ui.column.render, \"500:?2:⇕ \","
         "    ((string.map, ((cat, ((not, ((d.up.rate)) )), ((not, ((d.down.rate)) )) )),"
         "                  {00, \"⇅ \"}, {01, \"↟ \"}, {10, \"↡ \"}, {11, \"  \"} ))\n"
 
@@ -1244,7 +1244,7 @@ void initialize_command_ui_pyroscope() {
         "        ((convert.time_delta, ((value, ((d.custom, tm_completed)) )),"
         "                              ((value, ((d.custom.if_z, tm_started, ((d.custom, tm_loaded)) )) )) ))"
         "    ))\n"
-        "method.set_key = ui.column.render, \"530:6C90/6:∇⋮ ⌚  \","
+        "method.set_key = ui.column.render, \"530:6C90/6:∇⋮ ◷  \","
         "    ((if, ((d.down.rate)),"
         "        ((convert.human_size, ((d.down.rate)), ((value, 10)) )),"
         "        ((convert.time_delta, ((value, ((d.custom.if_z, tm_completed, ((d.custom, tm_loaded)) )) )) ))"
