@@ -9,13 +9,15 @@ Change History
 ------------------------------------
 
 This release adds the new fully customizable and responsive *canvas v2*,
-and many new confuguragtion and XMLRPC commands plus a few fixes
+and many new configuration and XMLRPC commands plus a few fixes
 – see below for a full list of changes.
 It comes with complete documentation hosted on *Read the Docs* and built with *Sphinx*.
 Binary builds for *Debian* and *Ubuntu* are available as DEB packages on *Bintray*.
 
 Note that *rTorrent-PS* is based on the *stable* release of *rTorrent*,
 and that is still version 0.9.6 at the time of this release.
+Many of the features and commands in version 0.9.7 are originally developed in
+or otherwise back-ported to this project anyway.
 
 Read the related `pyrocore update to 0.6.x`_ instructions,
 which will update configuration snippets in the ``rtorrent.d`` directories.
@@ -76,7 +78,7 @@ then you just have to know yourself what to do (i.e. browse through ``git`` diff
 -  Tasks: Added integration tests for commands – ``invoke test [-n ‹name›]`` (issue #84)
 -  Tasks: New ``cmd_docs`` task to generate extension command index
 -  Docker: Run ``pkg2deb`` for several Debian / Ubuntu LTS versions
--  Docker: Run an *EMPHEMERAL* rTorrent-PS instance in a `Debian Stretch` container
+-  Docker: Run an *EPHEMERAL* rTorrent-PS instance in a `Debian Stretch` container
 
 **NOTE:** Support for `rTorrent` versions before 0.9.6 and non-C++11
 compilers will end soon!
