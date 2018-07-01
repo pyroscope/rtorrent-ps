@@ -480,8 +480,10 @@ e.g. the logging configuration.
 The script can be called again to get updates from `GitHub`,
 **but will overwrite all standard configuration files** with their new version.
 To safely customize configuration,
-provide your own version of standard files
-and list the replaced files in the ``.rcignore`` file,
+provide your own version of standard files under a new name,
+and list the replaced files in the ``rtorrent.d/.rcignore`` file.
+
+For anything special not covered by standard configuration,
 add your own *additional* files,
 or as mentioned use the ``_rtlocal.rc`` file.
 
