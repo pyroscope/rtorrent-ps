@@ -16,7 +16,7 @@
 # then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
 #
 
-rtps_version=0.9.6-PS-1.0-94-g5a987ef~stretch
+rtps_version=0.9.6-PS-1.1~stretch
 
 ALREADY_IN_TMUX=${2:-0}
 
