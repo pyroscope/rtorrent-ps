@@ -46,15 +46,19 @@ else
     git_id="$(git describe --long --tags --dirty="-$git_stamp_iso")"
     git_commits_since_release=$(sed -re 's/.+-([0-9]+)-g[0-9a-fA-F]{7}.*/\1/' <<<"$git_id")
 fi
-export RT_PS_REVISION="${git_id%%-$git_commits_since_release-g*}"
-test "$git_commits_since_release" -eq 0 || \
-    RT_PS_REVISION="${RT_PS_REVISION%.*}.$(( ${RT_PS_REVISION##*.} + 1 ))-dev"
 
 # Version selection
 export RT_MINOR=6
 export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export GIT_MINOR=$(( $RT_MINOR + 1 ))  # ensure git version has a bumped version number
 export VERSION_EXTRAS=" $git_id"
+
+export RT_PS_REVISION="${git_id%%-$git_commits_since_release-g*}"
+if test "$git_commits_since_release" -eq 0; then
+    VERSION_EXTRAS=" $RT_PS_REVISION"
+else
+    RT_PS_REVISION="${RT_PS_REVISION%.*}.$(( ${RT_PS_REVISION##*.} + 1 ))-dev"
+fi
 
 # List of platforms to build DEBs for with "docker_deb all|stable|oldstable"
 docker_distros_stable=(
