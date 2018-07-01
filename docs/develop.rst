@@ -139,6 +139,7 @@ Creating a Release
 *  Make sure every command has docs in the manual (``invoke undoc``)
 *  Tag the release, push tags, put changelog up on GitHub
 *  Build packages and upload to Bintray (using ``bintray.sh``)
+*  Change DEB download links in `pimp-my-box`
 *  Make a stable snapshot of docs under the new version
 *  Bump version to next release in ``docs/conf.py``
 *  Announce to `reddit` etc.
