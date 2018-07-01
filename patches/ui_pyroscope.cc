@@ -1238,7 +1238,7 @@ void initialize_command_ui_pyroscope() {
         // Up|Leech Time / Down|Completion or Loaded Time
         // TODO: Could use "d.timestamp.started" and "d.timestamp.finished" here, but need to check
         //       when they were introduced, and if they're always set (e.g. what about fast-resumed items?)
-        "method.set_key = ui.column.render, \"520:6C96/6:∆⋮ ⌛  \","
+        "method.set_key = ui.column.render, \"520:6C96/6:∆⋮ ⟲  \","
         "    ((if, ((d.up.rate)),"
         "        ((convert.human_size, ((d.up.rate)), ((value, 10)) )),"
         "        ((convert.time_delta, ((value, ((d.custom, tm_completed)) )),"
