@@ -5,7 +5,7 @@ Change History
    :local:
 
 
-2018-07-xx v1.1 “Design Your Canvas”
+2018-07-01 v1.1 “Design Your Canvas”
 ------------------------------------
 
 Read the related `pyrocore update to 0.6.x`_ instructions,
