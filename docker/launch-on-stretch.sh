@@ -16,7 +16,11 @@
 # then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
 #
 
-rtps_version=0.9.6-PS-1.1~stretch
+# Both Stretch and Bionic have problems with the current v1.1 column headers
+#distro="debian:stretch"
+#distro="ubuntu:bionic"
+distro="ubuntu:xenial"
+rtps_version="0.9.6-PS-1.1~${distro#*:}"
 
 ALREADY_IN_TMUX=${2:-0}
 
@@ -25,7 +29,7 @@ as-root)
     # Install basics
     apt update -qq
     apt-get install -y apt-transport-https lsb-release locales \
-        lsof binutils less vim git tmux curl wget libcppunit-1.13-0v5 \
+        lsof binutils less vim git tmux curl wget libcppunit-dev \
         python-setuptools python-virtualenv python-dev
     echo "en_US.UTF-8 UTF-8" >/etc/locale.gen
     locale-gen
@@ -80,6 +84,8 @@ scgi_url = scgi://$HOME/rtorrent/.scgi_local
 # Add alias names for announce URLs to this section; those aliases are used
 # at many places, e.g. by the "mktor" tool and to shorten URLs to these aliases
 EOF
+    mktor -o ~/rtorrent/watch/load ~/rtorrent/start http://example.com
+    sed -i -re 's/122,/  5,/' ~/rtorrent/rtorrent.d/watch-dirs.rc
 
     # Start tmux session
     cp --no-clobber ~/.local/pyroscope/docs/examples/tmux.conf ~/.tmux.conf
@@ -93,9 +99,9 @@ EOF
 
 *)
     test -z "$TMUX"; ALREADY_IN_TMUX=$?
-    docker rm rtps-on-stretch >/dev/null 2>&1 || :
+    docker rm rtps-on-${distro#*:} >/dev/null 2>&1 || :
     docker run -it -v $(command cd $(dirname "$0") && pwd):/srv \
-               --name rtps-on-stretch "$@" debian:stretch \
+               --name rtps-on-${distro#*:} "$@" ${distro} \
                bash "/srv/$(basename $0)" as-root $ALREADY_IN_TMUX
     ;;
 esac
