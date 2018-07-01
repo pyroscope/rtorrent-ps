@@ -180,16 +180,19 @@ torrent::Object apply_random(rpc::target_type target, const torrent::Object::lis
 torrent::Tracker* get_active_tracker(torrent::Download* item) {
     torrent::TrackerList* tl = item->tracker_list();
     torrent::Tracker* tracker = 0;
+    torrent::Tracker* fallback = 0;
 
     for (size_t trkidx = 0; trkidx < tl->size(); trkidx++) {
         tracker = tl->at(trkidx);
-        if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP
-                && tracker->scrape_complete() + tracker->scrape_incomplete() > 0) {
-            break;
+        if (tracker->is_usable() && tracker->type() == torrent::Tracker::TRACKER_HTTP) {
+            if (!fallback) fallback = tracker;
+            if (tracker->scrape_complete() || tracker->scrape_incomplete()) {
+                break;
+            }
         }
         tracker = 0;
     }
-    if (!tracker && tl->size()) tracker = tl->at(0);
+    if (!tracker && tl->size()) tracker = fallback ? fallback : tl->at(0);
 
     return tracker;
 }
