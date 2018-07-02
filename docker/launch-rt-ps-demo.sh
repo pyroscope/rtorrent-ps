@@ -12,7 +12,7 @@
 # Detach from the process using ``Ctrl-P Ctrl-Q``,
 # and call ``reset`` to reset your terminal.
 #
-# Reattach with ``docker attach rtps-on-stretch``,
+# Reattach with ``docker attach rt-ps-demo``,
 # then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
 #
 
@@ -99,9 +99,9 @@ EOF
 
 *)
     test -z "$TMUX"; ALREADY_IN_TMUX=$?
-    docker rm rtps-on-${distro#*:} >/dev/null 2>&1 || :
+    docker rm rt-ps-demo >/dev/null 2>&1 || :
     docker run -it -v $(command cd $(dirname "$0") && pwd):/srv \
-               --name rtps-on-${distro#*:} "$@" ${distro} \
+               --name rt-ps-demo "$@" ${distro} \
                bash "/srv/$(basename $0)" as-root $ALREADY_IN_TMUX
     ;;
 esac
