@@ -90,22 +90,22 @@ Launching a Demo in Docker
 --------------------------
 
 To try out `rTorrent-PS` without any headaches, and *if you have Docker 17.06+ installed*, you can use
-the `launch-on-stretch.sh`_ script to run an *ephemeral* instance in a
+the `launch-rt-ps-demo.sh`_ script to run an *ephemeral* instance in a
 *Debian Stretch* container, like this:
 
 .. code-block:: bash
 
     git clone "https://github.com/pyroscope/rtorrent-ps.git" ~/src/rtorrent-ps
-    ~/src/rtorrent-ps/docker/launch-on-stretch.sh
+    ~/src/rtorrent-ps/docker/launch-rt-ps-demo.sh
 
 Detach from the process using ``Ctrl-P Ctrl-Q``,
 and call ``reset`` to reset your terminal.
 
-Reattach with ``docker attach rtps-on-stretch``,
+Reattach with ``docker attach rt-ps-demo``,
 then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
 
 If you want to do that directly via SSH from a remote machine,
-call ``ssh -t YOU@HOST "docker attach rtps-on-stretch"``
+call ``ssh -t YOU@HOST "docker attach rt-ps-demo"``
 and then refresh with ``Ctrl-A r``.
 
 Another use for such a container instance, besides taking a first look,
@@ -116,5 +116,5 @@ and can be used as a blue-print for your own ``Dockerfile``.
 
 
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
-.. _launch-on-stretch.sh: https://github.com/pyroscope/rtorrent-ps/blob/master/docker/launch-on-stretch.sh
+.. _launch-rt-ps-demo.sh: https://github.com/pyroscope/rtorrent-ps/blob/master/docker/launch-rt-ps-demo.sh
 .. _README: https://github.com/pyroscope/rtorrent-ps#rtorrent-ps
