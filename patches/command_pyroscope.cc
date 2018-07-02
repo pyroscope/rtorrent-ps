@@ -1015,20 +1015,20 @@ torrent::Object cmd_string_compare(int mode, const torrent::Object::list_type& a
         const std::string& cmp = itr->as_string();
         switch (mode) {
         case 0:
-            if (value == cmp) return 1L;
+            if (value == cmp) return (int64_t) 1;
             break;
         case 1:
-            if (value.substr(0, cmp.length()) == cmp) return 1L;
+            if (value.substr(0, cmp.length()) == cmp) return (int64_t) 1;
             break;
         case 2:
-            if (value.length() >= cmp.length() && value.substr(value.length() - cmp.length()) == cmp) return 1L;
+            if (value.length() >= cmp.length() && value.substr(value.length() - cmp.length()) == cmp) return (int64_t) 1;
             break;
         default:
             throw torrent::input_error("string comparison: internal error (unknown mode)");
         }
     }
 
-    return 0L;
+    return (int64_t) 0;
 }
 
 
