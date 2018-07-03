@@ -18,9 +18,9 @@
 
 # Both Stretch and Bionic have problems with the current v1.1 column headers
 #distro="debian:stretch"
-#distro="ubuntu:bionic"
-distro="ubuntu:xenial"
-rtps_version="0.9.6-PS-1.1~${distro#*:}"
+distro="ubuntu:bionic"
+#distro="ubuntu:xenial"
+rtps_version="0.9.6-PS-1.1-15-g56057fc~${distro#*:}"
 
 ALREADY_IN_TMUX=${2:-0}
 
