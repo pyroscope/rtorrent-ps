@@ -33,19 +33,26 @@ The latter includes custom command extensions from `rTorrent-PS`.
    :target: https://github.com/pyroscope/rtorrent-ps/issues
 
 
-Full Contents
--------------
-
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
+   :caption: Getting Started
 
    overview
    install
    setup
+.. toctree::
+   :maxdepth: 2
+   :caption: Using rTorrent-PS
+
    manual
    howto
-   develop
    troubleshooting
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Other Topics
+
+   develop
    CHANGES
 
 
