@@ -4,6 +4,17 @@ Change History
 .. contents:: List of Releases
    :local:
 
+2018-10-xx v1.2 “rTorrent 0.9.7”
+--------------------------------
+
+.. rubric:: UNRELEASED DEVELOPMENT VERSION
+
+- UI: Added *no data* indicator to alerts (in the ``❢`` column)
+- UI: Replaced problematic glyphs like ‘hourglass’ (caused visual defects on *Stretch* and *Bionic*)
+- Fix: Compilation on 32bit platforms (issue #108)
+- Docker: Demo launcher renamed to ``launch-rt-ps-demo.sh``,
+  and supports any distro with a package available for it
+
 
 2018-07-01 v1.1 “Design Your Canvas”
 ------------------------------------
