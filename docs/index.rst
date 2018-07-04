@@ -40,13 +40,14 @@ The latter includes custom command extensions from `rTorrent-PS`.
    overview
    install
    setup
+
 .. toctree::
    :maxdepth: 2
    :caption: Using rTorrent-PS
 
    manual
    howto
-   troubleshooting
+   customize
 
 .. toctree::
    :maxdepth: 2

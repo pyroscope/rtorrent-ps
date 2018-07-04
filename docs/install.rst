@@ -57,23 +57,23 @@ package from `Bintray`_ —
 assuming one is available for your platform. The packages install the
 `rTorrent-PS` binary including some libraries into ``/opt/rtorrent``.
 
-Example on `Debian Stretch`:
+Example on `Ubuntu Xenial`:
 
 .. code-block:: bash
 
-    version="0.9.6-PS-1.0-272-g388cfab~stretch_amd64"
+    version="0.9.6-PS-1.1~xenial_amd64"
     bintray="https://bintray.com/artifact/download/pyroscope"
     cd /tmp
     curl -Lko rt-ps.deb "$bintray/rtorrent-ps/rtorrent-ps_$version.deb"
     dpkg -i rt-ps.deb
 
 After installation, you must provide a configuration file
-(``~/.rtorrent.rc``), and either use the absolute path to the binary to
-start it, or link it into ``/usr/local`` like this:
-
-.. code-block:: bash
-
-    ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
+(typically located in ``~/.rtorrent.rc`` or ``~/rtorrent/rtorrent.rc``).
+To start `rTorrent-PS`, always use the provided `start script`_,
+which takes care of some technical details like settings
+the current working directory correctly.
+It also looks for the `rTorrent` binary at well-known places,
+including the ``/opt`` path the DEB package contains.
 
 .. note:: You can safely install the package and test it
     out in parallel to an existing installation, just use the absolute path
@@ -443,7 +443,7 @@ So always call that script, and not ``rtorrent`` directly.
     because `rTorrent` will mark the downloads stored on an absent device as broken
     (which they are without their data).
 
-.. _start script: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh
+.. _start script: https://github.com/pyroscope/pyrocore/blob/master/docs/examples/start.sh#L1-L4
 
 
 .. _make-rtorrent-config:
@@ -621,7 +621,7 @@ You're now ready to start your shiny new `rTorrent-PS`, so just do it:
 The ``exec bash`` keeps your ``tmux`` window open if ``rtorrent`` exits,
 which allows you to actually read any error messages in case it ends *unexpectedly*.
 If such an error occurs (e.g. about your terminal not providing enough colors),
-check out :doc:`setup` and the :doc:`troubleshooting` for a fix.
+check out :doc:`setup` and the :ref:`trouble-shooting` for a fix.
 
 After that, test the XMLRPC connection by using this command in a new ``tmux`` window:
 
