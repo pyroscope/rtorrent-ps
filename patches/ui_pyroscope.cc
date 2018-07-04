@@ -385,35 +385,38 @@ torrent::Object ui_canvas_color_set(const torrent::Object::string_type& arg) {
 
 int64_t cmd_d_message_alert(core::Download* d) {
     int64_t alert = ps::ALERT_NORMAL;
+    const std::string& msg = d->message();
 
-    if (!d->message().empty()) {
+    if (!msg.empty()) {
         alert = ps::ALERT_GENERIC;
 
-        if (d->message().find("Tried all trackers") != std::string::npos)
+        if (msg.find("Tried all trackers") != std::string::npos)
             alert = ps::ALERT_NORMAL_CYCLING;
-        else if (d->message().find("Timeout was reached") != std::string::npos
-                    || d->message().find("Timed out") != std::string::npos)
+        else if (msg.find("no data") != std::string::npos)
+            alert = ps::ALERT_NORMAL_GHOST;
+        else if (msg.find("Timeout was reached") != std::string::npos
+                    || msg.find("Timed out") != std::string::npos)
             alert = ps::ALERT_TIMEOUT;
-        else if (d->message().find("Connecting to") != std::string::npos)
+        else if (msg.find("Connecting to") != std::string::npos)
             alert = ps::ALERT_CONNECT;
-        else if (d->message().find("Could not parse bencoded data") != std::string::npos
-                    || d->message().find("Failed sending data") != std::string::npos
-                    || d->message().find("Server returned nothing") != std::string::npos
-                    || d->message().find("Couldn't connect to server") != std::string::npos)
+        else if (msg.find("Could not parse bencoded data") != std::string::npos
+                    || msg.find("Failed sending data") != std::string::npos
+                    || msg.find("Server returned nothing") != std::string::npos
+                    || msg.find("Couldn't connect to server") != std::string::npos)
             alert = ps::ALERT_REQUEST;
-        else if (d->message().find("not registered") != std::string::npos
-                    || d->message().find("torrent cannot be found") != std::string::npos
-                    || d->message().find("nregistered") != std::string::npos)
+        else if (msg.find("not registered") != std::string::npos
+                    || msg.find("torrent cannot be found") != std::string::npos
+                    || msg.find("nregistered") != std::string::npos)
             alert = ps::ALERT_GONE;
-        else if (d->message().find("not authorized") != std::string::npos
-                    || d->message().find("blocked from") != std::string::npos
-                    || d->message().find("denied") != std::string::npos
-                    || d->message().find("limit exceeded") != std::string::npos
-                    || d->message().find("active torrents are enough") != std::string::npos)
+        else if (msg.find("not authorized") != std::string::npos
+                    || msg.find("blocked from") != std::string::npos
+                    || msg.find("denied") != std::string::npos
+                    || msg.find("limit exceeded") != std::string::npos
+                    || msg.find("active torrents are enough") != std::string::npos)
             alert = ps::ALERT_PERMS;
-        else if (d->message().find("tracker is down") != std::string::npos)
+        else if (msg.find("tracker is down") != std::string::npos)
             alert = ps::ALERT_DOWN;
-        else if (d->message().find("n't resolve host name") != std::string::npos)
+        else if (msg.find("n't resolve host name") != std::string::npos)
             alert = ps::ALERT_DNS;
     }
 
@@ -763,7 +766,8 @@ int render_columns(bool headers, bool narrow, rpc::target_type target, core::Dow
                             case ps::COL_ALERT:  // COL_ALARM is the actual color, this is the dynamic one
                                 bool has_alert = !item->message().empty()
                                               && item->message().find("Tried all trackers") == std::string::npos;
-                                attr_idx = has_alert ? ps::COL_ALARM : ps::COL_INFO;
+                                bool no_data = item->message().find("no data") != std::string::npos;
+                                attr_idx = no_data ? ps::COL_PROGRESS0 : has_alert ? ps::COL_ALARM : ps::COL_INFO;
                                 break;
                         }
                     }
@@ -1213,7 +1217,7 @@ void initialize_command_ui_pyroscope() {
 
         // Status flags (❢ ☢ ☍ ⌘)
         "method.set_key = ui.column.render, \"100:3C95/2:❢  \","
-        "    ((array.at, {\"  \", \"♺ \", \"⚠ \", \"◔ \", \"⚡ \", \"↯ \", \"¿?\","
+        "    ((array.at, {\"  \", \"♺ \", \"ʘ \", \"⚠ \", \"◔ \", \"⚡ \", \"↯ \", \"¿?\","
                         " \"⨂ \", \"⋫ \", \"☡ \"}, ((d.message.alert)) ))\n"
         "method.set_key = ui.column.render, \"110:2C92/2:☢ \","
         "    ((string.map, ((cat, ((d.is_open)), ((d.is_active)))), {00, \"▪ \"}, {01, \"▪ \"}, {10, \"╍ \"}, {11, \"▹ \"}))\n"
