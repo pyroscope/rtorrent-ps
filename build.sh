@@ -55,7 +55,7 @@ export VERSION_EXTRAS=" $git_id"
 
 export RT_PS_REVISION="${git_id%%-$git_commits_since_release-g*}"
 if test "$git_commits_since_release" -eq 0; then
-    VERSION_EXTRAS=" $RT_PS_REVISION"
+    VERSION_EXTRAS=" ${RT_PS_REVISION}-0"
 else
     RT_PS_REVISION="${RT_PS_REVISION%.*}.$(( ${RT_PS_REVISION##*.} + 1 ))-dev"
 fi
