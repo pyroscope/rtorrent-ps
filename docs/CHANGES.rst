@@ -30,7 +30,7 @@ and that is still version 0.9.6 at the time of this release.
 Many of the features and commands in version 0.9.7 are originally developed in
 or otherwise back-ported to this project anyway.
 
-Read the related `pyrocore update to 0.6.x`_ instructions,
+Read the related :ref:`upgrade-to-0.6.x` instructions,
 which will update configuration snippets in the ``rtorrent.d`` directories.
 If you used those snippets before, their update is **required** to run the new version
 – else you'll get visual defects at the very minimum,
@@ -93,9 +93,6 @@ then you just have to know yourself what to do (i.e. browse through ``git`` diff
 
 **NOTE:** Support for `rTorrent` versions before 0.9.6 and non-C++11
 compilers will end soon!
-
-
-.. _`pyrocore update to 0.6.x`: https://pyrocore.readthedocs.io/en/latest/updating.html#upgrade-to-0-6-x
 
 
 2017-03-12 v1.0 “First version-tagged release”

@@ -37,8 +37,7 @@ changed again.
 .. note:: If you also install the `PyroScope command line
     utilities <https://github.com/pyroscope/pyrocore>`_, do not forget to
     activate the extended features available together with *rTorrent-PS*, as
-    mentioned in the
-    `Configuration Guide <https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc>`_.
+    mentioned in the :doc:`pyrocore:setup`.
     Starting with *version 1.1*, that activation is automatic.
 
 
@@ -371,8 +370,7 @@ or an incremental update after a ``git fetch`` with new `rTorrent-PS` changes.
 PyroScope Installation
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The installation of ``pyrocore`` is done from source, see its `manual`_
-for more details.
+The installation of ``pyrocore`` is done from source, see its :doc:`manual <pyrocore:installation>` for additional details.
 
 .. code-block:: shell
 
@@ -396,8 +394,6 @@ The last call's output should look similar to this:
     $ pyroadmin --version
     pyroadmin 0.6.1.dev20180601 on Python 2.7.13
 
-
-.. _manual: https://pyrocore.readthedocs.org/en/latest/installation.html
 
 
 rTorrent Instance Setup
@@ -586,10 +582,8 @@ the installed software, which makes later updates a lot easier.
     Linux   = http://linuxtracker.org:2710/
     EOF
 
-Read the `pyrocore Configuration Guide`_ for more information regarding this file.
-You can come back to customizing it later, the system will work fine with the above default.
-
-.. _`pyrocore Configuration Guide`: https://pyrocore.readthedocs.org/en/latest/setup.html
+Read the `pyrocore` :doc:`pyrocore:setup` for more information regarding this file.
+You can come back to customizing it later, your system will work fine with the above default.
 
 
 First Start and Testing
@@ -636,9 +630,8 @@ Put the above ``tmux`` call into ``ExecStart``,
 and use ``… new -d …`` to run a detached session
 – see the `rTorrent wiki`_ for detailed examples.
 
-Continue with reading the `'pyrocore' manual`_ to get acquainted with that,
+Continue with reading the `pyrocore` :doc:`pyrocore:usage` to get acquainted with the CLI tools,
 and :doc:`setup` for providing the necessary configuration regarding your terminal.
 
 .. _custom configuration: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/files/dotfiles/tmux.conf
-.. _'pyrocore' manual: https://pyrocore.readthedocs.org/en/latest/usage.html
 .. _`rTorrent wiki`: https://github.com/rakshasa/rtorrent/wiki/Common-Tasks-in-rTorrent#starting-rtorrent-on-system-startup

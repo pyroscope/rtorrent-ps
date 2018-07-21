@@ -208,8 +208,6 @@ the following...
 .. _`term-256color.py`: https://github.com/pyroscope/rtorrent-ps/blob/master/term-256color.py
 
 .. _`rTorrent Scripting`: https://rtorrent-docs.readthedocs.io/en/latest/scripting.html#
-.. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
-.. _`pyroadmin`: https://pyrocore.readthedocs.io/en/latest/references.html#pyroadmin
 .. _`~/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include#L5
 
 

@@ -28,16 +28,16 @@ you will get the following additional features in your `rTorrent-PS` installatio
     open items by their total upload amount (descending).
 #.  The ``"`` key is bound to the ``datasize`` view, which sorts all
     open items by the size of their content data (descending).
-#.  Add even more views, see `Additional Views`_ for details.
+#.  Add even more views, see :ref:`additional-views` for details.
 #.  ``Page ↑`` and ``Page ↓`` scroll by 50 items at a time (or whatever
     other value ``ui.focus.page_size`` has).
 #.  ``Home`` / ``End`` jump to the first / last item in the current
     view.
 #.  The ``~`` key rotates through all available color themes, or a
-    user-selected subset. See `Color Themes`_ for details.
+    user-selected subset. See :ref:`color-themes` for details.
 #.  The ``<`` and ``>`` keys rotate through all added category views
     (``pyro.category.add=‹name›``), with filtering based on the
-    ruTorrent label (``custom_1=‹name›``). See `Category Views`_ for details.
+    ruTorrent label (``custom_1=‹name›``). See :ref:`category-views` for details.
 #.  ``|`` reapplies the category filter and thus updates the current
     category view.
 #.  The ``u`` key shows the uptime and some other essential data of your
@@ -55,7 +55,7 @@ you will get the following additional features in your `rTorrent-PS` installatio
     Within each group, they're sorted by download and then upload speed.
 #.  Some `canvas v2` columns are added in the `pimp-my-box` configuration –
     the selected throttle (⋉), a download's chunk size (≣),
-    and the expected time of arrival (⌛⚪≋⚫) on the *active* and *leeching* displays only.
+    and the expected time of arrival (⟲ ◥◤) on the *active* and *leeching* displays only.
     The visibility of the chunk size column can be toggled using the ``_`` key.
 #.  The commands ``s=«keyword»``, ``t=«tracker_alias»``, and
     ``f=«filter_condition»`` are pre-defined for searching using a
@@ -67,7 +67,7 @@ you will get the following additional features in your `rTorrent-PS` installatio
     ``rtcontrol`` on them, or alternatively use ``--to-view tagged`` to
     populate the ``tagged`` view, then deselect some items interactively
     with the ``.`` key, and finally mass-control the rest.
-    See `Additional Views`_ for details.
+    See :ref:`additional-views` for details.
 #.  You can use the ``purge=`` and ``cull=`` commands (on a Ctrl-X
     prompt) for deleting the current item and its (incomplete) data.
 #.  ``Ctrl-g`` shows the tags of an item (as managed by ``rtcontrol``);
@@ -85,22 +85,14 @@ you will get the following additional features in your `rTorrent-PS` installatio
 With regards to using the ‘right’ configuration to get the above, you need
 the ``*.rc.default`` files in the ``~/.pyroscope/rtorrent.d`` directory
 provided by `pyrocore`.
-`Standard Configuration Explained`_ has details on these.
+:ref:`std-config` has details on these.
 Some more features are defined by the `pimp-my-box`_ configuration templates.
 
 To get there, perform the :ref:`DebianInstallFromSource` as described in this manual,
 or use the `pimp-my-box`_ project for an automatic remote installation.
-The instructions in the `Extending your ‘.rtorrent.rc’`_ section of the `pyrocore` manual
+The instructions in the :ref:`rtorrent-pyro-rc` section of the `pyrocore` manual
 only cover half of it, and you might miss some described features.
 
-
-
-
-.. _Extending your ‘.rtorrent.rc’: https://pyrocore.readthedocs.org/en/latest/setup.html#extending-your-rtorrent-rc
-.. _`Standard Configuration Explained`: https://pyrocore.readthedocs.io/en/latest/usage.html#std-config
-.. _`Category Views`: https://pyrocore.readthedocs.io/en/latest/usage.html#category-views
-.. _`Color Themes`: https://pyrocore.readthedocs.io/en/latest/usage.html#color-themes
-.. _`Additional Views`: https://pyrocore.readthedocs.io/en/latest/usage.html#additional-views
 
 .. |rt-ps-canvas-v2-small| image:: _static/img/rT-PS-1.0-301-g573a782-2018-06-10-small.png
 
@@ -215,14 +207,13 @@ Tracker
 
 
 For the various time displays to work, you need
-the `pyrocore` `standard configuration for rtorrent.rc`_.
+the `pyrocore` :ref:`standard configuration for rtorrent.rc <rtorrent-pyro-rc>`.
 
 The scrape info and peer numbers are exact only for values below 100, else they
 indicate the order of magnitude using roman numerals (c = 10², m = 10³,
 X = 10⁴, C = 10⁵, M = 10⁶).
 For up-to-date scrape info, you need the `Tracker Auto-Scraping`_ configuration from `pyrocore`.
 
-.. _`standard configuration for rtorrent.rc`: https://pyrocore.readthedocs.io/en/latest/setup.html#extending-your-rtorrent-rc
 .. _`Tracker Auto-Scraping`: https://github.com/pyroscope/pyrocore/blob/master/src/pyrocore/data/config/rtorrent.d/auto-scrape.rc#L1
 .. _`support by a cron job`: https://github.com/pyroscope/pimp-my-box/commit/ee96e5074412e3e010bf6cf1906639634b081cce#diff-28aed99001b37b5d394978a621f41987
 
@@ -243,7 +234,6 @@ Note that the links point to the `Commands Reference`_ chapter in the *rTorrent 
 .. _Bintray: https://bintray.com/pkg/show/general/pyroscope/rtorrent-ps/rtorrent-ps
 .. _installation options: https://github.com/pyroscope/rtorrent-ps#installation
 .. _Arch Linux: http://www.archlinux.org/
-.. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
 .. _`pimp-my-box`: https://github.com/pyroscope/pimp-my-box/
 
 .. end of "manual.rst"

@@ -47,7 +47,7 @@ Working With Color Schemes
 
 If your terminal works as intended,
 you now might want to find you own color theme.
-The easiest way is to use a second shell and ``rtxmlrpc``. Try
+The easiest way is to use a second shell and :ref:`rtxmlrpc`. Try
 out some colors, and add the combinations you like to your
 ``~/.rtorrent.rc``.
 
@@ -164,7 +164,7 @@ The main display with the downloads list is flexible and
 can be configured to your will, in `rTorrent-PS 1.1` and up.
 This is also known as *canvas v2*.
 
-Use the following `rtxmlrpc`_ command to check if you have a version
+Use the following :ref:`rtxmlrpc` command to check if you have a version
 that can do this:
 
 .. code-block:: shell
@@ -183,7 +183,7 @@ The latter takes all the space left by other columns.
 Inspecting Your Display
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To list the columns you have in your setup, call  `rtxmlrpc`_ like so:
+To list the columns you have in your setup, call :ref:`rtxmlrpc` like so:
 
 .. code-block:: console
 
@@ -221,7 +221,7 @@ which is defined in `~/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include`_ of `
     if you used that to set up your system.
     Otherwise you'll get duplicate columns.
 
-To show the full column definitions with their code, call `pyroadmin`_:
+To show the full column definitions with their code, call :ref:`cli-usage-pyroadmin`:
 
 .. code-block:: console
 
@@ -458,6 +458,4 @@ it to the current bounds.
 
 
 .. _`rTorrent Scripting`: https://rtorrent-docs.readthedocs.io/en/latest/scripting.html#
-.. _`rtxmlrpc`: https://pyrocore.readthedocs.io/en/latest/usage.html#rtxmlrpc
-.. _`pyroadmin`: https://pyrocore.readthedocs.io/en/latest/references.html#pyroadmin
 .. _`~/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include`: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/templates/rtorrent/rtorrent.d/05-rt-ps-columns-v2.rc.include#L5
