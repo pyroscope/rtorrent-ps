@@ -1062,6 +1062,7 @@ torrent::Object ui_find_next() {
     std::string term = rpc::call_command_string("ui.find.term");
     if (term.empty())
         return torrent::Object();  // no current search term set
+    std::transform(term.begin(), term.end(), term.begin(), ::tolower);
 
     ui::DownloadList* dl_list = control->ui()->download_list();
     core::View* dl_view = dl_list->current_view();
@@ -1076,7 +1077,12 @@ torrent::Object ui_find_next() {
         do {
             if (++itr == dl_view->end_visible())
                 itr = dl_view->begin_visible();
-            found = (*itr)->info()->name().find(term) != std::string::npos;
+
+            // In C++11, this can be done more efficiently using std::search;
+            // we only use this interactively, so meh.
+            std::string name = (*itr)->info()->name();
+            std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+            found = name.find(term) != std::string::npos;
         } while (!found && itr != dl_view->focus());
 
         if (!found) {
