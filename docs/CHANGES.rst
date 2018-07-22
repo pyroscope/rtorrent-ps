@@ -9,6 +9,7 @@ Change History
 
 .. rubric:: UNRELEASED DEVELOPMENT VERSION
 
+- UI: Added item search via ``Ctrl-F`` and ``Shift-F`` / ``F3``
 - UI: Added *no data* indicator to alerts (in the ``❢`` column)
 - UI: Replaced problematic glyphs like ‘hourglass’ (caused visual defects on *Stretch* and *Bionic*)
 - Fix: Compilation on 32bit platforms (issue #108)

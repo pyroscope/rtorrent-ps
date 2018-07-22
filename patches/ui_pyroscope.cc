@@ -1058,6 +1058,39 @@ torrent::Object apply_magnitude(const torrent::Object::list_type& args) {
 }
 
 
+torrent::Object ui_find_next() {
+    std::string term = rpc::call_command_string("ui.find.term");
+    if (term.empty())
+        return torrent::Object();  // no current search term set
+
+    ui::DownloadList* dl_list = control->ui()->download_list();
+    core::View* dl_view = dl_list->current_view();
+
+    if (dl_view->empty_visible()) {
+        control->core()->push_log("This view is empty, nothing to find!");
+    } else {
+        core::View::iterator itr = dl_view->focus() == dl_view->end_visible() ?
+            dl_view->begin_visible() : dl_view->focus();
+        bool found = false;
+
+        do {
+            if (++itr == dl_view->end_visible())
+                itr = dl_view->begin_visible();
+            found = (*itr)->info()->name().find(term) != std::string::npos;
+        } while (!found && itr != dl_view->focus());
+
+        if (!found) {
+            control->core()->push_log(("Cannot find anything matching '" + term + "'").c_str());
+        } else if (itr != dl_view->focus()) {
+            dl_view->set_focus(itr);
+            dl_view->set_last_changed();
+        }
+    }
+
+    return torrent::Object();
+}
+
+
 // register our commands
 void initialize_command_ui_pyroscope() {
     #define PS_VARIABLE_COLOR(key, value) \
@@ -1094,6 +1127,9 @@ void initialize_command_ui_pyroscope() {
     CMD2_ANY("ui.column.hidden.list", _cxxstd_::bind(&display::ui_column_hidden_list));
     CMD2_ANY("ui.column.sacrificial.list", _cxxstd_::bind(&display::ui_column_sacrificial_list));
     CMD2_VAR_VALUE("ui.column.sacrificed", 0);
+
+    CMD2_ANY       ("ui.find.next", _cxxstd_::bind(&ui_find_next));
+    CMD2_VAR_STRING("ui.find.term", "");
 
     PS_VARIABLE_COLOR("ui.color.progress0",     "red");
     PS_VARIABLE_COLOR("ui.color.progress20",    "bold bright red");
@@ -1165,6 +1201,10 @@ void initialize_command_ui_pyroscope() {
         // Bind '*' to toggle between collapsed and expanded display
         "schedule2 = collapsed_view_toggle, 0, 0, ((ui.bind_key, download_list, *, \""
             "view.collapsed.toggle= ; ui.current_view.set = (ui.current_view)\"))\n"
+
+        // Bind 'F' / F3 to find the next item for 'ui.find.term'
+        "schedule2 = ui_find_next_f,  0, 0, ((ui.bind_key, download_list, F,    \"ui.find.next=\"))\n"
+        "schedule2 = ui_find_next_f3, 0, 0, ((ui.bind_key, download_list, 0413, \"ui.find.next=\"))\n"
 
         // Collapse built-in views
         "view.collapsed.toggle = main\n"

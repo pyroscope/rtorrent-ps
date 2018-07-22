@@ -33,6 +33,9 @@ you will get the following additional features in your `rTorrent-PS` installatio
     other value ``ui.focus.page_size`` has).
 #.  ``Home`` / ``End`` jump to the first / last item in the current
     view.
+#.  :kbd:`Ctrl-F` opens a prompt where you can enter a search term,
+    and :kbd:`Shift-F` or :kbd:`F3` jump to the next hit for that term.
+    If nothing matches, a message is shown on the console.
 #.  The ``~`` key rotates through all available color themes, or a
     user-selected subset. See :ref:`color-themes` for details.
 #.  The ``<`` and ``>`` keys rotate through all added category views
