@@ -36,6 +36,7 @@ you will get the following additional features in your `rTorrent-PS` installatio
 #.  :kbd:`Ctrl-F` opens a prompt where you can enter a search term,
     and :kbd:`Shift-F` or :kbd:`F3` jump to the next hit for that term.
     If nothing matches, a message is shown on the console.
+    |rt-ps-ui-find|
 #.  The ``~`` key rotates through all available color themes, or a
     user-selected subset. See :ref:`color-themes` for details.
 #.  The ``<`` and ``>`` keys rotate through all added category views
@@ -96,6 +97,8 @@ or use the `pimp-my-box`_ project for an automatic remote installation.
 The instructions in the :ref:`rtorrent-pyro-rc` section of the `pyrocore` manual
 only cover half of it, and you might miss some described features.
 
+
+.. |rt-ps-ui-find| image:: _static/img/rt-ps-ui-find.png
 
 .. |rt-ps-canvas-v2-small| image:: _static/img/rT-PS-1.0-301-g573a782-2018-06-10-small.png
 
