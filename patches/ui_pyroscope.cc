@@ -441,7 +441,7 @@ torrent::Object cmd_d_tracker_alias(core::Download* download) {
 
 
 static void decorate_download_title(Window* window, display::Canvas* canvas, core::View* view,
-                                    int pos, Range& range, int x_title) {
+                                    int pos, Range& range, int x_title, size_t hilite, size_t hilen) {
     int offset = row_offset(view, range);
     core::Download* item = *range.first;
     bool active = item->is_open() && item->is_active();
@@ -458,6 +458,10 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
         title_col = (active ? D_INFO(item)->down_rate()->rate() ?
                      ps::COL_LEECHING : ps::COL_INCOMPLETE : ps::COL_QUEUED) + offset;
     canvas->set_attr(x_title, pos, -1, attr_map[title_col] | focus_attr, title_col);
+    if (hilen && hilite != std::string::npos && x_title + hilite < int(canvas->width())) {
+        canvas->set_attr(x_title + hilite, pos, std::min(hilen, int(canvas->width()) - x_title - hilite),
+                         (attr_map[title_col] | focus_attr) ^ A_BOLD, title_col);
+    }
 
     // show label for active tracker (a/k/a in focus tracker)
     if (int(canvas->width()) <= x_title + NAME_RESERVED_WIDTH + 3) return;
@@ -508,7 +512,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
         }
     }
 
-    decorate_download_title(window, canvas, view, pos, range, 2);
+    decorate_download_title(window, canvas, view, pos, range, 2, -1, 0);
 
     // better handling for trail of line 2 (ratio etc.)
     int status_pos = 91;
@@ -814,6 +818,8 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
     const torrent::Object::map_type& column_defs = control->object_storage()->get_str("ui.column.render").as_map();
     int pos = 1, x_base = 2, column = x_base;
     bool narrow = false;
+    std::string find_term = rpc::call_command_string("ui.find.term");
+    std::transform(find_term.begin(), find_term.end(), find_term.begin(), ::tolower);
 
     // Render header line
     canvas->print(0, pos, "⇳ ");
@@ -868,7 +874,13 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
             canvas->print(column, pos, " %s",
                 u8_chop(displayname.empty() ? d->info()->name() : displayname.c_str(),
                         canvas->width() - column - 1).c_str());
-            decorate_download_title(window, canvas, view, pos, range, column + 1);
+            size_t hilite = std::string::npos;
+            if (!find_term.empty()) {
+                if (displayname.empty()) displayname = d->info()->name();
+                std::transform(displayname.begin(), displayname.end(), displayname.begin(), ::tolower);
+                hilite = displayname.find(find_term);
+            }
+            decorate_download_title(window, canvas, view, pos, range, column + 1, hilite, find_term.length());
         }
 
         // Colorize focus marker
