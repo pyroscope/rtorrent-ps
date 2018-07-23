@@ -460,7 +460,7 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
     canvas->set_attr(x_title, pos, -1, attr_map[title_col] | focus_attr, title_col);
     if (hilen && hilite != std::string::npos && x_title + hilite < int(canvas->width())) {
         canvas->set_attr(x_title + hilite, pos, std::min(hilen, int(canvas->width()) - x_title - hilite),
-                         (attr_map[title_col] | focus_attr) ^ A_BOLD, title_col);
+                         (attr_map[title_col] | focus_attr | A_REVERSE) ^ A_BOLD, title_col);
     }
 
     // show label for active tracker (a/k/a in focus tracker)
