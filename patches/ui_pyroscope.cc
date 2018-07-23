@@ -1092,7 +1092,8 @@ torrent::Object ui_find_next() {
 
             // In C++11, this can be done more efficiently using std::search;
             // we only use this interactively, so meh.
-            std::string name = (*itr)->info()->name();
+            std::string name = get_custom_string(*itr, "displayname");
+            if (name.empty()) name = (*itr)->info()->name();
             std::transform(name.begin(), name.end(), name.begin(), ::tolower);
             found = name.find(term) != std::string::npos;
         } while (!found && itr != dl_view->focus());
