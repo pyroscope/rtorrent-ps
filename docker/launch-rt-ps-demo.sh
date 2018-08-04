@@ -100,7 +100,7 @@ EOF
 *)
     test -z "$TMUX"; ALREADY_IN_TMUX=$?
     docker rm rt-ps-demo >/dev/null 2>&1 || :
-    docker run -it -v $(command cd $(dirname "$0") && pwd):/srv \
+    docker run -it -v $(command cd $(dirname "$0") >/dev/null && pwd):/srv \
                --name rt-ps-demo "$@" ${distro} \
                bash "/srv/$(basename $0)" as-root $ALREADY_IN_TMUX
     ;;
