@@ -12,6 +12,7 @@ Change History
 - UI: Added item search via ``Ctrl-F`` and ``Shift-F`` / ``F3``
 - UI: Added *no data* indicator to alerts (in the ``❢`` column)
 - UI: Replaced problematic glyphs like ‘hourglass’ (caused visual defects on *Stretch* and *Bionic*)
+- Command: Added ``string.shorten`` command (for logging)
 - Fix: Compilation on 32bit platforms (issue #108)
 - Docker: Demo launcher renamed to ``launch-rt-ps-demo.sh``,
   and supports any distro with a package available for it
