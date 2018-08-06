@@ -45,6 +45,7 @@
    * `string.replace`_
    * `string.rpad`_
    * `string.rstrip`_
+   * `string.shorten`_
    * `string.split`_
    * `string.startswith`_
    * `string.strip`_
@@ -62,6 +63,7 @@
 .. _`string.replace`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-replace
 .. _`string.rpad`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-rpad
 .. _`string.rstrip`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-rstrip
+.. _`string.shorten`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-shorten
 .. _`string.split`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-split
 .. _`string.startswith`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-startswith
 .. _`string.strip`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-string-strip
