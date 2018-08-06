@@ -183,6 +183,8 @@
    * `ui.column.show`_
    * `ui.column.spec`_
    * `ui.current_view`_
+   * `ui.find.next`_
+   * `ui.find.term`_
    * `ui.focus.end`_
    * `ui.focus.home`_
    * `ui.focus.page_size`_
@@ -207,6 +209,8 @@
 .. _`ui.column.show`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-show
 .. _`ui.column.spec`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-column-spec
 .. _`ui.current_view`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-current-view
+.. _`ui.find.next`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-find-next
+.. _`ui.find.term`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-find-term
 .. _`ui.focus.end`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-focus-end
 .. _`ui.focus.home`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-focus-home
 .. _`ui.focus.page_size`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-ui-focus-page-size
