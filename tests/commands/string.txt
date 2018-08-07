@@ -24,9 +24,9 @@ $ rtxmlrpc --repr string.shorten '' -- 'verylongnameofafile.txt' 15 4
 $ rtxmlrpc --repr string.shorten '' -- 'file.txt' 8 4
 'file.txt'
 $ rtxmlrpc --repr string.shorten '' -- 'file.txt' 7 4
-'fil…txt'
+'fil\u2026txt'
 $ rtxmlrpc --repr string.shorten '' -- 'filename.txt' 8 4
-'file…txt'
+'file\u2026txt'
 $ rtxmlrpc --repr string.shorten '' -- 'file.txt' 6 4
 'fil\u2026xt'
 # END
