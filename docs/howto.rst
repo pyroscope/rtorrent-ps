@@ -29,7 +29,7 @@ as in this example:
 
 .. code-block:: console
 
-    $ grep -C1 import.rc ~/.pyroscope/rtorrent.d/*.rc ~/rtorrent/rtorrent.d/*.rc ~/rtorrent/*rt*rc
+    $ grep -C1 import.rc ~/.pyroscope/rtorrent.d/*.rc.default ~/rtorrent/rtorrent.d/*.rc ~/rtorrent/*rt*rc
     rtorrent/rtorrent.rc-execute2 = (cat,(pyro.bin_dir),pyroadmin),-q,--create-import,(cat,(cfg.basedir),"rtorrent.d/*.rc")
     rtorrent/rtorrent.rc:import = (cat,(cfg.basedir),"rtorrent.d/.import.rc")
     rtorrent/rtorrent.rc-
