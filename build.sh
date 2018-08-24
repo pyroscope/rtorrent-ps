@@ -82,13 +82,12 @@ docker_distros_all+=(
 BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev zlib1g-dev libcppunit-dev locales )
 
 # Fitting / tested dependency versions for major platforms
-#export CARES_VERSION=1.10.0
-#export CURL_VERSION=7.51.0 # 2016-11
-#export XMLRPC_REV=2775     # Release 1.43.01 2015-10
-export CARES_VERSION=1.13.0 # 2017-06
-export CURL_VERSION=7.54.1  # 2017-06
-export XMLRPC_REV=2917      # Release 1.48.00 2016-12-27
-# WARNING: see rT issue #457 regarding curl configure options
+#export CARES_VERSION=1.13.0 # 2017-06
+#export CURL_VERSION=7.54.1  # 2017-06
+#export XMLRPC_REV=2917      # Release 1.48.00 2016-12-27
+export CARES_VERSION=1.14.0 # 2018-02
+export CURL_VERSION=7.61.0  # 2018-07
+export XMLRPC_REV=2984      # Release 1.51.01 2018-04
 
 # Extra options handling (set overridable defaults)
 : ${PACKAGE_ROOT:=/opt/rtorrent}
