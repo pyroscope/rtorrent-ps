@@ -51,7 +51,7 @@ References
 
 
 .. _`official release`: https://github.com/pyroscope/rtorrent-ps/releases
-.. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/CHANGES.md
+.. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/CHANGES.rst
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
 .. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
