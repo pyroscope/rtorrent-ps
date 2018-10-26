@@ -16,11 +16,13 @@
 # then enter ``Ctrl-A r`` to refresh the ``tmux`` screen.
 #
 
+set -e
+
 # Both Stretch and Bionic have problems with the current v1.1 column headers
 #distro="debian:stretch"
 distro="ubuntu:bionic"
 #distro="ubuntu:xenial"
-rtps_version="0.9.6-PS-1.1-15-g56057fc~${distro#*:}"
+rtps_version="0.9.6-PS-1.1-25-g1b53ac9~${distro#*:}"
 
 ALREADY_IN_TMUX=${2:-0}
 
