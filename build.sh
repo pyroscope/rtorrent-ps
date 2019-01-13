@@ -159,7 +159,6 @@ esac
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
 #export CFLAGS="$CFLAGS -march=i586"
-export USE_CXXFLAGS=true
 GCC_DOT_VER=$(gcc --version 2>/dev/null | head -n1 | cut -d' ' -f4)
 GCC_INT_VER=$(printf "%d%02d%02d" $(tr . ' ' <<<$GCC_DOT_VER))
 
@@ -171,14 +170,19 @@ else
     GCC_TYPE=none
 fi
 
-# Fix libtorrent bug with gcc version >= 6 and non-empty CXXFLAGS env var
-test "${GCC_INT_VER:-0}" -ge 60000 && export USE_CXXFLAGS=false || :
+# Hack to prevent libtorrent from breaking the XMLRPC-C autoconf test.
+# -ltorrent is (incorrectly?) specified in LIBS when linking the XMLRPC-C test
+# program, causing the linker to use non-exported symbols in libtorrent, which
+# results in a link error. -O2 seems to work around this by eliminating
+# libtorrent as dead code from the test program.
+CFLAGS="${CFLAGS} -g -O2"
+CXXFLAGS="${CXXFLAGS} -g -O2"
 
 # Set C++ standard support
 cpp_std=""
 test "${GCC_INT_VER:-0}" -ge 40300 && cpp_std="-std=c++0x" || :
 test "${GCC_INT_VER:-0}" -ge 40801 && cpp_std="-std=c++11" || :
-grep -- '-std=' <<<"$CPPFLAGS" >/dev/null || export CPPFLAGS="${CPPFLAGS}${cpp_std:+ }${cpp_std}"
+grep -- '-std=' <<<"$CXXFLAGS" >/dev/null || export CXXFLAGS="${CXXFLAGS}${cpp_std:+ }${cpp_std}"
 
 case "$GCC_TYPE" in
     # Raspberry Pi 2 with one of
@@ -231,7 +235,6 @@ BUILD_GIT=false
 
 set_build_env() {
     export CPPFLAGS="-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
-    export CXXFLAGS="$CFLAGS"
     export LDFLAGS="-L$INSTALL_RELEASE_DIR/lib${LDFLAGS:+ }${LDFLAGS}"
     export LDFLAGS="-Wl,-rpath,$INSTALL_RELEASE_DIR/lib ${LDFLAGS}"
     export LIBS="${LIBS}"
@@ -249,7 +252,7 @@ set_build_env() {
     echo "!!! Installing rTorrent$VERSION_EXTRAS v$RT_VERSION$git_tag into $INSTALL_DIR !!!"; echo
 
     printf "export CPPFLAGS=%q\n"           "${CPPFLAGS}"
-    printf "export CXXFLAGS=%q # use=%s\n"  "${CXXFLAGS}" "${USE_CXXFLAGS}"
+    printf "export CXXFLAGS=%q\n"           "${CXXFLAGS}"
     printf "export LDFLAGS=%q\n"            "${LDFLAGS}"
     printf "export LIBS=%q\n"               "${LIBS}"
     printf "export PKG_CONFIG_PATH=%q\n"    "${PKG_CONFIG_PATH}"
@@ -475,10 +478,10 @@ core_unpack() { # Unpack original LT/RT source
 build() { ## Build and install all components
     test -f "$INSTALL_DIR/lib/DEPS-DONE" || fail "You need to '$0 deps' first!"
 
-    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd libtorrent-$LT_VERSION && automagic && \
+    ( set +x ; cd libtorrent-$LT_VERSION && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
-    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd rtorrent-$RT_VERSION && automagic && \
+    ( set +x ; cd rtorrent-$RT_VERSION && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INSTALL_DIR/bin/xmlrpc-c-config && \
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
 }
@@ -499,12 +502,12 @@ build_git() { ## a/k/a ‹git› – Build and install libtorrent and rtorrent f
     $SED_I 's/^AC_INIT(rtorrent, '$RT_RELEASE_VERSION'/AC_INIT(rtorrent, '$RT_VERSION'/' "$rt_src/configure.ac"
 
     echo; echo "*** Entering $lt_src"
-    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd "$lt_src" && automagic && \
+    ( set +x ; cd "$lt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_LT && $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
     $SED_I s:/usr/local:$INSTALL_DIR: $INSTALL_DIR/lib/pkgconfig/*.pc $INSTALL_DIR/lib/*.la
 
     echo; echo "*** Entering $rt_src"
-    ( set +x ; $USE_CXXFLAGS || unset CXXFLAGS; cd "$rt_src" && automagic && \
+    ( set +x ; cd "$rt_src" && automagic && \
         ./configure $CFG_OPTS $CFG_OPTS_RT --with-xmlrpc-c=$INSTALL_RELEASE_DIR/bin/xmlrpc-c-config && \
         $MAKE clean && $MAKE $MAKE_OPTS && $MAKE prefix=$INSTALL_DIR install )
 }
