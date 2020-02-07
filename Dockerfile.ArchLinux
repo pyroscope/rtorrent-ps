@@ -1,0 +1,33 @@
+# Build Arch Linux Package in Docker
+#
+# Needs docker 17.05!
+# https://docs.docker.com/engine/userguide/eng-image/multistage-build/#use-multi-stage-builds
+#
+# Build with "./build.sh docker_arch [‹build-opts›…]"
+#
+
+ARG DISTRO=archlinux
+ARG CODENAME=20200205
+#ARG CODENAME=latest
+
+FROM ${DISTRO}:${CODENAME} AS build
+WORKDIR /build
+RUN pacman -Syy --noconfirm && pacman -S --noconfirm --needed \
+        lsb-release base-devel pkg-config \
+        subversion git time tmux curl wget \
+        autoconf automake libtool cppunit \
+        openssl ncurses readline zlib
+COPY patches/ ./patches
+COPY build.sh tmp-docker/ ./
+RUN ./build.sh install
+
+#FROM ${DISTRO}:${CODENAME} AS package
+#ENV FULLNAME=pyroscope
+#ENV EMAIL=pyroscope.project@gmail.com
+#WORKDIR /package
+#RUN pacman -Syy --noconfirm && pacman -S --noconfirm --needed \
+#        lsb-release base-devel pkg-config ruby \
+#RUN gem install --no-user-install --install-dir /usr/local fpm -v 1.11.0
+#COPY --from=build /opt/rtorrent /opt/rtorrent/
+#COPY build.sh tmp-docker/ ./
+#RUN ./build.sh pkg2pacman
