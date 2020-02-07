@@ -733,6 +733,23 @@ docker_deb() { ## Build Debian packages via Docker
     ls -lrt *.deb
 }
 
+docker_arch() { ## Build Arch Linux packages via Docker
+    local DOCKER_TAG=rtps-arch
+
+    mkdir -p tmp-docker
+    set \
+        | egrep '^(git_[_a-z]+|[_A-Z]+_OPTS|[_A-Z]+_ROOT|CFG_[_A-Z]+)' \
+        | sed -re 's/^/export /' >tmp-docker/docker-env
+    ln -f Dockerfile.Arch tmp-docker/Dockerfile
+
+    docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile "$@" . \
+        || { echo -e "\n\n*** WARNING: $distro does not build ***\n\n"; continue; }
+    #docker run --rm -u $(id -u):$(id -g) --userns host -v "$PWD:/pwd" $DOCKER_TAG \
+    #           bash -c "cp /tmp/rt-ps-dist/rtorrent-ps_*.deb /pwd"
+
+    #ls -lrt *.deb
+}
+
 #
 # MAIN
 #
