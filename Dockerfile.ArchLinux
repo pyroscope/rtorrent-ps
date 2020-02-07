@@ -21,13 +21,13 @@ COPY patches/ ./patches
 COPY build.sh tmp-docker/ ./
 RUN ./build.sh install
 
-#FROM ${DISTRO}:${CODENAME} AS package
-#ENV FULLNAME=pyroscope
-#ENV EMAIL=pyroscope.project@gmail.com
-#WORKDIR /package
-#RUN pacman -Syy --noconfirm && pacman -S --noconfirm --needed \
-#        lsb-release base-devel pkg-config ruby \
-#RUN gem install --no-user-install --install-dir /usr/local fpm -v 1.11.0
-#COPY --from=build /opt/rtorrent /opt/rtorrent/
-#COPY build.sh tmp-docker/ ./
-#RUN ./build.sh pkg2pacman
+FROM ${DISTRO}:${CODENAME} AS package
+ENV DEBFULLNAME=pyroscope
+ENV DEBEMAIL=pyroscope.project@gmail.com
+WORKDIR /package
+RUN pacman -Syy --noconfirm && pacman -S --noconfirm --needed \
+        lsb-release base-devel pkg-config ruby
+RUN gem install --no-user-install fpm -v 1.11.0
+COPY --from=build /opt/rtorrent /opt/rtorrent/
+COPY build.sh tmp-docker/ ./
+RUN ./build.sh pkg2pacman
