@@ -231,14 +231,21 @@ Using Docker for Building Packages
 
 The ``docker_deb`` build action uses ``Dockerfile.Debian`` to compile and package
 *rTorrent-PS* on a given *Debian* or *Ubuntu* release.
+Similarly, ``docker_arch`` does the same for *Arch Linux* using ``Dockerfile.ArchLinux``.
 
 ``docker_deb`` takes an optional ``‹distro›:‹codename›`` argument,
 and defaults to ``debian:stretch``.
 You can also use ``all``, ``stable``, or ``oldstable`` to name classes of distributions,
 defined in the related `docker_distros_*`_ lists at the start of `build.sh`_.
 
-Any additional arguments are passed on to the underlying ``docker build`` command.
-Since ``docker_deb`` takes arguments, you cannot call any further actions after it,
+``docker_arch`` takes no release names due to its rolling release nature,
+but check out the ``ARG CODENAME=20200205`` at the top of ``Dockerfile.ArchLinux``
+that makes the build more reproducible
+– you might want to update that to ``latest`` or a newer release date.
+
+Any additional arguments to the ``build.sh`` call
+are passed on to the underlying ``docker build`` command.
+Since ``docker_*`` takes arguments, you cannot call any further actions after it,
 in the same ``build.sh`` call.
 
 .. note::
