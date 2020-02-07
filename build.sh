@@ -163,9 +163,9 @@ export USE_CXXFLAGS=true
 GCC_DOT_VER=$(gcc --version 2>/dev/null | head -n1 | cut -d' ' -f4)
 GCC_INT_VER=$(printf "%d%02d%02d" $(tr . ' ' <<<$GCC_DOT_VER))
 
-if command which dpkg-architecture >/dev/null && dpkg-architecture -earmhf; then
+if command which dpkg-architecture >/dev/null 2>&1 && dpkg-architecture -earmhf; then
     GCC_TYPE="Raspbian"
-elif command which gcc >/dev/null; then
+elif command which gcc >/dev/null 2>&1; then
     GCC_TYPE=$(gcc --version | head -n1 | tr -s '()' ' ' | cut -f2 -d' ')
 else
     GCC_TYPE=none
@@ -203,8 +203,10 @@ unset LC_ALL
 export LC_ALL
 
 # Select build tools (prefer 'g' variants if there)
-command which gmake >/dev/null && export MAKE=gmake || export MAKE=make
-command which glibtoolize >/dev/null && export LIBTOOLIZE=glibtoolize || export LIBTOOLIZE=libtoolize
+command which gmake >/dev/null 2>&1 \
+    && export MAKE=gmake || export MAKE=make
+command which glibtoolize >/dev/null 2>&1 \
+    && export LIBTOOLIZE=glibtoolize || export LIBTOOLIZE=libtoolize
 
 # Platform magic
 export SED_I="sed -i -e"
