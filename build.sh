@@ -740,14 +740,14 @@ docker_arch() { ## Build Arch Linux packages via Docker
     set \
         | egrep '^(git_[_a-z]+|[_A-Z]+_OPTS|[_A-Z]+_ROOT|CFG_[_A-Z]+)' \
         | sed -re 's/^/export /' >tmp-docker/docker-env
-    ln -f Dockerfile.Arch tmp-docker/Dockerfile
+    ln -f Dockerfile.ArchLinux tmp-docker/Dockerfile
 
     docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile "$@" . \
         || { echo -e "\n\n*** WARNING: $distro does not build ***\n\n"; continue; }
-    #docker run --rm -u $(id -u):$(id -g) --userns host -v "$PWD:/pwd" $DOCKER_TAG \
-    #           bash -c "cp /tmp/rt-ps-dist/rtorrent-ps_*.deb /pwd"
+    docker run --rm -u $(id -u):$(id -g) --userns host -v "$PWD:/pwd" $DOCKER_TAG \
+               bash -c "cp /tmp/rt-ps-dist/rtorrent-ps-*.pkg.tar.xz /pwd"
 
-    #ls -lrt *.deb
+    ls -lrt *.pkg.tar.xz
 }
 
 #
@@ -777,6 +777,9 @@ while test -n "$1"; do
                     export BUILD_GIT=true
                     prep; set_build_env; build_deps ;;
         docker_deb) docker_deb "$@"
+                    break  # takes args, so must be the last action on a call
+                    ;;
+        docker_arch) docker_arch "$@"
                     break  # takes args, so must be the last action on a call
                     ;;
         download)   prep; download ;;
