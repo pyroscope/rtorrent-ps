@@ -93,6 +93,9 @@ for installing on `Arch` via ``pacman``.
    `Debian` one, embedding a tested version combination of dependencies.
    See :ref:`build-pkg2deb` for general instructions on building that
    variant, and use ``pkg2pacman`` instead of ``pkg2deb``.
+
+   Or you make your life easier and just use ``./build.sh docker_arch``
+   to build a pacman package, see :ref:`build-docker_deb` for more.
 #. The *“Arch User Repository”* (AUR) PKGBUILDs maintained by @xsmile.
    These use a standard `Arch` build process, but include the usual `rTorrent-PS`
    patches.
