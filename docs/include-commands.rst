@@ -226,6 +226,7 @@
    :columns: 3
 
    * `array.at`_
+   * `close_low_diskspace.normal`_
    * `compare`_
    * `do`_
    * `import.return`_
@@ -238,6 +239,7 @@
 
 .. _`array.at`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-array-at
 .. _`compare`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-compare
+.. _`close_low_diskspace.normal`: https://rtorrent-docs.rtfd.io/en/latest/cmd-ref.html#term-close-low-diskspace-normal
 .. _`do`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-do
 .. _`import.return`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-import-return
 .. _`log.messages`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-log-messages
@@ -246,5 +248,3 @@
 .. _`trackers.alias.set_key`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-trackers-alias-set-key
 .. _`value`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-value
 .. _`view.collapsed.toggle`: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html#term-view-collapsed-toggle
-
-
