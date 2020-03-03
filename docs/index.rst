@@ -21,9 +21,9 @@ The latter includes custom command extensions from `rTorrent-PS`.
 |issues|
 
 
-.. hint:: **Community Contacts and Solving Problems**
+.. rubric:: **Community Contacts and Solving Problems**
 
-    .. include:: include-contacts.rst
+.. include:: include-contacts.rst
 
 
 .. _`rTorrent`: https://github.com/rakshasa/rtorrent
