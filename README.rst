@@ -32,11 +32,12 @@ See the
 `main documentation <http://rtorrent-ps.readthedocs.io/en/latest/overview.html>`_
 for details about installing and using ``rTorrent-PS``.
 
-To get in contact and share your experiences with other users of
-``rTorrent-PS``, join the
-`pyroscope-users <http://groups.google.com/group/pyroscope-users>`_
-mailing list or the inofficial ``##rtorrent`` channel on
-``irc.freenode.net``.
+
+To get in contact and share your experiences with other users of `PyroScope`_,
+join the `rtorrent-community`_ channel `rtorrent-ps`_ on Gitter.
+
+This is also the way to resolve any problems with or questions about your configuration
+and software installation.
 
 
 References
@@ -50,12 +51,16 @@ References
    and the `rTorrent Handbook <http://rtorrent-docs.rtfd.io/>`_
 
 
-.. _`official release`: https://github.com/pyroscope/rtorrent-ps/releases
-.. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/CHANGES.rst
-.. _`rTorrent`: https://github.com/rakshasa/rtorrent
 .. _`Bintray`: https://bintray.com/pyroscope/rtorrent-ps/rtorrent-ps
-.. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
-.. _`rTorrent Community Wiki`: https://github.com/rtorrent-community/rtorrent-community.github.io/wiki
+.. _`changelog`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/CHANGES.rst
 .. _`DebianInstallFromSource`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/DebianInstallFromSource.md
-.. _`RtorrentExtended`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md
+.. _`official release`: https://github.com/pyroscope/rtorrent-ps/releases
+.. _`PyroScope`: https://github.com/pyroscope
+.. _`pyroscope-tools`: https://gitter.im/rtorrent-community/pyroscope-tools
+.. _`rtorrent-community`: https://gitter.im/rtorrent-community/
+.. _`rTorrent Community Wiki`: https://github.com/rtorrent-community/rtorrent-community.github.io/wiki
+.. _`rTorrent Documentation Wiki`: https://github.com/rakshasa/rtorrent/wiki
 .. _`RtorrentExtendedCanvas`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtendedCanvas.md
+.. _`RtorrentExtended`: https://github.com/pyroscope/rtorrent-ps/blob/master/docs/RtorrentExtended.md
+.. _`rTorrent`: https://github.com/rakshasa/rtorrent
+.. _`rtorrent-ps`: https://gitter.im/rtorrent-community/rtorrent-ps
