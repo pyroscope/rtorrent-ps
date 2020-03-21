@@ -64,7 +64,7 @@ Supported Platforms
 -------------------
 
 The tested and officially supported platforms are `Debian` and any Debian-related Linux distro, specifically `Ubuntu`.
-`Arch Linux` is supported via contributors, and `Fedore 26` has some limited support
+`Arch Linux` is supported via contributors, and `Fedora 26` has some limited support
 – anything else vanilla rTorrent runs on will likely work too,
 but in the end *you* have to fix any problems that might occur.
 If you want better support for your platform, provide a *working* derivative of
