@@ -644,4 +644,5 @@ If you would prefer to manually start rtorrent-ps, you may want to consider crea
 .. code-block:: shell
 
     # This will allow the user to start the program (and tmux session and window) by only typing rt-ps
-    alias rt-ps='tmux -2u new -n rT-PS -s rtorrent "~/rtorrent/start; exec bash"'
+    echo -e 'alias rt-ps=\x27tmux -2u new -n rT-PS -s rtorrent "~/rtorrent/start; exec bash"\x27' >> ~/.bashrc
+    source ~/.bashrc
