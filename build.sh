@@ -132,6 +132,11 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         BUILD_PKG_DEPS+=( gcc-7 g++-7 )
         export CC=gcc-7 CXX=g++-7
         ;;
+    *-bullseye)
+        # Still fails with a compilation error!
+        BUILD_PKG_DEPS+=( gcc-8 g++-8 )
+        export CC=gcc-8 CXX=g++-8
+        ;;
     Arch-*) # 0.9.[46] only!
         BUILD_PKG_DEPS=( ncurses openssl cppunit )
         source /etc/makepkg.conf 2>/dev/null
