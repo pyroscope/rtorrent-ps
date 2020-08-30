@@ -64,6 +64,7 @@ fi
 docker_distros_stable=(
     debian:stretch
     ubuntu:bionic
+    ubuntu:focal
 )
 docker_distros_oldstable=(
     debian:jessie
@@ -104,7 +105,7 @@ export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPT
 export SRC_DIR=$(cd $(dirname $0) && pwd)
 LT_PATCHES=( )
 RT_PATCHES=( )
-LT_BASE_PATCHES=( $SRC_DIR/patches/lt-base-cppunit-pkgconfig.patch )
+LT_BASE_PATCHES=( $SRC_DIR/patches/lt-base-cppunit-pkgconfig.patch $SRC_DIR/patches/lt-base-c11-fixes.patch )
 RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
 
 # Distro specifics
@@ -155,6 +156,7 @@ esac
 #   trusty  (14.04) 4.8.2
 #   xenial  (16.04) 5.3.1
 #   bionic  (18.04) 7.3.0
+#   focal   (20.04) 9.3.0
 #
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:
