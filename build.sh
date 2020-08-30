@@ -75,6 +75,7 @@ docker_distros_all+=( "${docker_distros_stable[@]}" )
 docker_distros_all+=( "${docker_distros_oldstable[@]}" )
 docker_distros_all+=(
     debian:wheezy
+    debian:buster
     ubuntu:trusty
     ubuntu:precise
 )
@@ -119,6 +120,13 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
     *-vivid|*-wily|*-xenial|*-yakkety|*-zesty)
         ;;
     *-stretch|Fedora-TwentySix)
+        ;;
+    *-n/a)
+        if grep 'buster' /etc/os-release >/dev/null; then
+            BUILD_PKG_DEPS+=( gcc-7 g++-7 )
+            export CC=gcc-7 CXX=g++-7
+            deb_codename="buster"
+        fi
         ;;
     *-buster)
         BUILD_PKG_DEPS+=( gcc-7 g++-7 )
