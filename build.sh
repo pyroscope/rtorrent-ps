@@ -109,6 +109,8 @@ LT_BASE_PATCHES=( $SRC_DIR/patches/lt-base-cppunit-pkgconfig.patch $SRC_DIR/patc
 RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
 
 # Distro specifics
+##lsb_release -sic
+deb_codename=$(lsb_release -cs)
 case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') in
     *-precise|*-trusty|*-utopic|*-wheezy)
         ;;
@@ -315,6 +317,8 @@ printf 'export MAKE_OPTS=%q\n'      "$MAKE_OPTS"
 printf 'export CFG_OPTS=%q\n'       "$CFG_OPTS"
 printf 'export CFG_OPTS_LT=%q\n'    "$CFG_OPTS_LT"
 printf 'export CFG_OPTS_RT=%q\n'    "$CFG_OPTS_RT"
+printf 'export CC=%q\n'             "$CC"
+printf 'export CXX=%q\n'            "$CXX"
 echo
 
 
@@ -656,7 +660,7 @@ pkg2deb() { ## Package current $PACKAGE_ROOT installation for APT [needs fpm]
     package_prep
 
     fpm_pkg_ext="deb"
-    fpm_iteration="${VERSION_EXTRAS# }~"$(lsb_release -cs)
+    fpm_iteration="${VERSION_EXTRAS# }~"$deb_codename
     fpm_license="GPL v2"
     deps=$(ldd "$PACKAGE_ROOT"/bin/rtorrent | cut -f2 -d'>' | cut -f2 -d' ' | egrep '^/lib/|^/usr/lib/' \
         | sed -r -e 's:^/lib.+:&\n/usr&:' | xargs -n1 dpkg 2>/dev/null -S \
@@ -724,6 +728,7 @@ docker_deb() { ## Build Debian packages via Docker
             | sed -re 's/^/export /' >tmp-docker/docker-env
         ln -f Dockerfile.Debian tmp-docker/Dockerfile
 
+        echo "*** Docker build for $DISTRO_NAME:$DISTRO_CODENAME"
         docker build -t $DOCKER_TAG -f tmp-docker/Dockerfile \
                      --build-arg DISTRO=$DISTRO_NAME \
                      --build-arg CODENAME=$DISTRO_CODENAME \
