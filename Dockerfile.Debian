@@ -42,7 +42,9 @@ RUN echo 'Acquire::http::Timeout "90";' >/etc/apt/apt.conf.d/90docker.conf \
          || ( apt-get install -qy ruby1.9.3 \
               && update-alternatives --set gem /usr/bin/gem1.9.1 ) ) \
     && rm -rf /var/lib/apt/lists/*
-RUN gem install --no-rdoc --no-ri fpm -v 1.8.1
+# Deprecated --no-* options, maybe still needed on older distros?
+# RUN gem install --no-rdoc --no-ri fpm -v 1.8.1
+RUN gem install -N fpm -v 1.8.1
 COPY --from=build /opt/rtorrent /opt/rtorrent/
 COPY build.sh tmp-docker/ ./
 RUN ./build.sh pkg2deb
