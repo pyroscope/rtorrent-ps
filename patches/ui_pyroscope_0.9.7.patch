@@ -1,0 +1,77 @@
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -30,6 +30,7 @@ libsub_root_a_SOURCES = \
+ 	control.h \
+ 	globals.cc \
+ 	globals.h \
++	ui_pyroscope.cc \
+ 	option_parser.cc \
+ 	option_parser.h \
+ 	signal_handler.cc \
+--- a/src/command_helpers.cc
++++ b/src/command_helpers.cc
+@@ -57,6 +57,7 @@ void initialize_command_throttle();
+ void initialize_command_tracker();
+ void initialize_command_scheduler();
+ void initialize_command_ui();
++void initialize_command_ui_pyroscope();
+ 
+ void
+ initialize_commands() {
+@@ -75,4 +76,5 @@ initialize_commands() {
+   initialize_command_throttle();
+   initialize_command_tracker();
+   initialize_command_scheduler();
++  initialize_command_ui_pyroscope();
+ }
+--- a/src/display/canvas.h
++++ b/src/display/canvas.h
+@@ -137,7 +137,9 @@ Canvas::print(unsigned int x, unsigned int y, const char* str, ...) {
+ 
+   if (!m_isDaemon) {
+     va_start(arglist, str);
++    if (y < height()) {;
+     wmove(m_window, y, x);
+     vw_printw(m_window, const_cast<char*>(str), arglist);
++    }
+     va_end(arglist);
+   }
+--- a/src/display/window_statusbar.cc
++++ b/src/display/window_statusbar.cc
+@@ -67,6 +67,8 @@ WindowStatusbar::redraw() {
+     m_canvas->print(m_canvas->width() - (position - buffer), 0, "%s", buffer);
+   }
+ 
++  void ui_pyroscope_statusbar_redraw(Window* window, display::Canvas* canvas);
++  ui_pyroscope_statusbar_redraw(this, m_canvas);
+   m_lastTick = control->tick();
+ }
+ 
+ }
+--- a/src/display/window_download_list.cc
++++ b/src/display/window_download_list.cc
+@@ -83,6 +83,8 @@ WindowDownloadList::redraw() {
+ 
+   m_canvas->print(0, 0, "%s", ("[View: " + m_view->name() + "]").c_str());
+ 
++  bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, core::View* view);
++  if (ui_pyroscope_download_list_redraw(this, m_canvas, m_view)) return;
+   if (m_view->empty_visible() || m_canvas->width() < 5 || m_canvas->height() < 2)
+     return;
+ 
+@@ -132,6 +134,8 @@ WindowDownloadList::redraw() {
+       print_download_status(buffer, last, *range.first);
+       m_canvas->print(0, pos++, "%c %s", range.first == m_view->focus() ? '*' : ' ', buffer);
+ 
++      void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* canvas, core::View* view, int pos, Range& range);
++      ui_pyroscope_download_list_redraw_item(this, m_canvas, m_view, pos, range);
+       range.first++;
+     }
+ 
+--- a/src/display/canvas.cc
++++ b/src/display/canvas.cc
+@@ -113,2 +113,4 @@
+     initscr();
++    extern void ui_pyroscope_canvas_init();
++    ui_pyroscope_canvas_init();
+     raw();

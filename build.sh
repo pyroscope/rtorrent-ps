@@ -53,6 +53,17 @@ export LT_VERSION=0.13.$RT_MINOR; export RT_VERSION=0.9.$RT_MINOR;
 export GIT_MINOR=$(( $RT_MINOR + 1 ))  # ensure git version has a bumped version number
 export VERSION_EXTRAS=" $git_id"
 
+# Keep rTorrent version, once it was built in this directory
+# (this list also can be considered 'supported' versions,
+# though only the last stable is regularly compiled)
+test -d rtorrent-0.9.6 && { export LT_VERSION=0.13.6; export RT_VERSION=0.9.6; }
+test -d rtorrent-0.9.7 && { export LT_VERSION=0.13.7; export RT_VERSION=0.9.7; }
+test -d rtorrent-0.9.8 && { export LT_VERSION=0.13.8; export RT_VERSION=0.9.8; }
+# Reset the minor version in case it changed
+[[ $RT_VERSION =~ 0\.9\.(.) ]] && export RT_MINOR=${BASH_REMATCH[1]}
+BUILD_GIT=false
+
+
 export RT_PS_REVISION="${git_id%%-$git_commits_since_release-g*}"
 if test "$git_commits_since_release" -eq 0; then
     VERSION_EXTRAS=" ${RT_PS_REVISION}-0"
@@ -106,8 +117,14 @@ export PACKAGE_ROOT INSTALL_ROOT INSTALL_DIR BIN_DIR CURL_OPTS MAKE_OPTS CFG_OPT
 export SRC_DIR=$(cd $(dirname $0) && pwd)
 LT_PATCHES=( )
 RT_PATCHES=( )
-LT_BASE_PATCHES=( $SRC_DIR/patches/lt-base-cppunit-pkgconfig.patch $SRC_DIR/patches/lt-base-c11-fixes.patch )
-RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
+LT_BASE_PATCHES=( )
+RT_BASE_PATCHES=( )
+
+# Vanilla build fixes that were merged into mainline 0.9.7
+if [[ $RT_MINOR -le 6 ]]; then
+     LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-base-cppunit-pkgconfig.patch $SRC_DIR/patches/lt-base-c11-fixes.patch )
+     RT_BASE_PATCHES+=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
+fi
 
 # Distro specifics
 ##lsb_release -sic
@@ -154,7 +171,9 @@ esac
 # OpenSSL version detection for selective patching
 case $(openssl version 2> /dev/null | egrep -o "1.[0-9].[0-9]+") in
     1.1.*)
-        LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
+        if [[ $RT_MINOR -le 7 ]]; then # Merged into 0.9.8 mainline
+            LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
+        fi
         ;;
 esac
 
@@ -239,15 +258,6 @@ case "$(uname -s)" in
         ;;
 esac
 
-# Keep rTorrent version, once it was built in this directory
-# (this list also can be considered 'supported' versions,
-# though only the last stable is regularly compiled)
-test -d rtorrent-0.9.4 && { export LT_VERSION=0.13.4; export RT_VERSION=0.9.4; }
-test -d rtorrent-0.9.5 && { export LT_VERSION=0.13.5; export RT_VERSION=0.9.5; }
-test -d rtorrent-0.9.6 && { export LT_VERSION=0.13.6; export RT_VERSION=0.9.6; }
-BUILD_GIT=false
-
-
 set_build_env() {
     export CPPFLAGS="-I $INSTALL_RELEASE_DIR/include${CPPFLAGS:+ }${CPPFLAGS}"
     export CXXFLAGS="$CFLAGS"
@@ -295,8 +305,8 @@ esac
 #   http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/
 #   http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/
 TARBALLS+=(
-"https://bintray.com/artifact/download/pyroscope/rtorrent-ps/libtorrent-$LT_VERSION.tar.gz"
-"https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION.tar.gz"
+"https://rtorrent.net/downloads/libtorrent-$LT_VERSION.tar.gz"
+"https://rtorrent.net/downloads/rtorrent-$RT_VERSION.tar.gz"
 )
 
 BUILD_CMD_DEPS=$(cat <<.
@@ -565,14 +575,14 @@ extend() { ## Rebuild and install libtorrent and rTorrent with patches applied
         test ! -e "$backport" || { bold "$(basename $backport)"; patch -uNp1 -i "$backport"; }
     done
 
-    bold "pyroscope.patch"
-    patch -uNp1 -i "$SRC_DIR/patches/pyroscope.patch"
+    bold "pyroscope_${RT_VERSION}.patch"
+    patch -uNp1 -i "$SRC_DIR/patches/pyroscope_${RT_VERSION}.patch"
     for i in "$SRC_DIR"/patches/*.{cc,h}; do
         ln -nfs $i src
     done
 
-    bold "ui_pyroscope.patch"
-    patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope.patch"
+    bold "ui_pyroscope_${RT_VERSION}.patch"
+    patch -uNp1 -i "${SRC_DIR}/patches/ui_pyroscope_${RT_VERSION}.patch"
 
     $SED_I 's/rTorrent \" VERSION/rTorrent'"$VERSION_EXTRAS"' " VERSION/' src/ui/download_list.cc
     popd

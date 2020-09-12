@@ -45,7 +45,11 @@ python -c 'print u"\u22c5 \u22c5\u22c5 \u201d \u2019 \u266f \u2622 \u260d \u2318
 
 // In 0.9.x this changed to 'tr1', see https://stackoverflow.com/a/4682954/2748717
 // "C++ Technical Report 1" was later added to "C++11", using tr1 makes stuff compile on older GCC
+#if RT_HEX_VERSION <= 0x000906
 #define _cxxstd_ tr1
+#else
+#define _cxxstd_ std
+#endif
 
 #define D_INFO(item) (item->info())
 #include "rpc/object_storage.h"
@@ -898,7 +902,12 @@ bool ui_pyroscope_download_list_redraw(Window* window, display::Canvas* canvas, 
         char* last = buffer + canvas->width() + 1;
 
         pos = canvas->height() - 2 - network_history_lines;
+#if RT_HEX_VERSION <= 0x000906
         print_download_info(buffer, last, *view->focus());
+#else
+        // Use the full rather than compact info in 0.9.7+
+        print_download_info_full(buffer, last, *view->focus());
+#endif
         canvas->print(3, pos, "%s", buffer);
         canvas->set_attr(0, pos, -1, attr_map[ps::COL_LABEL], ps::COL_LABEL);
         print_download_status(buffer, last, *view->focus());
