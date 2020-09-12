@@ -49,7 +49,12 @@
 
 // In 0.9.x this changed to 'tr1' (dropping sigc::bind), see https://stackoverflow.com/a/4682954/2748717
 // "C++ Technical Report 1" was later added to "C++11", using tr1 makes stuff compile on older GCC
+#if RT_HEX_VERSION <= 0x000906
 #define _cxxstd_ tr1
+#else
+#define _cxxstd_ std
+#endif
+
 
 // List of system capabilities for `system.has` command
 static std::set<std::string> system_capabilities;
@@ -59,9 +64,6 @@ namespace core {
 int log_messages_fd = -1;
 };
 
-
-#if RT_HEX_VERSION <= 0x000906
-// will be merged into 0.9.7+ mainline!
 
 namespace torrent {
 
@@ -137,7 +139,6 @@ int uniform_rng::rand_range(int lo, int hi)
 
 }; // namespace torrent
 
-
 static torrent::uniform_rng system_random_gen;
 
 /*  @DOC
@@ -173,7 +174,6 @@ torrent::Object apply_random(rpc::target_type target, const torrent::Object::lis
 
 // #else
 // #include "torrent/utils/uniform_rng.h"
-#endif
 
 
 // return the "main" tracker for this download item
@@ -251,6 +251,7 @@ int64_t get_active_tracker_scrape_info(const int operation, torrent::Download* i
 }
 
 
+#if RT_HEX_VERSION <= 0x000907
 /*  @DOC
     `compare = <order>, <sort_key>=[, ...]`
 
@@ -321,6 +322,7 @@ torrent::Object apply_compare(rpc::target_type target, const torrent::Object::li
     // if all else is equal, ensure stable sort order based on memory location
     return (int64_t) (target.second < target.third);
 }
+#endif
 
 
 static std::map<int, std::string> bound_commands[ui::DownloadList::DISPLAY_MAX_SIZE];
@@ -504,7 +506,7 @@ torrent::Object cmd_do(rpc::target_type target, const torrent::Object& args) {
     return rpc::call_object(args, target);
 }
 
-
+#if RT_HEX_VERSION <= 0x000907
 torrent::Object retrieve_d_custom_if_z(core::Download* download, const torrent::Object::list_type& args) {
     torrent::Object::list_const_iterator itr = args.begin();
     if (itr == args.end())
@@ -521,6 +523,20 @@ torrent::Object retrieve_d_custom_if_z(core::Download* download, const torrent::
     } catch (torrent::bencode_error& e) {
         return itr->as_string();
     }
+}
+#endif
+
+
+torrent::Object cmd_d_custom_erase(core::Download* download, const torrent::Object::list_type& args) {
+    for (torrent::Object::list_type::const_iterator itr = args.begin(), last = args.end(); itr != last; itr++) {
+        const std::string& key = itr->as_string();
+        if (key.empty())
+            throw torrent::bencode_error("d.custom.erase: Empty key argument.");
+
+        download->bencode()->get_key("rtorrent").get_key("custom").erase_key(key);
+    }
+
+    return torrent::Object();
 }
 
 
@@ -550,19 +566,7 @@ torrent::Object cmd_d_custom_set_if_z(core::Download* download, const torrent::O
 }
 
 
-torrent::Object cmd_d_custom_erase(core::Download* download, const torrent::Object::list_type& args) {
-    for (torrent::Object::list_type::const_iterator itr = args.begin(), last = args.end(); itr != last; itr++) {
-        const std::string& key = itr->as_string();
-        if (key.empty())
-            throw torrent::bencode_error("d.custom.erase: Empty key argument.");
-
-        download->bencode()->get_key("rtorrent").get_key("custom").erase_key(key);
-    }
-
-    return torrent::Object();
-}
-
-
+#if RT_HEX_VERSION <= 0x000907
 torrent::Object retrieve_d_custom_map(core::Download* download, bool keys_only, const torrent::Object::list_type& args) {
     if (args.begin() != args.end())
         throw torrent::bencode_error("d.custom.keys/items takes no arguments.");
@@ -577,6 +581,7 @@ torrent::Object retrieve_d_custom_map(core::Download* download, bool keys_only, 
 
     return result;
 }
+#endif
 
 
 torrent::Object cmd_d_custom_toggle(core::Download* download, const std::string& key) {
@@ -616,7 +621,7 @@ torrent::Object retrieve_d_custom_as_value(core::Download* download, const std::
     }
 }
 
-
+#if RT_HEX_VERSION <= 0x000907
 torrent::Object
 d_multicall_filtered(const torrent::Object::list_type& args) {
   if (args.size() < 2)
@@ -652,7 +657,7 @@ d_multicall_filtered(const torrent::Object::list_type& args) {
 
   return resultRaw;
 }
-
+#endif
 
 /*  throttle.names=
 
@@ -1218,7 +1223,7 @@ inline std::vector<int64_t> as_vector(const torrent::Object::list_type& args) {
     return result;
 }
 
-
+#if RT_HEX_VERSION <= 0x000907
 int64_t apply_math_basic(const char* name, const std::function<int64_t(int64_t,int64_t)> op,
                          const torrent::Object::list_type& args) {
     int64_t val = 0, rhs = 0;
@@ -1309,7 +1314,7 @@ int64_t apply_arith_other(const char* op, const torrent::Object::list_type& args
         throw torrent::input_error("Wrong operation supplied to apply_arith_other.");
     }
 }
-
+#endif
 
 #if RT_HEX_VERSION <= 0x000906
 // https://github.com/rakshasa/rtorrent/commit/1f5e4d37d5229b63963bb66e76c07ec3e359ecba
@@ -1345,12 +1350,34 @@ void initialize_command_pyroscope() {
     // these are merged into 0.9.7+ mainline!
     CMD2_ANY_STRING("system.env", _cxxstd_::bind(&cmd_system_env, _cxxstd_::placeholders::_2));
     CMD2_ANY("ui.current_view", _cxxstd_::bind(&cmd_ui_current_view));
+    CMD2_DL("d.is_meta", _cxxstd_::bind(&torrent::DownloadInfo::is_meta_download,
+                                        _cxxstd_::bind(&core::Download::info, _cxxstd_::placeholders::_1)));
 #endif
 
 #if RT_HEX_VERSION <= 0x000907
-    // these are merged into 0.9.8+ mainline! (well, maybe, PRs are mostly ignored)
-    CMD2_ANY_LIST("system.random", &apply_random);
+    // these are merged into 0.9.8+ mainline!
     CMD2_ANY_LIST("d.multicall.filtered", _cxxstd_::bind(&d_multicall_filtered, _cxxstd_::placeholders::_2));
+    // math.* group
+    CMD2_ANY_LIST("math.add", std::bind(&apply_math_basic, "math.add", std::plus<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.sub", std::bind(&apply_math_basic, "math.sub", std::minus<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.mul", std::bind(&apply_math_basic, "math.mul", std::multiplies<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.div", std::bind(&apply_math_basic, "math.div", std::divides<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.mod", std::bind(&apply_math_basic, "math.mod", std::modulus<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.min", std::bind(&apply_arith_basic, std::less<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.max", std::bind(&apply_arith_basic, std::greater<int64_t>(), std::placeholders::_2));
+    CMD2_ANY_LIST("math.cnt", std::bind(&apply_arith_count, std::placeholders::_2));
+    CMD2_ANY_LIST("math.avg", std::bind(&apply_arith_other, "average", std::placeholders::_2));
+    CMD2_ANY_LIST("math.med", std::bind(&apply_arith_other, "median", std::placeholders::_2));
+    // d.custom.* extensions
+    CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,
+                                                 _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.keys", _cxxstd_::bind(&retrieve_d_custom_map,
+                                                 _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
+    CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
+                                                 _cxxstd_::placeholders::_1, false, _cxxstd_::placeholders::_2));
+    // Misc commands
+    CMD2_ANY_LIST("value", &cmd_value);
+    CMD2_ANY_LIST("compare", &apply_compare);
 #endif
 
     // string.* group
@@ -1375,18 +1402,6 @@ void initialize_command_pyroscope() {
     // array.* group
     CMD2_ANY_LIST("array.at", &cmd_array_at);
 
-    // math.* group
-    CMD2_ANY_LIST("math.add", std::bind(&apply_math_basic, "math.add", std::plus<int64_t>(), std::placeholders::_2));
-    CMD2_ANY_LIST("math.sub", std::bind(&apply_math_basic, "math.sub", std::minus<int64_t>(), std::placeholders::_2));
-    CMD2_ANY_LIST("math.mul", std::bind(&apply_math_basic, "math.mul", std::multiplies<int64_t>(), std::placeholders::_2));
-    CMD2_ANY_LIST("math.div", std::bind(&apply_math_basic, "math.div", std::divides<int64_t>(), std::placeholders::_2));
-    CMD2_ANY_LIST("math.mod", std::bind(&apply_math_basic, "math.mod", std::modulus<int64_t>(), std::placeholders::_2));
-    CMD2_ANY_LIST("math.min", std::bind(&apply_arith_basic, std::less<int64_t>(), std::placeholders::_2));
-    CMD2_ANY_LIST("math.max", std::bind(&apply_arith_basic, std::greater<int64_t>(), std::placeholders::_2));
-    CMD2_ANY_LIST("math.cnt", std::bind(&apply_arith_count, std::placeholders::_2));
-    CMD2_ANY_LIST("math.avg", std::bind(&apply_arith_other, "average", std::placeholders::_2));
-    CMD2_ANY_LIST("math.med", std::bind(&apply_arith_other, "median", std::placeholders::_2));
-
     // ui.focus.* – quick paging
     CMD2_ANY("ui.focus.home", _cxxstd_::bind(&cmd_ui_focus_home));
     CMD2_ANY("ui.focus.end", _cxxstd_::bind(&cmd_ui_focus_end));
@@ -1402,24 +1417,16 @@ void initialize_command_pyroscope() {
     CMD2_ANY("system.client_version.as_value", _cxxstd_::bind(&cmd_system_client_version_as_value));
 
     // d.custom.* extensions
-    CMD2_DL_LIST("d.custom.if_z", _cxxstd_::bind(&retrieve_d_custom_if_z,
-                                                 _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
     CMD2_DL_LIST("d.custom.set_if_z", _cxxstd_::bind(&cmd_d_custom_set_if_z,
                                                      _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
     CMD2_DL_LIST("d.custom.erase", _cxxstd_::bind(&cmd_d_custom_erase,
                                                   _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
-    CMD2_DL_LIST("d.custom.keys", _cxxstd_::bind(&retrieve_d_custom_map,
-                                                 _cxxstd_::placeholders::_1, true, _cxxstd_::placeholders::_2));
-    CMD2_DL_LIST("d.custom.items", _cxxstd_::bind(&retrieve_d_custom_map,
-                                                 _cxxstd_::placeholders::_1, false, _cxxstd_::placeholders::_2));
     CMD2_DL_STRING("d.custom.toggle",  _cxxstd_::bind(&cmd_d_custom_toggle,
                                                       _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
     CMD2_DL_STRING("d.custom.as_value",  _cxxstd_::bind(&retrieve_d_custom_as_value,
                                                         _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
 
     // Misc commands
-    CMD2_ANY_LIST("value", &cmd_value);
-    CMD2_ANY_LIST("compare", &apply_compare);
     CMD2_ANY("ui.bind_key", &apply_ui_bind_key);
     CMD2_VAR_VALUE("ui.bind_key.verbose", 1);
     CMD2_ANY("throttle.names", _cxxstd_::bind(&cmd_throttle_names));
@@ -1431,8 +1438,7 @@ void initialize_command_pyroscope() {
     CMD2_ANY_STRING("log.messages", _cxxstd_::bind(&cmd_log_messages, _cxxstd_::placeholders::_2));
     CMD2_ANY_P("import.return", &cmd_import_return);
     CMD2_ANY("do", _cxxstd_::bind(&cmd_do, _cxxstd_::placeholders::_1, _cxxstd_::placeholders::_2));
-    CMD2_DL("d.is_meta", _cxxstd_::bind(&torrent::DownloadInfo::is_meta_download,
-                                        _cxxstd_::bind(&core::Download::info, _cxxstd_::placeholders::_1)));
+    CMD2_ANY_LIST("system.random", &apply_random);
 
     // List capabilities of this build
     add_capability("system.has");         // self
