@@ -38,6 +38,9 @@
 # Note that patches are only tested for the current stable release,
 # so older versions might get regressions over time (failing patches).
 
+# Manifest constants
+BINARY_REPO="https://github.com/pyroscope/rtorrent-ps/releases/download/PS-1.1"
+
 # Get git metadata
 if test ! -d .git -a -f docker-env; then
     . docker-env
@@ -285,7 +288,7 @@ XMLRPC_SVN=true
 case $XMLRPC_REV in
     2954|2917|2775|2626|2366)
         # XMLRPC_REV=2954; tar -cvz --exclude .svn -f xmlrpc-c-advanced-$XMLRPC_REV-src.tgz xmlrpc-c-advanced-$XMLRPC_REV
-        TARBALLS+=( "https://bintray.com/artifact/download/pyroscope/rtorrent-ps/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz" )
+        TARBALLS+=( "$BINARY_REPO/xmlrpc-c-advanced-$XMLRPC_REV-src.tgz" )
         XMLRPC_SVN=false
         ;;
 esac
@@ -295,8 +298,8 @@ esac
 #   http://pkgs.fedoraproject.org/repo/pkgs/libtorrent/
 #   http://pkgs.fedoraproject.org/repo/pkgs/rtorrent/
 TARBALLS+=(
-"https://bintray.com/artifact/download/pyroscope/rtorrent-ps/libtorrent-$LT_VERSION.tar.gz"
-"https://bintray.com/artifact/download/pyroscope/rtorrent-ps/rtorrent-$RT_VERSION.tar.gz"
+"$BINARY_REPO/libtorrent-$LT_VERSION.tar.gz"
+"$BINARY_REPO/rtorrent-$RT_VERSION.tar.gz"
 )
 
 BUILD_CMD_DEPS=$(cat <<.
