@@ -124,13 +124,6 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         ;;
     *-stretch|Fedora-TwentySix)
         ;;
-    *-n/a)
-        if grep 'buster' /etc/os-release >/dev/null; then
-            BUILD_PKG_DEPS+=( gcc-7 g++-7 )
-            export CC=gcc-7 CXX=g++-7
-            deb_codename="buster"
-        fi
-        ;;
     *-buster)
         BUILD_PKG_DEPS+=( gcc-7 g++-7 )
         export CC=gcc-7 CXX=g++-7
@@ -144,6 +137,13 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         BUILD_PKG_DEPS=( ncurses openssl cppunit )
         source /etc/makepkg.conf 2>/dev/null
         MAKE_OPTS="${MAKEFLAGS}${MAKE_OPTS:+ }${MAKE_OPTS}"
+        ;;
+    *-n/a)
+        if grep 'buster' /etc/os-release >/dev/null; then
+            BUILD_PKG_DEPS+=( gcc-7 g++-7 )
+            export CC=gcc-7 CXX=g++-7
+            deb_codename="buster"
+        fi
         ;;
     NonLSB)
         # Place tests for MacOSX etc. here
