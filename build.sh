@@ -92,6 +92,7 @@ BUILD_PKG_DEPS=( libncurses5-dev libncursesw5-dev libssl-dev zlib1g-dev libcppun
 #export XMLRPC_REV=2917      # Release 1.48.00 2016-12-27
 export CARES_VERSION=1.14.0 # 2018-02
 export CURL_VERSION=7.61.0  # 2018-07
+#export CURL_VERSION=7.65.3  # reported to be fine
 export XMLRPC_REV=2954      # Release 1.49.02 2017-09
 
 # Extra options handling (set overridable defaults)
