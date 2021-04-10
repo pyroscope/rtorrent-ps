@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 #
-# Run an EMPHEMERAL rTorrent-PS instance in a Stretch container, like this:
+# Run an EMPHEMERAL rTorrent-PS instance in a Bionic container, like this:
 #
 #   git clone "https://github.com/pyroscope/rtorrent-ps.git" ~/src/rtorrent-ps
 #   ~/src/rtorrent-ps/docker/launch-on-stretch.sh
@@ -18,11 +18,11 @@
 
 set -e
 
-# Both Stretch and Bionic have problems with the current v1.1 column headers
 #distro="debian:stretch"
 distro="ubuntu:bionic"
 #distro="ubuntu:xenial"
 rtps_version="0.9.6-PS-1.1-25-g1b53ac9~${distro#*:}"
+# TODO: switch from BinTray downloads to GitHub!
 
 ALREADY_IN_TMUX=${2:-0}
 
