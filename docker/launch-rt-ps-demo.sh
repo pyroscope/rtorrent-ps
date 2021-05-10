@@ -3,7 +3,7 @@
 # Run an EMPHEMERAL rTorrent-PS instance in a Bionic container, like this:
 #
 #   git clone "https://github.com/pyroscope/rtorrent-ps.git" ~/src/rtorrent-ps
-#   ~/src/rtorrent-ps/docker/launch-on-stretch.sh
+#   ~/src/rtorrent-ps/docker/launch-rt-ps-demo.sh
 #
 # Incidentally, this is also a condensed version of…
 #
@@ -18,11 +18,11 @@
 
 set -e
 
-#distro="debian:stretch"
+#distro="debian:buster"
 distro="ubuntu:bionic"
-#distro="ubuntu:xenial"
-rtps_version="0.9.6-PS-1.1-25-g1b53ac9~${distro#*:}"
-# TODO: switch from BinTray downloads to GitHub!
+#distro="ubuntu:focal"
+rtps_version="0.9.6-PS-1.1-66-gbac90aa.${distro#*:}"
+rtps_download="https://github.com/pyroscope/rtorrent-ps/releases/download/PS-1.1/rtorrent-ps_${rtps_version}_amd64.deb"
 
 ALREADY_IN_TMUX=${2:-0}
 
@@ -37,10 +37,12 @@ as-root)
     locale-gen
 
     # Install rT-PS
-    echo >/etc/apt/sources.list.d/rtps.list \
-         "deb [trusted=yes] https://dl.bintray.com/pyroscope/rtorrent-ps /"
-    apt update -qq
-    apt install -y rtorrent-ps=$rtps_version
+    #echo >/etc/apt/sources.list.d/rtps.list \
+    #     "deb [trusted=yes] https://dl.bintray.com/pyroscope/rtorrent-ps /"
+    #apt update -qq
+    #apt install -y rtorrent-ps=$rtps_version
+    curl -L -o "/tmp/${rtps_download##*/}" "${rtps_download}"
+    dpkg -i "/tmp/${rtps_download##*/}"
     ln -s /opt/rtorrent/bin/rtorrent /usr/local/bin
     rtorrent -h | head -n1
 
