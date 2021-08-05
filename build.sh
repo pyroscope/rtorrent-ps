@@ -125,14 +125,9 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         ;;
     *-stretch|Fedora-TwentySix)
         ;;
-    *-buster)
+    *-buster|*-bullseye|*-hirsute)
         BUILD_PKG_DEPS+=( gcc-7 g++-7 )
         export CC=gcc-7 CXX=g++-7
-        ;;
-    *-bullseye)
-        # Still fails with a compilation error!
-        BUILD_PKG_DEPS+=( gcc-8 g++-8 )
-        export CC=gcc-8 CXX=g++-8
         ;;
     Arch-*) # 0.9.[46] only!
         BUILD_PKG_DEPS=( ncurses openssl cppunit )
@@ -140,10 +135,10 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
         MAKE_OPTS="${MAKEFLAGS}${MAKE_OPTS:+ }${MAKE_OPTS}"
         ;;
     *-n/a)
-        if grep 'buster' /etc/os-release >/dev/null; then
+        if egrep 'bullseye' /etc/os-release >/dev/null; then
             BUILD_PKG_DEPS+=( gcc-7 g++-7 )
             export CC=gcc-7 CXX=g++-7
-            deb_codename="buster"
+            deb_codename="bullseye"
         fi
         ;;
     NonLSB)

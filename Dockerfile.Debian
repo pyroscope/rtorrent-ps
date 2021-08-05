@@ -21,7 +21,7 @@ RUN echo 'Acquire::http::Timeout "90";' >/etc/apt/apt.conf.d/90docker.conf \
         subversion git time tmux curl wget ruby-dev \
         libssl-dev zlib1g-dev libncurses-dev libncursesw5-dev \
         libreadline-dev libcppunit-dev autoconf automake libtool \
-    && if grep -m1 buster /etc/os-release >/dev/null; then apt-get install -qy gcc-7 g++-7; fi \
+    && if egrep -m1 'buster|bullseye|hirsute' /etc/os-release >/dev/null; then apt-get install -qy gcc-7 g++-7; fi \
     && rm -rf /var/lib/apt/lists/*
 RUN echo "en_US.UTF-8 UTF-8" >/etc/locale.gen \
     && locale-gen --lang en_US.UTF-8
