@@ -65,20 +65,21 @@ fi
 
 # List of platforms to build DEBs for with "docker_deb all|stable|oldstable"
 docker_distros_stable=(
-    debian:stretch
-    ubuntu:bionic
+    debian:bullseye
     ubuntu:focal
 )
 docker_distros_oldstable=(
-    debian:jessie
-    ubuntu:xenial
+    debian:buster
+    ubuntu:bionic
 )
 docker_distros_all=()
 docker_distros_all+=( "${docker_distros_stable[@]}" )
 docker_distros_all+=( "${docker_distros_oldstable[@]}" )
 docker_distros_all+=(
+    debian:stretch
+    debian:jessie
     debian:wheezy
-    debian:buster
+    ubuntu:xenial
     ubuntu:trusty
     ubuntu:precise
 )
