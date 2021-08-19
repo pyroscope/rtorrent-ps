@@ -638,3 +638,11 @@ and :doc:`setup` for providing the necessary configuration regarding your termin
 
 .. _custom configuration: https://github.com/pyroscope/pimp-my-box/blob/master/roles/rtorrent-ps/files/dotfiles/tmux.conf
 .. _`rTorrent wiki`: https://github.com/rakshasa/rtorrent/wiki/Common-Tasks-in-rTorrent#starting-rtorrent-on-system-startup
+
+If you would prefer to manually start rtorrent-ps, you may want to consider creating an alias to help starting the script.
+
+.. code-block:: shell
+
+    # This will allow the user to start the program (and tmux session and window) by only typing rt-ps
+    echo -e 'alias rt-ps=\x27tmux -2u new -n rT-PS -s rtorrent "~/rtorrent/start; exec bash"\x27' >> ~/.bashrc
+    source ~/.bashrc
