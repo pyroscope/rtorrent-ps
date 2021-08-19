@@ -491,10 +491,19 @@ static void decorate_download_title(Window* window, display::Canvas* canvas, cor
 }
 
 
+// get progress ratio for the download
+static int get_progress_ratio(torrent::Download* download) {
+    uint32_t completed_chunks = download->file_list()->completed_chunks();
+    uint32_t total_chunks = download->file_list()->size_chunks();
+    // avoid potential multiplication overflow
+    return (int) (((uint64_t) completed_chunks) * 1000 / total_chunks);
+}
+
 // show ratio progress by color (ratio is scaled x1000)
-static int ratio_color(int ratio) {
+static int ratio_color(int64_t ratio) {
     int rcol = sizeof(ratio_col) / sizeof(*ratio_col) - 1;
-    return ratio_col[std::min(rcol, std::max(0, ratio) * rcol / 1200)];
+    int ratio_clamped = std::min<int64_t>(std::max<int64_t>(0, ratio), 1200);
+    return ratio_col[ratio_clamped * rcol / 1200];
 }
 
 
@@ -516,7 +525,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
 
     // better handling for trail of line 2 (ratio etc.)
     int status_pos = 91;
-    int ratio = rpc::call_command_value("d.ratio", rpc::make_target(*range.first));
+    int64_t ratio = rpc::call_command_value("d.ratio", rpc::make_target(*range.first));
 
     if (status_pos < int(canvas->width())) {
         canvas->print(status_pos, pos+1, "R:%6.2f [%c%c] %-4.4s  ",
@@ -565,7 +574,7 @@ void ui_pyroscope_download_list_redraw_item(Window* window, display::Canvas* can
     }
 
     // apply progress color to completion indicator
-    int pcol = ratio_color(item->file_list()->completed_chunks() * 1000 / item->file_list()->size_chunks());
+    int pcol = ratio_color(get_progress_ratio(item));
     canvas->set_attr(76, pos+1, 3, attr_map[pcol + offset], pcol + offset);
 
     // show ratio progress by color
@@ -764,8 +773,7 @@ int render_columns(bool headers, bool narrow, rpc::target_type target, core::Dow
                                 attr_idx = ratio_color(rpc::call_command_value("d.ratio", target));
                                 break;
                             case ps::COL_PROGRESS:
-                                attr_idx = ratio_color(item->file_list()->completed_chunks() * 1000 /
-                                                       item->file_list()->size_chunks());
+                                attr_idx = ratio_color(get_progress_ratio(item->download()));
                                 break;
                             case ps::COL_ALERT:  // COL_ALARM is the actual color, this is the dynamic one
                                 bool has_alert = !item->message().empty()
