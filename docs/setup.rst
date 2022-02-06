@@ -315,8 +315,7 @@ Similarly, execute this in a shell prompt:
     free -m | head -n2; uptime; \
     strings $(which rtorrent) | grep "client version"; \
     ldd $(which rtorrent) | egrep "lib(torrent|curses|curl|xmlrpc.so|cares|ssl|crypto)"; \
-    ps auxw | egrep "USER|rtorrent" | grep -v grep
-
+    ps auxw | egrep "USER|rtorrent" | grep -v grep | grep -v \\.rtorrent\\.rc
 
 Common Problems & Solutions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
