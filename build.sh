@@ -465,6 +465,7 @@ build_deps() {
 
     ( cd xmlrpc-c-advanced-$XMLRPC_REV \
         && $SED_I s:PGROGRAMDESTDIR:PROGRAMDESTDIR: common.mk \
+        && cp /usr/share/automake-*/config.guess config.guess \
         && ./configure --prefix=$INSTALL_DIR --with-libwww-ssl \
             --disable-wininet-client --disable-curl-client --disable-libwww-client --disable-abyss-server --disable-cgi-server \
         && $MAKE $MAKE_OPTS && $MAKE DESTDIR=$INSTALL_DIR prefix= install \
