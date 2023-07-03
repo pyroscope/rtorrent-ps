@@ -112,7 +112,7 @@ export SRC_DIR=$(cd $(dirname $0) && pwd)
 LT_PATCHES=( )
 RT_PATCHES=( )
 LT_BASE_PATCHES=( $SRC_DIR/patches/lt-base-cppunit-pkgconfig.patch $SRC_DIR/patches/lt-base-c11-fixes.patch )
-RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch )
+RT_BASE_PATCHES=( $SRC_DIR/patches/rt-base-cppunit-pkgconfig.patch $SRC_DIR/patches/rt-base-c11-fixes.patch )
 
 # Distro specifics
 ##lsb_release -sic
@@ -156,8 +156,8 @@ case $(echo -n "$(lsb_release -sic 2>/dev/null || echo NonLSB)" | tr ' \n' '-') 
 esac
 
 # OpenSSL version detection for selective patching
-case $(openssl version 2> /dev/null | egrep -o "1.[0-9].[0-9]+") in
-    1.1.*)
+case $(openssl version 2> /dev/null | egrep -o "[1,3].[0-9].[0-9]+") in
+    1.1.*|3.0.*|3.1.*)
         LT_BASE_PATCHES+=( $SRC_DIR/patches/lt-open-ssl-1.1.patch )
         ;;
 esac
@@ -176,6 +176,7 @@ esac
 #   xenial  (16.04) 5.3.1
 #   bionic  (18.04) 7.3.0
 #   focal   (20.04) 9.3.0
+#   jammy   (22.04) 11.3.0
 #
 # Try this when you get configure errors regarding xmlrpc-c
 # ... on a Intel PC type system with certain types of CPUs:

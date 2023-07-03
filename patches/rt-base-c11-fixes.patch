@@ -1,0 +1,12 @@
+diff --git a/src/display/window_file_list.cc b/src/display/window_file_list.cc
+index 7c9f692..b550490 100644
+--- a/src/display/window_file_list.cc
++++ b/src/display/window_file_list.cc
+@@ -36,6 +36,7 @@
+ 
+ #include "config.h"
+ 
++#include <locale>
+ #include <stdio.h>
+ #include <torrent/path.h>
+ #include <torrent/data/file.h>

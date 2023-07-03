@@ -35,7 +35,7 @@ index aa653d4..7ec1316 100644
 +
    m_dh = DH_new();
 +
-+#ifdef USE_OPENSSL_1_1
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 +  BIGNUM * const dh_p = BN_bin2bn(prime, primeLength, NULL);
 +  BIGNUM * const dh_g = BN_bin2bn(generator, generatorLength, NULL);
 +
@@ -59,7 +59,7 @@ index aa653d4..7ec1316 100644
 +  if (m_dh == NULL)
 +    return false;
 +
-+#ifdef USE_OPENSSL_1_1
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 +  const BIGNUM *pub_key;
 +
 +  DH_get0_key(m_dh, &pub_key, NULL);
@@ -80,7 +80,7 @@ index aa653d4..7ec1316 100644
 -    BN_bn2bin(m_dh->pub_key, dest + length - BN_num_bytes(m_dh->pub_key));
 +  const BIGNUM *pub_key;
 +
-+#ifdef USE_OPENSSL_1_1
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 +  DH_get0_key(m_dh, &pub_key, NULL);
 +#else
 +  pub_key = m_dh->pub_key;
